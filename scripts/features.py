@@ -129,3 +129,29 @@ for f in isl['features']:
     inset_land.append(ring_d(ring))
 add_point('peaks:teide', 0, 0, inset_xy=iproj(-16.642, 28.272)); items['peaks:teide']['inset'] = 1
 out['inset'] = {'x': IX, 'y': IY, 'w': IW, 'h': IH, 'land': ''.join(inset_land), 'label': 'Islas Canarias'}
+
+# ---------------------------------------------------------------- clue data for the "Conexiones" questions
+PLACES = {  # id: (name, lon, lat)
+ 'toledo': ('Toledo', -4.02, 39.86), 'zaragoza': ('Zaragoza', -0.88, 41.65), 'cordoba': ('Córdoba', -4.78, 37.89), 'sevilla': ('Sevilla', -5.98, 37.39),
+ 'valencia': ('Valencia', -0.38, 39.47), 'murcia': ('Murcia', -1.13, 37.98), 'bilbao': ('Bilbao', -2.93, 43.26), 'oviedo': ('Oviedo', -5.85, 43.36),
+ 'merida': ('Mérida', -6.34, 38.92), 'badajoz': ('Badajoz', -6.97, 38.88), 'barcelona': ('Barcelona', 2.17, 41.39), 'soria': ('Soria', -2.47, 41.76),
+ 'zamora': ('Zamora', -5.75, 41.50), 'oporto': ('Oporto', -8.61, 41.15), 'cuenca': ('Cuenca', -2.13, 40.07), 'lugo': ('Lugo', -7.56, 43.01),
+ 'ourense': ('Ourense', -7.86, 42.34), 'lisboa': ('Lisboa', -9.14, 38.72), 'tarragona': ('Tarragona', 1.25, 41.12), 'irun': ('Irún', -1.79, 43.34),
+ 'madrid': ('Madrid', -3.70, 40.42), 'avila': ('Ávila', -4.70, 40.66), 'segovia': ('Segovia', -4.12, 40.95), 'granada': ('Granada', -3.60, 37.18),
+ 'teruel': ('Teruel', -1.11, 40.34), 'palma': ('Palma', 2.65, 39.57), 'huelva': ('Huelva', -6.95, 37.26), 'cadiz': ('Cádiz', -6.29, 36.53),
+ 'almeria': ('Almería', -2.46, 36.84), 'cartagena': ('Cartagena', -0.99, 37.60), 'alicante': ('Alicante', -0.48, 38.35), 'girona': ('Girona', 2.82, 41.98),
+ 'pamplona': ('Pamplona', -1.64, 42.82), 'a_coruna': ('A Coruña', -8.41, 43.37), 'santander': ('Santander', -3.80, 43.46), 'leon': ('León', -5.57, 42.60),
+ 'ciudad_real': ('Ciudad Real', -3.93, 38.99), 'sc_tenerife': ('Santa Cruz de Tenerife', -16.25, 28.47), 'palma_canarias': ('Santa Cruz de La Palma', -17.76, 28.68),
+}
+out['places'] = {}
+for pid, (nm, lon, lat) in PLACES.items():
+    x, y = iproj(lon, lat) if lon < -12 else P((lon, lat))
+    out['places'][pid] = {'name': nm, 'x': round(x, 1), 'y': round(y, 1)}
+REGION_IDS = {'Andalucía': 'andalucia', 'Aragón': 'aragon', 'Principado de Asturias': 'asturias', 'Illes Balears': 'baleares', 'Cantabria': 'cantabria',
+              'Comunidad de Madrid': 'madrid', 'Castilla y León': 'castilla_leon', 'Región de Murcia': 'murcia', 'Castilla-La Mancha': 'castilla_la_mancha',
+              'Cataluña/Catalunya': 'cataluna', 'Extremadura': 'extremadura', 'Galicia': 'galicia', 'Comunidad Foral de Navarra': 'navarra',
+              'País Vasco/Euskadi': 'pais_vasco', 'La Rioja': 'la_rioja', 'Comunitat Valenciana': 'valenciana'}
+out['areas'] = {REGION_IDS[f['properties']['name']]: poly_path(f['geometry'], 0.5) for f in regions['features'] if f['properties']['name'] in REGION_IDS}
+for f in land['features']:
+    if f['properties']['kind'] == 'france': out['areas']['francia'] = poly_path(f['geometry'], 0.6)
+    if f['properties']['kind'] == 'portugal': out['areas']['portugal'] = poly_path(f['geometry'], 0.6)

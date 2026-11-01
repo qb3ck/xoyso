@@ -150,6 +150,68 @@ TOPICS.push(
   },
 );
 
+// "Conexiones": multiple-choice questions linking features to places and regions, asked on a blank map.
+// Q(id, topic, answer item id, [question es, en], clue places, clue regions, optional extra hint [es, en])
+// After a wrong answer the map shows the clue (places/regions), then the shape of the answer, then reveals it.
+const Q = (id, topic, answer, q, places = [], areas = [], hint = null) => ({ id, topic, answer, q, places, areas, hint });
+export const CONNECTIONS = [
+  Q('tajo_toledo', 'rivers', 'tajo', ['¿Qué río pasa por Toledo?', 'Which river flows through Toledo?'], ['toledo']),
+  Q('ebro_zaragoza', 'rivers', 'ebro', ['¿Qué río pasa por Zaragoza?', 'Which river flows through Zaragoza?'], ['zaragoza']),
+  Q('guadalquivir_sevilla', 'rivers', 'guadalquivir', ['¿Qué río pasa por Córdoba y Sevilla?', 'Which river flows through Córdoba and Sevilla?'], ['cordoba', 'sevilla']),
+  Q('turia_valencia', 'rivers', 'turia', ['¿Qué río atraviesa la ciudad de Valencia?', 'Which river runs through the city of Valencia?'], ['valencia']),
+  Q('segura_murcia', 'rivers', 'segura', ['¿Qué río pasa por Murcia?', 'Which river flows through Murcia?'], ['murcia']),
+  Q('nervion_bilbao', 'rivers', 'nervion', ['¿Qué río pasa por Bilbao?', 'Which river flows through Bilbao?'], ['bilbao']),
+  Q('nalon_oviedo', 'rivers', 'nalon', ['¿Qué río pasa cerca de Oviedo?', 'Which river flows near Oviedo?'], ['oviedo']),
+  Q('guadiana_badajoz', 'rivers', 'guadiana', ['¿Qué río pasa por Mérida y Badajoz?', 'Which river flows through Mérida and Badajoz?'], ['merida', 'badajoz']),
+  Q('llobregat_barcelona', 'rivers', 'llobregat', ['¿Qué río desemboca justo al sur de Barcelona?', 'Which river reaches the sea just south of Barcelona?'], ['barcelona']),
+  Q('duero_zamora', 'rivers', 'duero', ['¿Qué río pasa por Soria y Zamora y acaba en Oporto?', 'Which river flows through Soria and Zamora and ends at Porto?'], ['soria', 'zamora', 'oporto']),
+  Q('jucar_cuenca', 'rivers', 'jucar', ['¿Qué río pasa por Cuenca y llega al mar al sur de Valencia?', 'Which river passes Cuenca and reaches the sea south of Valencia?'], ['cuenca', 'valencia']),
+  Q('mino_ourense', 'rivers', 'mino', ['¿Qué río pasa por Lugo y Ourense, en Galicia?', 'Which river flows through Lugo and Ourense, in Galicia?'], ['lugo', 'ourense']),
+  Q('tajo_lisboa', 'rivers', 'tajo', ['¿Qué río desemboca en Lisboa?', 'Which river reaches the sea at Lisbon?'], ['lisboa']),
+  Q('ebro_delta', 'rivers', 'ebro', ['¿Qué río forma un delta junto a Tarragona?', 'Which river forms a delta near Tarragona?'], ['tarragona']),
+  Q('bidasoa_irun', 'rivers', 'bidasoa', ['¿Qué río hace de frontera con Francia en Irún?', 'Which river forms the border with France at Irún?'], ['irun']),
+  Q('navia_galicia', 'rivers', 'navia', ['¿Qué río nace en Galicia y desemboca en Asturias?', 'Which river rises in Galicia and reaches the sea in Asturias?'], [], ['galicia', 'asturias']),
+  Q('pirineos_francia', 'relief', 'pirineos', ['¿Qué cordillera separa España de Francia?', 'Which mountain range separates Spain from France?'], ['pamplona', 'girona'], ['francia']),
+  Q('betico_granada', 'relief', 'sistema_betico', ['¿Qué sistema montañoso está en Granada y Almería, en el sur?', 'Which mountain system is in Granada and Almería, in the south?'], ['granada', 'almeria']),
+  Q('costero_cataluna', 'relief', 'sistema_costero_catalan', ['¿Qué sistema montañoso está pegado a la costa de Cataluña?', 'Which mountain system hugs the coast of Catalonia?'], ['barcelona'], ['cataluna']),
+  Q('central_madrid', 'relief', 'sistema_central', ['¿Qué sistema montañoso está al norte de Madrid, con Ávila y Segovia?', 'Which mountain system lies north of Madrid, by Ávila and Segovia?'], ['madrid', 'avila', 'segovia']),
+  Q('morena_cordoba', 'relief', 'sierra_morena', ['¿Qué sierra está justo al norte de Córdoba?', 'Which range lies just north of Córdoba?'], ['cordoba', 'ciudad_real']),
+  Q('cantabrica_asturias', 'relief', 'cordillera_cantabrica', ['¿Qué cordillera cruza Asturias y Cantabria, junto al mar?', 'Which range runs through Asturias and Cantabria, beside the sea?'], ['oviedo', 'santander', 'leon'], ['asturias', 'cantabria']),
+  Q('iberico_soria', 'relief', 'sistema_iberico', ['¿Qué sistema montañoso pasa por Soria y Teruel?', 'Which mountain system passes Soria and Teruel?'], ['soria', 'teruel']),
+  Q('galaico_galicia', 'relief', 'macizo_galaico', ['¿Qué macizo antiguo está en Galicia?', 'Which ancient massif is in Galicia?'], ['ourense', 'lugo'], ['galicia']),
+  Q('meseta_madrid', 'relief', 'meseta_central', ['¿Qué gran llanura alta rodea a Madrid y Toledo?', 'Which big high plain surrounds Madrid and Toledo?'], ['madrid', 'toledo']),
+  Q('ebro_zaragoza_dep', 'relief', 'depresion_del_ebro', ['¿Qué depresión rodea a Zaragoza?', 'Which depression surrounds Zaragoza?'], ['zaragoza']),
+  Q('guad_sevilla_dep', 'relief', 'depresion_del_guadalquivir', ['¿Qué depresión rodea a Sevilla y Córdoba?', 'Which depression surrounds Sevilla and Córdoba?'], ['sevilla', 'cordoba']),
+  Q('toledo_montes', 'relief', 'montes_de_toledo', ['¿Qué montes están justo al sur de Toledo?', 'Which hills lie just south of Toledo?'], ['toledo', 'ciudad_real']),
+  Q('tramuntana_mallorca', 'relief', 'sierra_de_tramuntana', ['¿Qué sierra está en el norte de Mallorca?', 'Which range is in the north of Mallorca?'], ['palma'], ['baleares']),
+  Q('vascos_pais_vasco', 'relief', 'montes_vascos', ['¿Qué montes están en el País Vasco?', 'Which hills are in the Basque Country?'], ['bilbao'], ['pais_vasco']),
+  Q('teide_canarias', 'peaks', 'teide', ['¿Qué montaña de Tenerife es la más alta de España?', 'Which mountain on Tenerife is the highest in Spain?'], ['sc_tenerife']),
+  Q('aneto_pirineos', 'peaks', 'aneto', ['¿Qué pico es el más alto de los Pirineos?', 'Which peak is the highest in the Pyrenees?'], ['pamplona', 'girona'], [], ['Está en Huesca (Aragón).', 'It is in Huesca (Aragón).']),
+  Q('mulhacen_granada', 'peaks', 'mulhacen', ['¿Qué pico de Sierra Nevada, cerca de Granada, es el más alto de la península?', 'Which Sierra Nevada peak, near Granada, is the highest on the peninsula?'], ['granada']),
+  Q('golfo_cadiz', 'gulfs', 'cadiz', ['¿Qué golfo está frente a Huelva y Cádiz, en el Atlántico?', 'Which gulf lies off Huelva and Cádiz, on the Atlantic?'], ['huelva', 'cadiz']),
+  Q('golfo_valencia', 'gulfs', 'valencia', ['¿Qué golfo baña la costa de la ciudad de Valencia?', 'Which gulf washes the coast by the city of Valencia?'], ['valencia']),
+  Q('golfo_almeria', 'gulfs', 'almeria', ['¿Qué golfo está frente a Almería?', 'Which gulf is off Almería?'], ['almeria']),
+  Q('golfo_leon', 'gulfs', 'leon', ['¿Qué golfo del Mediterráneo está frente a la costa sur de Francia?', 'Which Mediterranean gulf lies off the south coast of France?'], ['girona'], ['francia']),
+  Q('golfo_vizcaya', 'gulfs', 'vizcaya', ['¿Qué golfo baña el País Vasco y el oeste de Francia?', 'Which gulf washes the Basque Country and western France?'], ['bilbao'], ['pais_vasco', 'francia']),
+  Q('cabo_palos', 'capes', 'palos', ['¿Qué cabo está junto al Mar Menor, en Murcia?', 'Which cape is next to the Mar Menor, in Murcia?'], ['cartagena', 'murcia']),
+  Q('cabo_gata', 'capes', 'gata', ['¿Qué cabo de Almería es una zona volcánica y seca?', 'Which cape in Almería is a dry, volcanic area?'], ['almeria']),
+  Q('cabo_fisterra', 'capes', 'fisterra', ['¿Qué cabo gallego se llamó «el fin de la tierra»?', 'Which Galician cape was called «the end of the earth»?'], ['a_coruna'], ['galicia']),
+  Q('cabo_creus', 'capes', 'creus', ['¿Qué cabo de Girona es el punto más oriental de la península?', 'Which cape in Girona is the easternmost point of the peninsula?'], ['girona'], ['cataluna']),
+  Q('cabo_trafalgar', 'capes', 'trafalgar', ['¿Qué cabo de Cádiz es famoso por una batalla naval de 1805?', 'Which cape in Cádiz is famous for a naval battle in 1805?'], ['cadiz']),
+  Q('cabo_nao', 'capes', 'la_nao', ['¿Qué cabo de Alicante es el que más se acerca a Ibiza?', 'Which cape in Alicante reaches closest to Ibiza?'], ['alicante', 'valencia']),
+  Q('estrecho_gibraltar', 'seas', 'estrecho_de_gibraltar', ['¿Qué estrecho separa Europa de África y une el Atlántico con el Mediterráneo?', 'Which strait separates Europe from Africa and joins the Atlantic and the Mediterranean?'], ['cadiz']),
+  Q('delta_tarragona', 'seas', 'delta_del_ebro', ['¿Qué delta está en Tarragona, con arrozales?', 'Which delta, with rice fields, is in Tarragona?'], ['tarragona']),
+  Q('laguna_murcia', 'seas', 'mar_menor', ['¿Qué laguna de agua salada está en Murcia?', 'Which salt-water lagoon is in Murcia?'], ['cartagena', 'murcia']),
+  Q('mar_asturias', 'seas', 'mar_cantabrico', ['¿Qué mar baña Asturias, Cantabria y el País Vasco?', 'Which sea washes Asturias, Cantabria and the Basque Country?'], ['oviedo', 'santander', 'bilbao']),
+  Q('mar_valencia', 'seas', 'mar_mediterraneo', ['¿Qué mar baña Barcelona, Valencia y Murcia?', 'Which sea washes Barcelona, Valencia and Murcia?'], ['barcelona', 'valencia', 'murcia']),
+  Q('oceano_galicia', 'seas', 'oceano_atlantico', ['¿Qué océano baña Galicia, Portugal y las Canarias?', 'Which ocean washes Galicia, Portugal and the Canaries?'], ['a_coruna', 'lisboa']),
+  Q('isla_mayor', 'islands', 'mallorca', ['¿Qué isla balear, con Palma de capital, es la más grande?', 'Which Balearic island, with Palma as its capital, is the biggest?'], ['palma'], ['baleares']),
+  Q('isla_teide', 'islands', 'tenerife', ['¿Qué isla canaria tiene el Teide?', 'Which Canary island has the Teide?'], [], [], ['Es la isla más grande de las Canarias.', 'It is the biggest of the Canary Islands.']),
+  Q('isla_oeste', 'islands', 'el_hierro', ['¿Qué isla canaria es la más pequeña y la más al oeste?', 'Which Canary island is the smallest and furthest west?']),
+  Q('isla_sur_ibiza', 'islands', 'formentera', ['¿Qué isla balear está justo debajo de Ibiza?', 'Which Balearic island lies right below Ibiza?'], [], ['baleares']),
+  Q('isla_lanzarote', 'islands', 'lanzarote', ['¿Qué isla canaria es la más al noreste y tiene el Parque de Timanfaya?', 'Which Canary island is furthest north-east and has Timanfaya Park?']),
+];
+
 // Silly mnemonics, keyed 'topic:item'. Shown with the tip and after wrong answers.
 const SILLY = {
  "rivers:mino": [

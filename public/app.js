@@ -1,5 +1,5 @@
 import { MAP } from './map-data.js';
-import { SUPABASE_URL, SUPABASE_KEY, TOPICS, SECTIONS } from './config.js';
+import { SUPABASE_URL, SUPABASE_KEY, TOPICS, SECTIONS, CONNECTIONS } from './config.js';
 
 /* ---------------------------------------------------------------- helpers */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -198,12 +198,12 @@ function distance(key, x, y) {
 }
 
 class MapView {
-  constructor(topic, { onTap, showCities = true, hide = false } = {}) {
+  constructor(topic, { onTap, showCities = true, hide = false, blank = false } = {}) {
     this.topic = topic; this.onTap = onTap;
     this.full = [0, 0, MAP.width, MAP.height];
     this.vb = [...this.full];
     this.el = h('div', { class: 'map-wrap' });
-    const svg = this.svg = s('svg', { class: `map${hide ? ' hide-items' : ''}${hide && topic.id === 'relief' ? ' hide-relief' : ''}`, viewBox: this.full.join(' '), role: 'img', 'aria-label': L('Mapa de España', 'Map of Spain') });
+    const svg = this.svg = s('svg', { class: `map${blank ? ' blank' : ''}${hide ? ' hide-items' : ''}${hide && topic.id === 'relief' ? ' hide-relief' : ''}`, viewBox: this.full.join(' '), role: 'img', 'aria-label': L('Mapa de España', 'Map of Spain') });
     svg.append(
       s('rect', { x: -200, y: -200, width: MAP.width + 400, height: MAP.height + 400, class: 'sea' }),
       s('path', { d: MAP.neighbours, class: 'land-other' }),
@@ -213,6 +213,7 @@ class MapView {
       s('path', { d: MAP.bg.ranges, class: 'bg-ranges' }),
       s('path', { d: MAP.regions, class: 'regions' }),
     );
+    this.areasG = s('g', { class: 'areas' }); svg.append(this.areasG);
     if (topic.id !== 'rivers') {   // rivers are always visible, so he can see them running between the mountains
       svg.append(s('path', { d: Object.entries(MAP.items).filter(([k]) => k.startsWith('rivers:')).map(([, v]) => v.d).join(''), class: 'bg-rivers' }));
     }
@@ -233,6 +234,7 @@ class MapView {
       this.paths.set(it.id, p); this.itemsG.append(p);
     }
     svg.append(this.itemsG);
+    this.placesG = s('g', { class: 'places' }); svg.append(this.placesG);
     this.citiesG = s('g', { class: 'cities' });
     if (showCities) for (const c of MAP.cities) {
       const g = s('g', { transform: `translate(${c.x} ${c.y})` });
@@ -386,6 +388,21 @@ class MapView {
       : s('path', { d: MAP.items[key].d, class: `zone ${g.kind}`, style: `stroke-width:${t * 2}px` });
     this.zonesG.replaceChildren(z);
   }
+  // --- clue helpers for the Conexiones questions ---
+  showClue(q) {
+    this.areasG.replaceChildren(...q.areas.map((a) => s('path', { d: MAP.areas[a], class: 'clue-area' })));
+    this.placesG.replaceChildren(...q.places.flatMap((id) => {
+      const pl = MAP.places[id], dot = s('circle', { cx: pl.x, cy: pl.y, r: 5 * Math.sqrt(this.k) + 1, class: 'place-dot' });
+      const t = s('text', { x: pl.x + 8 * this.k, y: pl.y - 6 * this.k, class: 'place-label' }); t.textContent = pl.name; return [dot, t];
+    }));
+  }
+  drawShape(key, cls) {
+    const item = MAP.items[key], [tp] = key.split(':');
+    this.itemsG.append(s('path', { d: item.d, class: `item ${item.kind} t-${tp} ${cls}` }));
+  }
+  labelKey(key, text, cls = '') {
+    const [x, y] = geometry(key).anchor, t = s('text', { x, y, class: `item-label ${cls}` }); t.textContent = text; this.labelsG.append(t);
+  }
   marker(x, y, cls) { this.labelsG.append(s('circle', { cx: x, cy: y, r: 6 * this.k + 2, class: `tap-marker ${cls}` })); }
   removeLabel(itemId) { this.labelsG.querySelector(`[data-id="${itemId}"]`)?.remove(); }
 }
@@ -488,11 +505,20 @@ function renderSection(section) {
         h('div', { class: 'meter' }, h('span', { style: `width:${(100 * mastered) / total}%` })),
         h('p', { class: 'small' }, tr(`${mastered} de ${total} dominados`, `${mastered} of ${total} mastered`))));
   });
+  const bigCard = (icon, title, blurb, line, meter, fn) => h('button', { class: 'card topic-card special', onclick: fn },
+    h('div', { class: 'topic-icon', html: topicIcon(icon) }),
+    h('div', { class: 'topic-text' }, h('h2', {}, tr(title)), h('p', { class: 'muted' }, tr(blurb)), meter == null ? null : h('div', { class: 'meter' }, h('span', { style: `width:${100 * meter}%` })), h('p', { class: 'small' }, tr(line))));
+  const connMastered = CONNECTIONS.filter((q) => level(`conn:${q.id}`) === 'mastered').length, best = store.get('geo.examBest');
+  const specials = [
+    bigCard('conn', ['Conexiones', 'Connections'], ['Une ríos, montañas, costas y ciudades en un mapa en blanco.', 'Link rivers, mountains, coasts and cities on a blank map.'],
+      [`${connMastered} de ${CONNECTIONS.length} dominadas`, `${connMastered} of ${CONNECTIONS.length} mastered`], connMastered / CONNECTIONS.length, () => startConnections(section)),
+    bigCard('exam', ['Examen final', 'Final quiz'], ['20 preguntas de todo el temario. Cada vez salen otras.', '20 questions on everything. Different ones each time.'],
+      best != null ? [`Mejor nota: ${best} / ${EXAM_LENGTH}`, `Best score: ${best} / ${EXAM_LENGTH}`] : ['Todavía no lo has hecho', 'Not tried yet'], null, () => startExam(section))];
   screen(h('section', { class: 'home' },
     h('button', { class: 'back', onclick: renderHome }, '← ', tr('Inicio', 'Home')),
     h('h1', {}, tr(section.title)),
     h('p', { class: 'muted lead' }, tr('Elige un tema para repasar.', 'Choose a topic to revise.')),
-    h('div', { class: 'topic-grid' }, ...cards)));
+    h('div', { class: 'topic-grid' }, ...cards, ...specials)));
 }
 function topicIcon(id) {
   if (id === 'geo1eso') return '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="17" fill="none" stroke="currentColor" stroke-width="4"/><path d="M7 24h34M24 7c-9 9-9 25 0 34M24 7c9 9 9 25 0 34" fill="none" stroke="currentColor" stroke-width="3"/></svg>';
@@ -503,6 +529,8 @@ function topicIcon(id) {
   if (id === 'capes') return `<svg viewBox="0 0 48 48"><path d="M6 40h14c4 0 6-3 6-8V16c0-4 3-6 7-6h9" ${stroke}/><circle cx="26" cy="16" r="3" fill="currentColor"/></svg>`;
   if (id === 'seas') return `<svg viewBox="0 0 48 48"><path d="M4 18c5-6 9 6 14 0s9 6 14 0 9 6 12 0M4 32c5-6 9 6 14 0s9 6 14 0 9 6 12 0" ${stroke}/></svg>`;
   if (id === 'islands') return `<svg viewBox="0 0 48 48"><path d="M10 30c0-8 8-12 14-12s14 4 14 12c0 5-6 6-14 6s-14-1-14-6z" ${stroke}/><circle cx="40" cy="12" r="3" fill="currentColor"/></svg>`;
+  if (id === 'conn') return `<svg viewBox="0 0 48 48"><circle cx="12" cy="14" r="5" fill="currentColor"/><circle cx="36" cy="34" r="5" fill="currentColor"/><path d="M12 14c14 0 6 20 24 20" ${stroke}/></svg>`;
+  if (id === 'exam') return `<svg viewBox="0 0 48 48"><rect x="9" y="6" width="30" height="36" rx="4" ${stroke}/><path d="M16 17h16M16 25h16M16 33h9" ${stroke}/></svg>`;
   if (id === 'relief') return `<svg viewBox="0 0 48 48"><path d="M4 36l9-14 6 8 8-16 7 12 6-5 4 15z" ${stroke}/></svg>`;
   return '<svg viewBox="0 0 48 48"><path d="M6 38l12-20 8 12 5-7 11 15z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg>';
 }
@@ -767,6 +795,191 @@ function renderProgress(topic) {
       h('div', { class: 'summary' }, h('div', { class: 'score small-score' }, h('span', {}, String(mastered)), ` / ${total}`), h('p', { class: 'muted' }, tr('dominados', 'mastered'))),
       h('div', { class: 'legend' }, h('span', { class: 'lg mastered' }, tr(LEVEL_LABEL.mastered)), h('span', { class: 'lg learning' }, tr(LEVEL_LABEL.learning)), h('span', { class: 'lg new' }, tr(LEVEL_LABEL.new))),
       list, resetBtn))));
+}
+
+
+/* ----------------------------------------------------- connections and final quiz */
+const topicById = (id) => TOPICS.find((t) => t.id === id);
+const CONN_TOPIC = { id: 'conn', items: [] };
+const weightOf = (id) => {
+  const p = stats(id), tries = p.correct + p.wrong; let w = 1;
+  if (tries === 0) w += 2;
+  w += 4 * (p.wrong / (tries + 1));
+  if (p.streak < MASTERED_STREAK) w += 2 - Math.min(p.streak, 2) * 0.5;
+  return w;
+};
+function weightedPick(list, idFn, n) {
+  const pool = list.map((x) => ({ x, w: weightOf(idFn(x)) })), out = [];
+  while (out.length < Math.min(n, list.length)) {
+    const total = pool.reduce((a, b) => a + b.w, 0); let r = Math.random() * total, i = 0;
+    while ((r -= pool[i].w) > 0 && i < pool.length - 1) i++;
+    out.push(pool.splice(i, 1)[0].x);
+  }
+  return out;
+}
+function shell({ title, label, pct, back, backLabel, map, side }) {
+  const bar = h('div', { class: 'round-bar' }, h('span', { style: `width:${100 * pct}%` }));
+  screen(h('section', { class: 'play' },
+    h('div', { class: 'play-head' }, h('button', { class: 'back', onclick: back }, '← ', tr(backLabel || ['Parar', 'Stop'])), h('h1', {}, tr(title)), bar),
+    h('div', { class: 'play-body' }, map.el, h('aside', { class: 'side quiz-side' }, h('div', { class: 'prompt' }, h('p', { class: 'eyebrow' }, tr(label)), ...side.prompt), ...side.rest))));
+}
+function resultsScreen({ eyebrow, score, total, missed, extra, again, againLabel, back }) {
+  const pct = score / total;
+  const msg = pct === 1 ? ['¡Perfecto! ¡Todas bien!', 'Perfect! Full marks!'] : pct >= 0.8 ? ['¡Muy bien! Buen trabajo.', 'Well done! Great work.']
+    : pct >= 0.5 ? ['Buen intento. ¡Sigue así!', 'Good effort. Keep going!'] : ['Sigue practicando. ¡Lo conseguirás!', 'Keep practising. You’ll get there!'];
+  screen(h('section', { class: 'results' }, h('div', { class: `card results-card ${pct === 1 ? 'perfect' : ''}` },
+    pct === 1 ? h('div', { class: 'confetti', 'aria-hidden': 'true' }, ...Array.from({ length: 24 }, (_, i) => h('i', { style: `--i:${i}` }))) : null,
+    h('p', { class: 'eyebrow' }, tr(eyebrow)), h('div', { class: 'score' }, h('span', {}, String(score)), ` / ${total}`), h('p', { class: 'lead' }, tr(msg)),
+    extra || null,
+    missed.length ? h('div', {}, h('p', { class: 'muted' }, tr('Repasa estos:', 'Worth another look:')), h('div', { class: 'pill-row' }, ...missed.map((m) => h('span', { class: 'pill' }, m)))) : null,
+    h('div', { class: 'row center' }, h('button', { class: 'btn primary', onclick: again }, tr(againLabel)), h('button', { class: 'btn ghost', onclick: back }, tr('Volver', 'Back'))))));
+}
+
+/* one multiple-choice "connection" question on a blank map. staged = clues appear after each wrong answer */
+function connOptions(q) {
+  const topic = topicById(q.topic), ans = topic.items.find((i) => i.id === q.answer);
+  const others = shuffle(topic.items.filter((x) => x.id !== ans.id));
+  const same = others.filter((x) => x.group === ans.group).slice(0, 2);
+  return shuffle([ans, ...same, ...others.filter((x) => !same.includes(x))].slice(0, 4));
+}
+function askConn(q, { staged, title, label, pct, back, onDone }) {
+  setUserArea();
+  const topic = topicById(q.topic), ans = topic.items.find((i) => i.id === q.answer), key = `${q.topic}:${q.answer}`;
+  const map = new MapView(CONN_TOPIC, { onTap: () => {}, blank: true, showCities: false });
+  let stage = 0, wrongs = 0, locked = false, remaining = 0;
+  const feedback = h('div', { class: 'feedback', 'aria-live': 'assertive' });
+  const answers = h('div', { class: 'answers' });
+  const nextBtn = h('button', { class: 'btn primary wide', hidden: true, onclick: () => onDone(wrongs === 0) }, tr('Siguiente', 'Next'));
+  const say = (cls, ...kids) => { feedback.className = `feedback ${cls}`; feedback.replaceChildren(...kids); };
+  const finish = (good) => {
+    locked = true; map.showClue(q); map.drawShape(key, good ? 'correct' : 'correct reveal'); map.labelKey(key, ans.name, 'correct');
+    answers.querySelectorAll('button').forEach((b) => { b.disabled = true; if (b.dataset.id === q.answer) b.classList.add('right'); });
+    recordAnswer(`conn:${q.id}`, good && wrongs === 0);
+    if (good && wrongs === 0) say('good', h('strong', {}, tr(pick(PRAISE))), tipEl(ans));
+    else if (good) say('good', h('strong', {}, tr('¡Bien! Lo has sacado con ayuda; volverá a salir.', 'Good! You got there with help; it’ll come up again.')), tipEl(ans));
+    else say('bad', tr(both(() => L(`Respuesta: ${ans.name}.`, `Answer: ${ans.name}.`))), tipEl(ans));
+    nextBtn.hidden = false; nextBtn.focus();
+  };
+  const advance = () => {   // reveal the next help; after the last help, show the answer
+    stage++;
+    if (stage === 1) { map.showClue(q); say('bad', tr('Casi. Mira el mapa: te enseño dónde está.', 'Not quite. Look at the map: I’ll show you where it is.'), q.hint ? h('p', { class: 'small' }, tr(q.hint)) : null); }
+    else if (stage === 2) { map.drawShape(key, 'target'); say('bad', tr('Otra vez. Ahora ves la forma o la zona.', 'Try again. Now you can see the shape or the area.')); }
+    else finish(false);
+  };
+  const pickOpt = (id, btn) => {
+    if (locked) return;
+    if (id === q.answer) return finish(true);
+    wrongs++; btn.disabled = true; btn.classList.add('wrong');
+    if (staged) advance(); else finish(false);
+  };
+  for (const o of connOptions(q)) { answers.append(h('button', { class: 'btn option', 'data-id': o.id, onclick: (e) => pickOpt(o.id, e.currentTarget) }, o.name)); remaining++; }
+  const idk = h('button', { type: 'button', class: 'btn ghost', onclick: () => { if (locked) return; wrongs++; if (staged) advance(); else finish(false); } }, tr('No lo sé', 'I don’t know'));
+  shell({ title, label, pct, back, map, side: { prompt: [h('h2', { class: 'question' }, tr(q.q))], rest: [answers, h('div', { class: 'row' }, idk), feedback, nextBtn] } });
+}
+
+/* connections round: 10 questions with staged clues */
+function startConnections(section) {
+  const qs = weightedPick(CONNECTIONS, (q) => `conn:${q.id}`, 10);
+  const run = (i, score, missed) => {
+    if (i >= qs.length) return resultsScreen({ eyebrow: ['Ronda terminada', 'Round complete'], score, total: qs.length, missed, again: () => startConnections(section),
+      againLabel: ['Jugar otra vez', 'Play again'], back: () => renderSection(section) });
+    const q = qs[i], ans = topicById(q.topic).items.find((x) => x.id === q.answer);
+    askConn(q, { staged: true, title: ['Conexiones', 'Connections'], label: [`Pregunta ${i + 1} de ${qs.length}`, `Question ${i + 1} of ${qs.length}`], pct: i / qs.length,
+      back: () => renderSection(section), onDone: (ok) => run(i + 1, score + (ok ? 1 : 0), ok ? missed : [...missed, ans.name]) });
+  };
+  run(0, 0, []);
+}
+
+/* one single-attempt question about a single item (used by the final quiz) */
+function askItem({ topic, it, mode }, { title, label, pct, back, onDone }) {
+  setUserArea();
+  const nEs = topic.noun[0], nEn = topic.noun[1];
+  let locked = false;
+  const feedback = h('div', { class: 'feedback', 'aria-live': 'assertive' });
+  const answers = h('div', { class: 'answers' });
+  const nextBtn = h('button', { class: 'btn primary wide', hidden: true }, tr('Siguiente', 'Next'));
+  const map = new MapView(topic, { onTap: (id) => {
+    if (mode !== 'find' || locked) return;
+    if (!id) { toast(L('Toca justo encima. Si están muy juntos, acerca el mapa con +.', 'Tap right on it. If they’re close together, zoom in with +.'), 3000); return; }
+    finish(id === it.id, id);
+  } });
+  function finish(ok, tappedId) {
+    locked = true; answers.replaceChildren();
+    if (!ok && tappedId) { const tp = topic.items.find((x) => x.id === tappedId); map.setClass(tappedId, 'wrong'); map.label(tappedId, tp.name, 'wrong'); }
+    map.setClass(it.id, ok ? 'correct' : 'correct reveal'); map.label(it.id, it.name, 'correct');
+    recordAnswer(`${topic.id}:${it.id}`, ok);
+    if (ok) { feedback.className = 'feedback good'; feedback.replaceChildren(h('strong', {}, tr(pick(PRAISE)))); }
+    else { feedback.className = 'feedback bad'; feedback.replaceChildren(tr(both(() => L(`Respuesta: ${it.name}.`, `Answer: ${it.name}.`))), tipEl(it)); map.focus(it.id); }
+    nextBtn.onclick = () => onDone(ok); nextBtn.hidden = false; nextBtn.focus();
+  }
+  let ask;
+  if (mode === 'find') { map.reset(true); ask = [h('p', { class: 'ask' }, tr(`Toca ${gd(topic).el} ${nEs}`, `Tap the ${nEn}`)), h('h2', { class: 'big-name' }, it.name)]; }
+  else {
+    map.dimOthers(true); map.setClass(it.id, 'target'); map.focus(it.id);
+    ask = [h('p', { class: 'ask' }, tr(`¿Qué ${nEs} está iluminad${gd(topic).o}?`, `Which ${nEn} is lit up?`))];
+    if (mode === 'choose') {
+      const others = shuffle(topic.items.filter((x) => x.id !== it.id)), same = others.filter((x) => x.group === it.group).slice(0, 2);
+      for (const o of shuffle([it, ...same, ...others.filter((x) => !same.includes(x))].slice(0, 4)))
+        answers.append(h('button', { class: 'btn option', 'data-id': o.id, onclick: (e) => {
+          if (locked) return; const ok = o.id === it.id; if (!ok) e.currentTarget.classList.add('wrong');
+          answers.querySelectorAll('button').forEach((b) => { b.disabled = true; if (b.dataset.id === it.id) b.classList.add('right'); }); finish(ok);
+        } }, o.name));
+    } else {
+      const names = [it.name, ...(it.alt || [])];
+      const input = h('input', { class: 'spell-input', autocomplete: 'off', autocapitalize: 'words', spellcheck: 'false', placeholder: L('Escribe el nombre…', 'Type the name…'), 'data-ph-es': 'Escribe el nombre…', 'data-ph-en': 'Type the name…' });
+      const keys = h('div', { class: 'accent-keys' }, ...['á', 'é', 'í', 'ó', 'ú', 'ñ'].map((ch) => h('button', { type: 'button', class: 'key', onclick: () => { const ps = input.selectionStart ?? input.value.length; input.value = input.value.slice(0, ps) + ch + input.value.slice(input.selectionEnd ?? ps); input.focus(); input.setSelectionRange(ps + 1, ps + 1); } }, ch)));
+      answers.append(h('form', { class: 'spell-form', onsubmit: (e) => { e.preventDefault(); if (locked || !input.value.trim()) return; finish(names.some((n) => plain(input.value) === plain(n))); } },
+        input, keys, h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'submit' }, tr('Comprobar', 'Check')))));
+      setTimeout(() => input.focus({ preventScroll: true }), 50);
+    }
+  }
+  shell({ title, label, pct, back, map, side: { prompt: ask, rest: [answers, feedback, nextBtn] } });
+}
+
+/* final quiz: 20 questions across everything; one attempt each; different questions each time */
+const EXAM_LENGTH = 20;
+function buildExam() {
+  const last = new Set(store.get('geo.lastExam') || []);
+  const fresh = (list, idFn) => { const f = list.filter((x) => !last.has(idFn(x))); return f.length >= Math.min(list.length, 1) ? f : list; };
+  const counts = { rivers: 3, relief: 3, peaks: 1, gulfs: 1, capes: 2, seas: 1, islands: 1 };
+  const modes = shuffle(['find', 'find', 'find', 'find', 'choose', 'choose', 'choose', 'choose', 'choose', 'type', 'type', 'type']);
+  const items = [];
+  for (const t of TOPICS) {
+    const pool = t.items.filter((it) => !last.has(`${t.id}:${it.id}`));
+    const src = pool.length >= (counts[t.id] || 1) ? pool : t.items;
+    for (const it of weightedPick(src, (x) => `${t.id}:${x.id}`, counts[t.id] || 1)) items.push({ kind: 'item', topic: t, it });
+  }
+  shuffle(items).forEach((e, i) => { e.mode = modes[i % modes.length]; });
+  const byTopic = new Map();
+  for (const q of shuffle(fresh(CONNECTIONS, (q) => q.id))) { if (!byTopic.has(q.topic)) byTopic.set(q.topic, []); byTopic.get(q.topic).push(q); }
+  const conns = [];
+  while (conns.length < EXAM_LENGTH - items.length && [...byTopic.values()].some((a) => a.length)) {
+    for (const arr of shuffle([...byTopic.values()])) if (arr.length && conns.length < EXAM_LENGTH - items.length) conns.push({ kind: 'conn', q: arr.shift() });
+  }
+  return shuffle([...items, ...conns]);
+}
+function startExam(section) {
+  const entries = buildExam();
+  store.set('geo.lastExam', entries.map((e) => (e.kind === 'conn' ? e.q.id : `${e.topic.id}:${e.it.id}`)));
+  const results = [];
+  const run = (i) => {
+    if (i >= entries.length) return examResults(section, results);
+    const e = entries[i], common = { title: ['Examen final', 'Final quiz'], label: [`Pregunta ${i + 1} de ${entries.length}`, `Question ${i + 1} of ${entries.length}`], pct: i / entries.length,
+      back: () => { if (confirm(L('¿Salir del examen? Perderás esta ronda.', 'Leave the quiz? You’ll lose this round.'))) renderSection(section); } };
+    if (e.kind === 'conn') {
+      const ans = topicById(e.q.topic).items.find((x) => x.id === e.q.answer);
+      askConn(e.q, { ...common, staged: false, onDone: (ok) => { results.push({ topic: e.q.topic, ok, name: ans.name }); run(i + 1); } });
+    } else askItem(e, { ...common, onDone: (ok) => { results.push({ topic: e.topic.id, ok, name: e.it.name }); run(i + 1); } });
+  };
+  run(0);
+}
+function examResults(section, results) {
+  const score = results.filter((r) => r.ok).length;
+  const best = Math.max(score, store.get('geo.examBest') || 0); store.set('geo.examBest', best);
+  const rows = TOPICS.map((t) => { const rs = results.filter((r) => r.topic === t.id); return rs.length ? h('div', { class: 'break-row' }, h('span', {}, tr(t.title)), h('strong', {}, `${rs.filter((r) => r.ok).length} / ${rs.length}`)) : null; });
+  resultsScreen({ eyebrow: ['Examen terminado', 'Quiz complete'], score, total: results.length, missed: [...new Set(results.filter((r) => !r.ok).map((r) => r.name))],
+    extra: h('div', { class: 'breakdown' }, ...rows, h('p', { class: 'small' }, tr(`Mejor nota: ${best} / ${EXAM_LENGTH}`, `Best score: ${best} / ${EXAM_LENGTH}`))),
+    again: () => startExam(section), againLabel: ['Otro examen', 'Another quiz'], back: () => renderSection(section) });
 }
 
 /* -------------------------------------------------------------------- boot */
