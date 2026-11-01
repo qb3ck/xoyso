@@ -417,7 +417,11 @@ function screen(...children) { app.replaceChildren(...children); window.scrollTo
 const gd = (topic) => (topic.g === 'f' ? { el: 'la', un: 'una', o: 'a', cada: 'cada' } : { el: 'el', un: 'un', o: 'o', cada: 'cada' });
 const art = (topic, it) => `${Lp(it.article || topic.article)} ${it.name}`;          // "el Ebro"
 const artCap = (topic, it) => `${Lp(it.articleCap || topic.articleCap)} ${it.name}`; // "El Ebro"
-const sectionOf = (topic) => SECTIONS.find((s) => s.topics.includes(topic)) || SECTIONS[0];
+const subsections = () => SECTIONS.flatMap((g) => g.children);
+const sectionOf = (topic) => subsections().find((c) => c.topics.includes(topic)) || subsections()[0];
+const scopedQuestions = (section) => CONNECTIONS.filter((q) => section.topics.some((t) => t.id === q.topic));
+const examSize = (section) => Math.min(20, section.topics.reduce((n, t) => n + t.items.length, 0));
+const bestKey = (section) => `geo.examBest.${section.id}`;
 const tipEl = (it) => (it.tip ? h('div', { class: 'tip' },
   h('p', {}, h('strong', {}, tr('💡 Truco: ', '💡 Memory tip: ')), tr(it.tip)),
   it.silly ? h('p', { class: 'silly' }, h('strong', {}, tr('🤪 Para recordarlo: ', '🤪 Silly way to remember: ')), tr(it.silly)) : null) : null);
@@ -484,7 +488,7 @@ function renderHome() {
   setUserArea(); document.onkeydown = null;
   const cards = SECTIONS.map((sec) => {
     const { mastered, total } = sectionSummary(sec);
-    return h('button', { class: 'card topic-card', onclick: () => renderSection(sec) },
+    return h('button', { class: 'card topic-card', onclick: () => renderGroup(sec) },
       h('div', { class: 'topic-icon', html: topicIcon('geo1eso') }),
       h('div', { class: 'topic-text' }, h('h2', {}, tr(sec.title)), h('p', { class: 'muted' }, tr(sec.blurb)),
         h('div', { class: 'meter' }, h('span', { style: `width:${(100 * mastered) / total}%` })),
@@ -493,6 +497,22 @@ function renderHome() {
   screen(h('section', { class: 'home' },
     h('h1', {}, tr(`¡Hola, ${state.session.username}!`, `Hi ${state.session.username}!`)),
     h('p', { class: 'muted lead' }, tr('¿Qué quieres repasar hoy?', 'What do you want to revise today?')),
+    h('div', { class: 'topic-grid' }, ...cards)));
+}
+function renderGroup(group) {
+  setUserArea(); document.onkeydown = null;
+  const cards = group.children.map((c) => {
+    const { mastered, total } = sectionSummary(c);
+    return h('button', { class: 'card topic-card', onclick: () => renderSection(c) },
+      h('div', { class: 'topic-icon', html: topicIcon(c.icon) }),
+      h('div', { class: 'topic-text' }, h('h2', {}, tr(c.title)), h('p', { class: 'muted' }, tr(c.blurb)),
+        h('div', { class: 'meter' }, h('span', { style: `width:${(100 * mastered) / total}%` })),
+        h('p', { class: 'small' }, tr(`${mastered} de ${total} dominados`, `${mastered} of ${total} mastered`))));
+  });
+  screen(h('section', { class: 'home' },
+    h('button', { class: 'back', onclick: renderHome }, '← ', tr('Inicio', 'Home')),
+    h('h1', {}, tr(group.title)),
+    h('p', { class: 'muted lead' }, tr('Elige una parte para repasar.', 'Choose a part to revise.')),
     h('div', { class: 'topic-grid' }, ...cards)));
 }
 function renderSection(section) {
@@ -508,14 +528,14 @@ function renderSection(section) {
   const bigCard = (icon, title, blurb, line, meter, fn) => h('button', { class: 'card topic-card special', onclick: fn },
     h('div', { class: 'topic-icon', html: topicIcon(icon) }),
     h('div', { class: 'topic-text' }, h('h2', {}, tr(title)), h('p', { class: 'muted' }, tr(blurb)), meter == null ? null : h('div', { class: 'meter' }, h('span', { style: `width:${100 * meter}%` })), h('p', { class: 'small' }, tr(line))));
-  const connMastered = CONNECTIONS.filter((q) => level(`conn:${q.id}`) === 'mastered').length, best = store.get('geo.examBest');
+  const qs = scopedQuestions(section), connMastered = qs.filter((q) => level(`conn:${q.id}`) === 'mastered').length, best = store.get(bestKey(section)), size = examSize(section);
   const specials = [
     bigCard('conn', ['Conexiones', 'Connections'], ['Une ríos, montañas, costas y ciudades en un mapa en blanco.', 'Link rivers, mountains, coasts and cities on a blank map.'],
-      [`${connMastered} de ${CONNECTIONS.length} dominadas`, `${connMastered} of ${CONNECTIONS.length} mastered`], connMastered / CONNECTIONS.length, () => startConnections(section)),
-    bigCard('exam', ['Examen final', 'Final quiz'], ['20 preguntas de todo el temario. Cada vez salen otras.', '20 questions on everything. Different ones each time.'],
-      best != null ? [`Mejor nota: ${best} / ${EXAM_LENGTH}`, `Best score: ${best} / ${EXAM_LENGTH}`] : ['Todavía no lo has hecho', 'Not tried yet'], null, () => startExam(section))];
+      [`${connMastered} de ${qs.length} dominadas`, `${connMastered} of ${qs.length} mastered`], connMastered / qs.length, () => startConnections(section)),
+    bigCard('exam', ['Examen final', 'Final quiz'], [`${size} preguntas de todo este apartado. Cada vez salen otras.`, `${size} questions on this whole part. Different ones each time.`],
+      best ? [`Mejor nota: ${best.score} / ${best.total}`, `Best score: ${best.score} / ${best.total}`] : ['Todavía no lo has hecho', 'Not tried yet'], null, () => startExam(section))];
   screen(h('section', { class: 'home' },
-    h('button', { class: 'back', onclick: renderHome }, '← ', tr('Inicio', 'Home')),
+    h('button', { class: 'back', onclick: () => (section.parent ? renderGroup(section.parent) : renderHome()) }, '← ', tr(section.parent ? section.parent.title : ['Inicio', 'Home'])),
     h('h1', {}, tr(section.title)),
     h('p', { class: 'muted lead' }, tr('Elige un tema para repasar.', 'Choose a topic to revise.')),
     h('div', { class: 'topic-grid' }, ...cards, ...specials)));
@@ -880,7 +900,7 @@ function askConn(q, { staged, title, label, pct, back, onDone }) {
 
 /* connections round: 10 questions with staged clues */
 function startConnections(section) {
-  const qs = weightedPick(CONNECTIONS, (q) => `conn:${q.id}`, 10);
+  const qs = weightedPick(scopedQuestions(section), (q) => `conn:${q.id}`, 10);
   const run = (i, score, missed) => {
     if (i >= qs.length) return resultsScreen({ eyebrow: ['Ronda terminada', 'Round complete'], score, total: qs.length, missed, again: () => startConnections(section),
       againLabel: ['Jugar otra vez', 'Play again'], back: () => renderSection(section) });
@@ -939,24 +959,31 @@ function askItem({ topic, it, mode }, { title, label, pct, back, onDone }) {
 
 /* final quiz: 20 questions across everything; one attempt each; different questions each time */
 const EXAM_LENGTH = 20;
-function buildExam(withConn) {
-  // plain questions (tap it / name it / spell it) spread over every topic; optionally 6 "which river passes through…" connection questions
-  const last = new Set(store.get('geo.lastExam') || []);
-  const counts = withConn ? { rivers: 3, relief: 3, peaks: 1, gulfs: 1, capes: 2, seas: 1, islands: 1, regions: 2 }
-    : { rivers: 4, relief: 4, peaks: 1, gulfs: 2, capes: 3, seas: 1, islands: 2, regions: 3 };
-  const modes = shuffle([...Array(7).fill('find'), ...Array(8).fill('choose'), ...Array(5).fill('type')]);
-  const items = [];
-  for (const t of TOPICS) {
-    const n = counts[t.id] || 1, pool = t.items.filter((it) => !last.has(`${t.id}:${it.id}`));
-    for (const it of weightedPick(pool.length >= n ? pool : t.items, (x) => `${t.id}:${x.id}`, n)) items.push({ kind: 'item', topic: t, it });
+function quotas(topics, n) {   // how many plain questions each topic gets: proportional to its size, at least one, never more than it has
+  const total = topics.reduce((a, t) => a + t.items.length, 0), share = (t) => (n * t.items.length) / total;
+  const q = new Map(topics.map((t) => [t.id, Math.max(1, Math.min(t.items.length, Math.floor(share(t))))]));
+  const sum = () => [...q.values()].reduce((a, b) => a + b, 0);
+  while (sum() < n) { const t = [...topics].filter((t) => q.get(t.id) < t.items.length).sort((a, b) => (share(b) - q.get(b.id)) - (share(a) - q.get(a.id)))[0]; if (!t) break; q.set(t.id, q.get(t.id) + 1); }
+  while (sum() > n) { const t = [...topics].sort((a, b) => q.get(b.id) - q.get(a.id))[0]; if (q.get(t.id) <= 1) break; q.set(t.id, q.get(t.id) - 1); }
+  return q;
+}
+function buildExam(section, withConn) {
+  // plain questions (tap it / name it / spell it) spread over the section's topics; optionally 6 "which river passes through…" questions
+  const lastKey = `geo.lastExam.${section.id}`, last = new Set(store.get(lastKey) || []);
+  const pool = scopedQuestions(section), size = examSize(section), nConn = withConn ? Math.min(6, pool.length) : 0, nItems = size - nConn;
+  const q = quotas(section.topics, nItems), items = [];
+  for (const t of section.topics) {
+    const n = q.get(t.id), fresh = t.items.filter((it) => !last.has(`${t.id}:${it.id}`));
+    for (const it of weightedPick(fresh.length >= n ? fresh : t.items, (x) => `${t.id}:${x.id}`, n)) items.push({ kind: 'item', topic: t, it });
   }
-  shuffle(items).forEach((e, i) => { e.mode = modes[i % modes.length]; });
+  const modes = shuffle(items.map((_, i) => (i % 20 < 7 ? 'find' : i % 20 < 15 ? 'choose' : 'type')));
+  shuffle(items).forEach((e, i) => { e.mode = modes[i]; });
   const conns = [];
-  if (withConn) {
-    const byTopic = new Map(), fresh = CONNECTIONS.filter((q) => !last.has(q.id));
-    for (const q of shuffle(fresh.length >= 6 ? fresh : CONNECTIONS)) { if (!byTopic.has(q.topic)) byTopic.set(q.topic, []); byTopic.get(q.topic).push(q); }
-    while (conns.length < EXAM_LENGTH - items.length && [...byTopic.values()].some((a) => a.length))
-      for (const arr of shuffle([...byTopic.values()])) if (arr.length && conns.length < EXAM_LENGTH - items.length) conns.push({ kind: 'conn', q: arr.shift() });
+  if (nConn) {
+    const byTopic = new Map(), fresh = pool.filter((x) => !last.has(x.id));
+    for (const x of shuffle(fresh.length >= nConn ? fresh : pool)) { if (!byTopic.has(x.topic)) byTopic.set(x.topic, []); byTopic.get(x.topic).push(x); }
+    while (conns.length < nConn && [...byTopic.values()].some((a) => a.length))
+      for (const arr of shuffle([...byTopic.values()])) if (arr.length && conns.length < nConn) conns.push({ kind: 'conn', q: arr.shift() });
   }
   return shuffle([...items, ...conns]);
 }
@@ -966,16 +993,16 @@ function startExam(section) {
   const box = h('input', { type: 'checkbox', id: 'withConn' }); box.checked = store.get('geo.examConn') !== false;
   screen(h('section', { class: 'results' }, h('div', { class: 'card results-card' },
     h('p', { class: 'eyebrow' }, tr('Examen final', 'Final quiz')),
-    h('h2', {}, tr('20 preguntas de todo el temario', '20 questions on everything')),
+    h('h2', {}, tr(`${examSize(section)} preguntas de todo este apartado`, `${examSize(section)} questions on this whole part`)),
     h('p', { class: 'muted' }, tr('Tocar, nombrar y escribir. Un solo intento por pregunta y sin pistas.', 'Tap, name and spell. One try per question and no hints.')),
-    h('label', { class: 'toggle examopt', for: 'withConn' }, box, ' ', tr('Incluir 6 preguntas de conexiones (por ejemplo «¿qué río pasa por Toledo?»)', 'Include 6 connection questions (e.g. “which river flows through Toledo?”)')),
+    h('label', { class: 'toggle examopt', for: 'withConn' }, box, ' ', tr('Incluir 6 preguntas de conexiones (por ejemplo «¿qué comunidad tiene como capital Mérida?»)', 'Include 6 connection questions (e.g. “which community has Mérida as its capital?”)')),
     h('div', { class: 'row center' },
       h('button', { class: 'btn primary', onclick: () => { store.set('geo.examConn', box.checked); runExam(section, box.checked); } }, tr('Empezar', 'Start')),
       h('button', { class: 'btn ghost', onclick: () => renderSection(section) }, tr('Volver', 'Back'))))));
 }
 function runExam(section, withConn) {
-  const entries = buildExam(withConn);
-  store.set('geo.lastExam', entries.map((e) => (e.kind === 'conn' ? e.q.id : `${e.topic.id}:${e.it.id}`)));
+  const entries = buildExam(section, withConn);
+  store.set(`geo.lastExam.${section.id}`, entries.map((e) => (e.kind === 'conn' ? e.q.id : `${e.topic.id}:${e.it.id}`)));
   const results = [];
   const run = (i) => {
     if (i >= entries.length) return examResults(section, results, withConn);
@@ -990,10 +1017,10 @@ function runExam(section, withConn) {
 }
 function examResults(section, results, withConn) {
   const score = results.filter((r) => r.ok).length;
-  const best = Math.max(score, store.get('geo.examBest') || 0); store.set('geo.examBest', best);
-  const rows = TOPICS.map((t) => { const rs = results.filter((r) => r.topic === t.id); return rs.length ? h('div', { class: 'break-row' }, h('span', {}, tr(t.title)), h('strong', {}, `${rs.filter((r) => r.ok).length} / ${rs.length}`)) : null; });
+  const prev = store.get(bestKey(section)), better = !prev || score / results.length > prev.score / prev.total, best = better ? { score, total: results.length } : prev; store.set(bestKey(section), best);
+  const rows = section.topics.map((t) => { const rs = results.filter((r) => r.topic === t.id); return rs.length ? h('div', { class: 'break-row' }, h('span', {}, tr(t.title)), h('strong', {}, `${rs.filter((r) => r.ok).length} / ${rs.length}`)) : null; });
   resultsScreen({ eyebrow: ['Examen terminado', 'Quiz complete'], score, total: results.length, missed: [...new Set(results.filter((r) => !r.ok).map((r) => r.name))],
-    extra: h('div', { class: 'breakdown' }, ...rows, h('p', { class: 'small' }, tr(`Mejor nota: ${best} / ${EXAM_LENGTH}`, `Best score: ${best} / ${EXAM_LENGTH}`))),
+    extra: h('div', { class: 'breakdown' }, ...rows, h('p', { class: 'small' }, tr(`Mejor nota: ${best.score} / ${best.total}`, `Best score: ${best.score} / ${best.total}`))),
     again: () => runExam(section, withConn), againLabel: ['Otro examen', 'Another quiz'], back: () => renderSection(section) });
 }
 

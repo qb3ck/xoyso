@@ -589,12 +589,17 @@ const SILLY = {
 };
 for (const t of TOPICS) for (const x of t.items) x.silly = SILLY[`${t.id}:${x.id}`];
 
-// Subjects / courses shown on the home screen. Each section groups several topics.
+// Subjects shown on the home screen. A subject contains sub-sections; each sub-section has its own topics,
+// its own Conexiones questions and its own final quiz.
+const byIds = (ids) => TOPICS.filter((t) => ids.includes(t.id));
+const physical = { id: 'fisico', icon: 'relief', title: ['Mapa físico de España', 'Physical map of Spain'],
+  blurb: ['Ríos, relieve, montañas, costas e islas', 'Rivers, relief, mountains, coasts and islands'],
+  topics: byIds(['rivers', 'relief', 'peaks', 'gulfs', 'capes', 'seas', 'islands']) };
+const political = { id: 'comunidades', icon: 'regions', title: ['Comunidades autónomas', 'Autonomous communities'],
+  blurb: ['Las 17 comunidades y las 2 ciudades autónomas', 'The 17 communities and the 2 autonomous cities'],
+  topics: byIds(['regions']) };
 export const SECTIONS = [
-  {
-    id: 'geo1eso',
-    title: ['Geografía 1º ESO', 'Geography, 1st ESO'],
-    blurb: ['Mapa físico de España', 'Physical map of Spain'],
-    topics: TOPICS,
-  },
+  { id: 'geo1eso', title: ['Geografía 1º ESO', 'Geography, 1st ESO'], blurb: ['Mapa físico y comunidades autónomas', 'Physical map and autonomous communities'],
+    topics: TOPICS, children: [physical, political] },
 ];
+physical.parent = political.parent = SECTIONS[0];
