@@ -939,10 +939,11 @@ function askItem({ topic, it, mode }, { title, label, pct, back, onDone }) {
 
 /* final quiz: 20 questions across everything; one attempt each; different questions each time */
 const EXAM_LENGTH = 20;
-function buildExam() {
-  // 20 plain questions (tap it / name it / spell it) spread over every topic; no "which river passes through…" questions
+function buildExam(withConn) {
+  // plain questions (tap it / name it / spell it) spread over every topic; optionally 6 "which river passes through…" connection questions
   const last = new Set(store.get('geo.lastExam') || []);
-  const counts = { rivers: 4, relief: 4, peaks: 1, gulfs: 2, capes: 3, seas: 1, islands: 2, regions: 3 };
+  const counts = withConn ? { rivers: 3, relief: 3, peaks: 1, gulfs: 1, capes: 2, seas: 1, islands: 1, regions: 2 }
+    : { rivers: 4, relief: 4, peaks: 1, gulfs: 2, capes: 3, seas: 1, islands: 2, regions: 3 };
   const modes = shuffle([...Array(7).fill('find'), ...Array(8).fill('choose'), ...Array(5).fill('type')]);
   const items = [];
   for (const t of TOPICS) {
@@ -950,14 +951,34 @@ function buildExam() {
     for (const it of weightedPick(pool.length >= n ? pool : t.items, (x) => `${t.id}:${x.id}`, n)) items.push({ kind: 'item', topic: t, it });
   }
   shuffle(items).forEach((e, i) => { e.mode = modes[i % modes.length]; });
-  return items;
+  const conns = [];
+  if (withConn) {
+    const byTopic = new Map(), fresh = CONNECTIONS.filter((q) => !last.has(q.id));
+    for (const q of shuffle(fresh.length >= 6 ? fresh : CONNECTIONS)) { if (!byTopic.has(q.topic)) byTopic.set(q.topic, []); byTopic.get(q.topic).push(q); }
+    while (conns.length < EXAM_LENGTH - items.length && [...byTopic.values()].some((a) => a.length))
+      for (const arr of shuffle([...byTopic.values()])) if (arr.length && conns.length < EXAM_LENGTH - items.length) conns.push({ kind: 'conn', q: arr.shift() });
+  }
+  return shuffle([...items, ...conns]);
 }
+/* setup screen: he chooses whether to include connection questions */
 function startExam(section) {
-  const entries = buildExam();
+  setUserArea();
+  const box = h('input', { type: 'checkbox', id: 'withConn' }); box.checked = store.get('geo.examConn') !== false;
+  screen(h('section', { class: 'results' }, h('div', { class: 'card results-card' },
+    h('p', { class: 'eyebrow' }, tr('Examen final', 'Final quiz')),
+    h('h2', {}, tr('20 preguntas de todo el temario', '20 questions on everything')),
+    h('p', { class: 'muted' }, tr('Tocar, nombrar y escribir. Un solo intento por pregunta y sin pistas.', 'Tap, name and spell. One try per question and no hints.')),
+    h('label', { class: 'toggle examopt', for: 'withConn' }, box, ' ', tr('Incluir 6 preguntas de conexiones (por ejemplo «¿qué río pasa por Toledo?»)', 'Include 6 connection questions (e.g. “which river flows through Toledo?”)')),
+    h('div', { class: 'row center' },
+      h('button', { class: 'btn primary', onclick: () => { store.set('geo.examConn', box.checked); runExam(section, box.checked); } }, tr('Empezar', 'Start')),
+      h('button', { class: 'btn ghost', onclick: () => renderSection(section) }, tr('Volver', 'Back'))))));
+}
+function runExam(section, withConn) {
+  const entries = buildExam(withConn);
   store.set('geo.lastExam', entries.map((e) => (e.kind === 'conn' ? e.q.id : `${e.topic.id}:${e.it.id}`)));
   const results = [];
   const run = (i) => {
-    if (i >= entries.length) return examResults(section, results);
+    if (i >= entries.length) return examResults(section, results, withConn);
     const e = entries[i], common = { title: ['Examen final', 'Final quiz'], label: [`Pregunta ${i + 1} de ${entries.length}`, `Question ${i + 1} of ${entries.length}`], pct: i / entries.length,
       back: () => { if (confirm(L('¿Salir del examen? Perderás esta ronda.', 'Leave the quiz? You’ll lose this round.'))) renderSection(section); } };
     if (e.kind === 'conn') {
@@ -967,13 +988,13 @@ function startExam(section) {
   };
   run(0);
 }
-function examResults(section, results) {
+function examResults(section, results, withConn) {
   const score = results.filter((r) => r.ok).length;
   const best = Math.max(score, store.get('geo.examBest') || 0); store.set('geo.examBest', best);
   const rows = TOPICS.map((t) => { const rs = results.filter((r) => r.topic === t.id); return rs.length ? h('div', { class: 'break-row' }, h('span', {}, tr(t.title)), h('strong', {}, `${rs.filter((r) => r.ok).length} / ${rs.length}`)) : null; });
   resultsScreen({ eyebrow: ['Examen terminado', 'Quiz complete'], score, total: results.length, missed: [...new Set(results.filter((r) => !r.ok).map((r) => r.name))],
     extra: h('div', { class: 'breakdown' }, ...rows, h('p', { class: 'small' }, tr(`Mejor nota: ${best} / ${EXAM_LENGTH}`, `Best score: ${best} / ${EXAM_LENGTH}`))),
-    again: () => startExam(section), againLabel: ['Otro examen', 'Another quiz'], back: () => renderSection(section) });
+    again: () => runExam(section, withConn), againLabel: ['Otro examen', 'Another quiz'], back: () => renderSection(section) });
 }
 
 /* -------------------------------------------------------------------- boot */
