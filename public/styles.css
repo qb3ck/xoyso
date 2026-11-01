@@ -298,3 +298,8 @@ main { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding: 18px 16
 .tap-marker { stroke: #fff; stroke-width: 1.5; vector-effect: non-scaling-stroke; pointer-events: none; }
 .tap-marker.ok { fill: var(--good); }
 .tap-marker.miss { fill: var(--bad); }
+.zone { fill: color-mix(in srgb, var(--good) 22%, transparent); stroke: color-mix(in srgb, var(--good) 22%, transparent); stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.zone.area { fill: none; }
+/* Señálalo: the answers are hidden until he has pointed */
+.map.hide-items .items .item:not(.correct) { visibility: hidden; }
+.map.hide-relief .bg-ranges, .map.hide-relief .bg-meseta, .map.hide-relief .bg-depr { visibility: hidden; }

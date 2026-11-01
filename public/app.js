@@ -198,12 +198,12 @@ function distance(key, x, y) {
 }
 
 class MapView {
-  constructor(topic, { onTap, showCities = true } = {}) {
+  constructor(topic, { onTap, showCities = true, hide = false } = {}) {
     this.topic = topic; this.onTap = onTap;
     this.full = [0, 0, MAP.width, MAP.height];
     this.vb = [...this.full];
     this.el = h('div', { class: 'map-wrap' });
-    const svg = this.svg = s('svg', { class: 'map', viewBox: this.full.join(' '), role: 'img', 'aria-label': L('Mapa de España', 'Map of Spain') });
+    const svg = this.svg = s('svg', { class: `map${hide ? ' hide-items' : ''}${hide && topic.id === 'relief' ? ' hide-relief' : ''}`, viewBox: this.full.join(' '), role: 'img', 'aria-label': L('Mapa de España', 'Map of Spain') });
     svg.append(
       s('rect', { x: -200, y: -200, width: MAP.width + 400, height: MAP.height + 400, class: 'sea' }),
       s('path', { d: MAP.neighbours, class: 'land-other' }),
@@ -241,6 +241,7 @@ class MapView {
       this.citiesG.append(g);
     }
     svg.append(this.citiesG);
+    this.zonesG = s('g', { class: 'zones' }); svg.append(this.zonesG);
     this.labelsG = s('g', { class: 'item-labels' });
     svg.append(this.labelsG);
     this.el.append(svg, this.controls());
@@ -368,7 +369,7 @@ class MapView {
   }
   /* --- state of items --- */
   setClass(itemId, cls) { this.paths.get(itemId)?.setAttribute('class', `item ${MAP.items[`${this.topic.id}:${itemId}`].kind} t-${this.topic.id} ${cls || ''}`.trim()); if (cls) this.itemsG.append(this.paths.get(itemId)); }
-  clearAll() { for (const id of this.paths.keys()) this.setClass(id, ''); this.labelsG.replaceChildren(); }
+  clearAll() { for (const id of this.paths.keys()) this.setClass(id, ''); this.labelsG.replaceChildren(); this.zonesG.replaceChildren(); }
   dimOthers(on) { this.itemsG.classList.toggle('dim', on); }
   label(itemId, text, cls = '') {
     this.labelsG.querySelector(`[data-id="${itemId}"]`)?.remove();
@@ -376,10 +377,14 @@ class MapView {
     const t = s('text', { x, y, class: `item-label ${cls}`, 'data-id': itemId }); t.textContent = text;
     this.labelsG.append(t);
   }
-  // "Pointing" is forgiving: inside the shape, or within a few percent of the map width of it
-  near(itemId, x, y) {
-    const g = geometry(`${this.topic.id}:${itemId}`);
-    return distance(`${this.topic.id}:${itemId}`, x, y) <= (g.kind === 'area' ? 15 : 30);
+  // "Pointing" is forgiving: anywhere in the general area counts (in map units, so independent of zoom)
+  tol(itemId) { const k = geometry(`${this.topic.id}:${itemId}`).kind; return k === 'area' ? 28 : k === 'point' ? 45 : 60; }
+  near(itemId, x, y) { return distance(`${this.topic.id}:${itemId}`, x, y) <= this.tol(itemId); }
+  zone(itemId) {   // draws the accepted area as a soft band/circle around the answer
+    const key = `${this.topic.id}:${itemId}`, g = geometry(key), t = this.tol(itemId);
+    const z = g.kind === 'point' ? s('circle', { cx: g.parts[0][0][0], cy: g.parts[0][0][1], r: t, class: 'zone' })
+      : s('path', { d: MAP.items[key].d, class: `zone ${g.kind}`, style: `stroke-width:${t * 2}px` });
+    this.zonesG.replaceChildren(z);
   }
   marker(x, y, cls) { this.labelsG.append(s('circle', { cx: x, cy: y, r: 6 * this.k + 2, class: `tap-marker ${cls}` })); }
   removeLabel(itemId) { this.labelsG.querySelector(`[data-id="${itemId}"]`)?.remove(); }
@@ -517,7 +522,7 @@ function renderTopic(topic) {
     h('div', { class: 'mode-grid' },
       mode(['Aprender', 'Learn'], [`Explora el mapa y toca cada ${nEs} para ver su nombre.`, `Explore the map and tap each ${nEn} to see its name.`], ICONS.learn, () => renderLearn(topic)),
       mode(['Encuéntralo', 'Find it'], [`Ves un nombre y tocas ${gd(topic).el === 'la' ? 'esa' : 'ese'} ${nEs} en el mapa.`, `See a name, then tap that ${nEn} on the map.`], ICONS.find, () => startQuiz(topic, 'find'), 'accent'),
-      mode(['Señálalo', 'Point to it'], ['Ves un nombre y señalas más o menos por dónde está. No hace falta acertar con precisión.', 'See a name and point to roughly where it is. It doesn’t need to be exact.'], ICONS.point, () => startQuiz(topic, 'point')),
+      mode(['Señálalo', 'Point to it'], ['Ves un nombre y señalas de memoria por dónde está, sin ayuda en el mapa. Vale con acercarte.', 'See a name and point from memory to where it is, with no help on the map. Close is good enough.'], ICONS.point, () => startQuiz(topic, 'point')),
       mode(['¿Cuál es?', 'Name it'], [`Se ilumina ${gd(topic).un} ${nEs}. Elige su nombre.`, `One ${nEn} lights up. Pick its name.`], ICONS.name, () => startQuiz(topic, 'choose')),
       mode(['Escríbelo', 'Spell it'], ['Como ¿Cuál es?, pero escribes tú el nombre, con sus tildes.', 'Like Name it, but you type the name, accents and all.'], ICONS.spell, () => startQuiz(topic, 'type')),
       mode(['Mi progreso', 'My progress'], ['Mira lo que ya dominas y lo que tienes que practicar.', 'See what you’ve mastered and what needs practice.'], ICONS.progress, () => renderProgress(topic)))));
@@ -584,7 +589,7 @@ function renderQuiz(round) {
   const feedback = h('div', { class: 'feedback', 'aria-live': 'assertive' });
   const nextBtn = h('button', { class: 'btn primary wide', hidden: true, onclick: () => next() }, tr('Siguiente', 'Next'));
   let locked = false;
-  const map = new MapView(topic, { onTap: (id, e) => onMapTap(id, e) });
+  const map = new MapView(topic, { onTap: (id, e) => onMapTap(id, e), hide: mode === 'point' });
   const current = () => round.items[round.i];
   const titles = { find: ['Encuéntralo', 'Find it'], point: ['Señálalo', 'Point to it'], choose: ['¿Cuál es?', 'Name it'], type: ['Escríbelo', 'Spell it'] };
   const hintBtn = (box) => { const b = h('button', { type: 'button', class: 'btn ghost', onclick: () => { if (locked) return; b.disabled = true; box.replaceChildren(h('strong', {}, tr('Pista: ', 'Hint: ')), tr(current().fact)); box.hidden = false; } }, tr('💡 Pista', '💡 Hint')); return b; };
@@ -637,10 +642,10 @@ function renderQuiz(round) {
     const it = current(), [x, y] = map.toSvg(ev.clientX, ev.clientY);
     locked = true; answers.replaceChildren();
     if (map.near(it.id, x, y)) {
-      map.setClass(it.id, 'correct'); map.label(it.id, it.name, 'correct'); map.marker(x, y, 'ok');
+      map.zone(it.id); map.setClass(it.id, 'correct'); map.label(it.id, it.name, 'correct'); map.marker(x, y, 'ok');
       recordAnswer(`${topic.id}:${it.id}`, true); correctFeedback(); autoNext();
     } else {
-      map.marker(x, y, 'miss'); map.setClass(it.id, 'correct reveal'); map.label(it.id, it.name, 'correct');
+      map.zone(it.id); map.marker(x, y, 'miss'); map.setClass(it.id, 'correct reveal'); map.label(it.id, it.name, 'correct');
       recordAnswer(`${topic.id}:${it.id}`, false);
       wrongFeedback(both(() => L(`Por ahí no. «${it.name}» se muestra en verde.`, `Not there. “${it.name}” is shown in green.`)));
       map.focus(it.id); nextBtn.hidden = false; nextBtn.focus();
