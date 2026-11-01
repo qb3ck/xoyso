@@ -1,5 +1,5 @@
 import { MAP } from './map-data.js';
-import { SUPABASE_URL, SUPABASE_KEY, TOPICS } from './config.js';
+import { SUPABASE_URL, SUPABASE_KEY, TOPICS, SECTIONS } from './config.js';
 
 /* ---------------------------------------------------------------- helpers */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -371,6 +371,8 @@ function setUserArea() {
 function screen(...children) { app.replaceChildren(...children); window.scrollTo(0, 0); }
 const art = (topic, it) => `${Lp(it.article || topic.article)} ${it.name}`;          // "el Ebro"
 const artCap = (topic, it) => `${Lp(it.articleCap || topic.articleCap)} ${it.name}`; // "El Ebro"
+const sectionOf = (topic) => SECTIONS.find((s) => s.topics.includes(topic)) || SECTIONS[0];
+const tipEl = (it) => (it.tip ? h('p', { class: 'tip' }, h('strong', {}, tr('💡 Truco: ', '💡 Memory tip: ')), tr(it.tip)) : null);
 const both = (fn) => [((l) => { const o = lang; lang = l; const r = fn(); lang = o; return r; })('es'), ((l) => { const o = lang; lang = l; const r = fn(); lang = o; return r; })('en')];
 
 function renderLogin(mode = 'signin', message = null) {
@@ -427,9 +429,27 @@ function heroMapSvg() {
   return `<svg viewBox="0 0 ${MAP.width} ${MAP.height}" aria-hidden="true"><path class="land-spain" d="${MAP.spain}"/><g class="hero-rivers">${rivers}</g></svg>`;
 }
 
+function sectionSummary(section) {
+  return section.topics.reduce((acc, t) => { const x = topicSummary(t); return { mastered: acc.mastered + x.mastered, total: acc.total + x.total }; }, { mastered: 0, total: 0 });
+}
 function renderHome() {
   setUserArea(); document.onkeydown = null;
-  const cards = TOPICS.map((t) => {
+  const cards = SECTIONS.map((sec) => {
+    const { mastered, total } = sectionSummary(sec);
+    return h('button', { class: 'card topic-card', onclick: () => renderSection(sec) },
+      h('div', { class: 'topic-icon', html: topicIcon('geo1eso') }),
+      h('div', { class: 'topic-text' }, h('h2', {}, tr(sec.title)), h('p', { class: 'muted' }, tr(sec.blurb)),
+        h('div', { class: 'meter' }, h('span', { style: `width:${(100 * mastered) / total}%` })),
+        h('p', { class: 'small' }, tr(`${mastered} de ${total} dominados`, `${mastered} of ${total} mastered`))));
+  });
+  screen(h('section', { class: 'home' },
+    h('h1', {}, tr(`¡Hola, ${state.session.username}!`, `Hi ${state.session.username}!`)),
+    h('p', { class: 'muted lead' }, tr('¿Qué quieres repasar hoy?', 'What do you want to revise today?')),
+    h('div', { class: 'topic-grid' }, ...cards)));
+}
+function renderSection(section) {
+  setUserArea(); document.onkeydown = null;
+  const cards = section.topics.map((t) => {
     const { mastered, total } = topicSummary(t);
     return h('button', { class: 'card topic-card', onclick: () => renderTopic(t) },
       h('div', { class: 'topic-icon', html: topicIcon(t.id) }),
@@ -442,11 +462,13 @@ function renderHome() {
     h('div', { class: 'topic-text' }, h('h2', {}, tr('Próximamente', 'Coming soon')),
       h('p', { class: 'muted' }, tr('Aquí aparecerán las islas, las montañas y más.', 'Islands, mountains and more will appear here.'))));
   screen(h('section', { class: 'home' },
-    h('h1', {}, tr(`¡Hola, ${state.session.username}!`, `Hi ${state.session.username}!`)),
-    h('p', { class: 'muted lead' }, tr('¿Qué quieres repasar hoy?', 'What do you want to revise today?')),
+    h('button', { class: 'back', onclick: renderHome }, '← ', tr('Inicio', 'Home')),
+    h('h1', {}, tr(section.title)),
+    h('p', { class: 'muted lead' }, tr('Elige un tema para repasar.', 'Choose a topic to revise.')),
     h('div', { class: 'topic-grid' }, ...cards, coming)));
 }
 function topicIcon(id) {
+  if (id === 'geo1eso') return '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="17" fill="none" stroke="currentColor" stroke-width="4"/><path d="M7 24h34M24 7c-9 9-9 25 0 34M24 7c9 9 9 25 0 34" fill="none" stroke="currentColor" stroke-width="3"/></svg>';
   if (id === 'rivers') return '<svg viewBox="0 0 48 48"><path d="M6 12c10 0 10 9 20 9s9 15 16 15" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>';
   return '<svg viewBox="0 0 48 48"><path d="M6 38l12-20 8 12 5-7 11 15z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg>';
 }
@@ -458,7 +480,7 @@ function renderTopic(topic) {
   const mode = (title, desc, icon, fn, extra = '') => h('button', { class: `card mode-card ${extra}`, onclick: fn },
     h('div', { class: 'mode-icon', html: icon }), h('h3', {}, tr(title)), h('p', { class: 'muted' }, tr(desc)));
   screen(h('section', { class: 'topic' },
-    h('button', { class: 'back', onclick: renderHome }, '← ', tr('Todos los temas', 'All topics')),
+    h('button', { class: 'back', onclick: () => renderSection(sectionOf(topic)) }, '← ', tr(sectionOf(topic).title)),
     h('h1', {}, tr(topic.title)),
     h('p', { class: 'muted lead' }, tr(
       `Dominas ${mastered} de ${total}. Acierta uno ${MASTERED_STREAK} veces seguidas para dominarlo.`,
@@ -488,7 +510,7 @@ function renderLearn(topic) {
   const drawCard = () => {
     if (!selected) { card.replaceChildren(h('p', { class: 'muted' }, tr(`Toca un ${topic.noun[0]} en el mapa o un nombre de abajo.`, `Tap a ${topic.noun[1]} on the map, or a name below.`))); return; }
     const it = topic.items.find((i) => i.id === selected);
-    card.replaceChildren(h('p', { class: 'eyebrow' }, topic.groupLabel?.[it.group] ? tr(topic.groupLabel[it.group]) : ''), h('h2', { class: 'big-name' }, it.name), h('p', {}, tr(it.fact)));
+    card.replaceChildren(h('p', { class: 'eyebrow' }, topic.groupLabel?.[it.group] ? tr(topic.groupLabel[it.group]) : ''), h('h2', { class: 'big-name' }, it.name), h('p', {}, tr(it.fact)), tipEl(it));
   };
   const select = (id, zoom) => {
     selected = id;
@@ -534,18 +556,20 @@ function renderQuiz(round) {
   const map = new MapView(topic, { onTap: (id) => onMapTap(id) });
   const current = () => round.items[round.i];
   const titles = { find: ['Encuéntralo', 'Find it'], choose: ['¿Cuál es?', 'Name it'], type: ['Escríbelo', 'Spell it'] };
+  const hintBtn = (box) => { const b = h('button', { type: 'button', class: 'btn ghost', onclick: () => { if (locked) return; b.disabled = true; box.replaceChildren(h('strong', {}, tr('Pista: ', 'Hint: ')), tr(current().fact)); box.hidden = false; } }, tr('💡 Pista', '💡 Hint')); return b; };
   const dontKnow = () => h('button', { type: 'button', class: 'btn ghost', onclick: () => giveUp() }, tr('No lo sé', 'I don’t know'));
 
   function setup() {
     locked = false; feedback.replaceChildren(); feedback.className = 'feedback'; nextBtn.hidden = true;
     map.clearAll(); map.dimOthers(false); answers.replaceChildren();
+    const box = h('div', { class: 'feedback hint', hidden: true });
     progressBar.firstChild.style.width = `${(100 * round.i) / round.items.length}%`;
     const it = current();
     const counter = h('p', { class: 'eyebrow' }, tr(`Pregunta ${round.i + 1} de ${round.items.length}`, `Question ${round.i + 1} of ${round.items.length}`));
     if (mode === 'find') {
       map.reset(true);
       prompt.replaceChildren(counter, h('p', { class: 'ask' }, tr(`Toca el ${nEs}`, `Tap the ${nEn}`)), h('h2', { class: 'big-name' }, it.name));
-      answers.append(dontKnow());
+      answers.append(h('div', { class: 'row' }, hintBtn(box), dontKnow()), box);
     } else {
       map.dimOthers(true); map.setClass(it.id, 'target'); map.focus(it.id);
       prompt.replaceChildren(counter, h('p', { class: 'ask' }, tr(`¿Qué ${nEs} está iluminado?`, `Which ${nEn} is lit up?`)));
@@ -555,14 +579,15 @@ function renderQuiz(round) {
         const same = others.filter((x) => x.group === it.group).slice(0, 2);
         const opts = shuffle([it, ...same, ...others.filter((x) => !same.includes(x))].slice(0, 4));
         for (const o of opts) answers.append(h('button', { class: 'btn option', 'data-id': o.id, onclick: (e) => choose(o.id, e.currentTarget) }, o.name));
+        answers.append(h('div', { class: 'row' }, hintBtn(box)), box);
       } else {
         const input = h('input', { class: 'spell-input', autocomplete: 'off', autocapitalize: 'words', spellcheck: 'false',
           placeholder: L('Escribe el nombre…', 'Type the name…'), 'data-ph-es': 'Escribe el nombre…', 'data-ph-en': 'Type the name…', 'aria-label': L('Escribe el nombre', 'Type the name') });
         const accents = h('div', { class: 'accent-keys' }, ...['á', 'é', 'í', 'ó', 'ú', 'ñ'].map((ch) =>
           h('button', { type: 'button', class: 'key', onclick: () => { const p = input.selectionStart ?? input.value.length; input.value = input.value.slice(0, p) + ch + input.value.slice(input.selectionEnd ?? p); input.focus(); input.setSelectionRange(p + 1, p + 1); } }, ch)));
         const form = h('form', { class: 'spell-form', onsubmit: (e) => { e.preventDefault(); if (input.value.trim()) typed(input.value, input); } },
-          input, accents, h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'submit' }, tr('Comprobar', 'Check')), dontKnow()));
-        answers.append(form);
+          input, accents, h('div', { class: 'row' }, h('button', { class: 'btn primary', type: 'submit' }, tr('Comprobar', 'Check')), hintBtn(box), dontKnow()));
+        answers.append(form, box);
         setTimeout(() => input.focus({ preventScroll: true }), 50);
       }
     }
@@ -574,7 +599,7 @@ function renderQuiz(round) {
   }
   function wrongFeedback(pair) {
     round.missed.push(current());
-    feedback.className = 'feedback bad'; feedback.replaceChildren(tr(pair));
+    feedback.className = 'feedback bad'; feedback.replaceChildren(tr(pair), tipEl(current()));
   }
   function onMapTap(id) {
     if (mode !== 'find' || locked) return;

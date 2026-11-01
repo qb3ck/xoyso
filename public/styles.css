@@ -14,7 +14,7 @@
   --sea: #d4e9f4;
   --land: #fbf6e8;
   --land-edge: #9c9483;
-  --land-other: #e7e3d8;
+  --land-other: #dcd6c6;
   --region: #d8cba8;
   --river: #2a78bd;
   --label-halo: #fbf6e8;
@@ -27,7 +27,7 @@
     --bg: #12191e; --surface: #1b252c; --ink: #e8eef2; --muted: #9db0bc; --line: #2c3a43;
     --brand: #5aa7dc; --brand-ink: #0d1a22; --accent: #f29150;
     --good: #4cc27c; --good-bg: #173426; --bad: #ef7070; --bad-bg: #3a1e1e;
-    --sea: #10283a; --land: #24323a; --land-edge: #5f6f78; --land-other: #1a242a; --region: #3d4c55;
+    --sea: #10283a; --land: #24323a; --land-edge: #5f6f78; --land-other: #34444d; --region: #3d4c55;
     --river: #6cb8f0; --label-halo: #24323a;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 18px rgba(0, 0, 0, .25);
     color-scheme: dark;
@@ -37,7 +37,7 @@
   --bg: #12191e; --surface: #1b252c; --ink: #e8eef2; --muted: #9db0bc; --line: #2c3a43;
   --brand: #5aa7dc; --brand-ink: #0d1a22; --accent: #f29150;
   --good: #4cc27c; --good-bg: #173426; --bad: #ef7070; --bad-bg: #3a1e1e;
-  --sea: #10283a; --land: #24323a; --land-edge: #5f6f78; --land-other: #1a242a; --region: #3d4c55;
+  --sea: #10283a; --land: #24323a; --land-edge: #5f6f78; --land-other: #34444d; --region: #3d4c55;
   --river: #6cb8f0; --label-halo: #24323a;
   color-scheme: dark;
 }
@@ -157,9 +157,9 @@ main { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding: 18px 16
 
 /* map */
 .map-wrap { position: relative; background: var(--sea); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
-.map { display: block; width: 100%; height: auto; aspect-ratio: 1000 / 733; touch-action: none; user-select: none; -webkit-user-select: none; }
+.map { display: block; width: 100%; height: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
 .sea { fill: var(--sea); }
-.land-other { fill: var(--land-other); stroke: var(--land-edge); stroke-width: .6; vector-effect: non-scaling-stroke; }
+.land-other { fill: var(--land-other); stroke: var(--land-edge); stroke-width: .9; vector-effect: non-scaling-stroke; }
 .land-spain { fill: var(--land); stroke: var(--land-edge); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .regions { fill: none; stroke: var(--region); stroke-width: .8; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .place-labels text { font-size: calc(13px * var(--k, 1)); fill: var(--muted); text-anchor: middle; font-weight: 700; pointer-events: none; }
@@ -259,3 +259,8 @@ main { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding: 18px 16
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition: none !important; }
   .hero-rivers path { stroke-dashoffset: 0; }
 }
+
+/* memory tips and hints */
+.tip, .feedback.hint { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); color: var(--ink); border-radius: 12px; padding: 10px 12px; font-size: 1rem; }
+.tip { margin: .9em 0 0; }
+.feedback.bad .tip { margin: .7em 0 0; }

@@ -4,7 +4,7 @@ Usage: python3 scripts/build_map.py"""
 import json, math
 
 W = 1000  # viewBox width; height follows the bounding box
-BBOX = (-9.8, 35.7, 4.6, 44.0)  # lon/lat window to show (peninsula + Balearics)
+BBOX = (-9.8, 35.7, 4.6, 44.9)  # lon/lat window to show (peninsula + Balearics)
 
 # Lambert conformal conic, standard parallels 37N / 43N, centre 40N 3.7W
 phi1, phi2, phi0, lam0 = map(math.radians, (37, 43, 40, -3.7))
@@ -75,7 +75,7 @@ out['spain'] = ''.join(poly_path(f['geometry'], 0.35) for f in land['features'] 
 out['neighbours'] = ''.join(poly_path(f['geometry'], 0.6) for f in land['features'] if f['properties']['kind'] != 'spain')
 out['regions'] = ''.join(poly_path(f['geometry'], 0.5) for f in regions['features'])
 out['countryLabels'] = [{'name': n, 'x': round(proj(*ll)[0]), 'y': round(proj(*ll)[1])} for n, ll in
-                        [('PORTUGAL', (-8.0, 40.25)), ('FRANCIA', (0.6, 43.75)),
+                        [('PORTUGAL', (-8.0, 40.25)), ('FRANCIA', (-0.2, 44.25)),
                          ('Océano Atlántico', (-9.3, 43.75)), ('Mar Mediterráneo', (2.6, 38.6)), ('Mar Cantábrico', (-5.0, 43.85))]]
 # Quiz items, keyed 'topic:id'. kind: line (rivers), area (islands, ranges) or point (peaks)
 out['items'] = {}
