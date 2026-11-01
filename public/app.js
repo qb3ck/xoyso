@@ -291,6 +291,7 @@ class MapView {
   reset(animate) { animate ? this.animateTo([...this.full]) : (this.vb = [...this.full], this.applyViewBox()); }
   // Zoom so that a small item is easy to see; big items keep the whole map.
   focus(itemId) {
+    if (this.topic.id === 'rivers') { this.reset(true); return; }   // rivers: always keep the whole map in view
     const box = geometry(`${this.topic.id}:${itemId}`).box;
     const bw = box[2] - box[0], bh = box[3] - box[1];
     if (Math.max(bw, bh) > 220) { this.reset(true); return; }
