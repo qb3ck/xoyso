@@ -155,3 +155,26 @@ out['areas'] = {REGION_IDS[f['properties']['name']]: poly_path(f['geometry'], 0.
 for f in land['features']:
     if f['properties']['kind'] == 'france': out['areas']['francia'] = poly_path(f['geometry'], 0.6)
     if f['properties']['kind'] == 'portugal': out['areas']['portugal'] = poly_path(f['geometry'], 0.6)
+
+# ---------------------------------------------------------------- comunidades autónomas as quiz items
+RID = dict(REGION_IDS); RID.update({'Ciudad de Ceuta': 'ceuta', 'Ciudad de Melilla': 'melilla'})
+for f in regions['features']:
+    rid = RID[f['properties']['name']]; g = f['geometry']
+    polys = g['coordinates'] if g['type'] == 'MultiPolygon' else [g['coordinates']]
+    rings = []
+    for poly in polys:
+        pts = [P(p) for p in poly[0]]
+        if not any(inside(p) for p in pts): continue
+        pts = clip_ring(pts); small = rid in ('ceuta', 'melilla', 'baleares')
+        r = rdp(pts, 0.04 if small else 0.5)
+        if len(r) >= 3: rings.append(orient(r))
+    big = max(rings, key=lambda r: (max(p[0] for p in r) - min(p[0] for p in r)) * (max(p[1] for p in r) - min(p[1] for p in r)))
+    bb = box_of(big)
+    add_area('regions:' + rid, rings, anchor=((bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2))
+# Canarias = the seven islands in the inset
+cn = [items['islands:' + i] for i in ('tenerife', 'gran_canaria', 'lanzarote', 'fuerteventura', 'la_palma', 'la_gomera', 'el_hierro')]
+items['regions:canarias'] = {'kind': 'area', 'd': ''.join(c['d'] for c in cn), 'box': [IX, IY, IX + IW, IY + IH], 'a': [IX + IW / 2, IY + IH / 2 - 4], 'inset': 1}
+out['places'].update({k: {'name': nm, 'x': round(P((lo, la))[0], 1), 'y': round(P((lo, la))[1], 1)} for k, (nm, lo, la) in {
+    'valladolid': ('Valladolid', -4.72, 41.65), 'santiago': ('Santiago de Compostela', -8.54, 42.88), 'vitoria': ('Vitoria-Gasteiz', -2.67, 42.85),
+    'logrono': ('Logroño', -2.45, 42.47)}.items()})
+out['places']['las_palmas'] = {'name': 'Las Palmas de Gran Canaria', 'x': round(iproj(-15.41, 28.12)[0], 1), 'y': round(iproj(-15.41, 28.12)[1], 1)}

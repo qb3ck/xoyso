@@ -150,6 +150,36 @@ TOPICS.push(
   },
 );
 
+TOPICS.push({
+  id: 'regions', g: 'f',
+  title: ['Comunidades autónomas', 'Autonomous communities'],
+  blurb: ['Las 17 comunidades y las 2 ciudades autónomas', 'The 17 communities and 2 autonomous cities'],
+  noun: ['comunidad', 'community'],
+  learnTitle: ['Aprende las comunidades', 'Learn the communities'],
+  groupLabel: { com: ['Comunidades autónomas', 'Autonomous communities'], city: ['Ciudades autónomas', 'Autonomous cities'] },
+  items: [
+      it("galicia", "Galicia", "com", ["Es la esquina noroeste, la que mira al Atlántico, con las rías.", "The north-west corner, facing the Atlantic, with its rías (sea inlets)."], ["Capital: Santiago de Compostela. Termina allí el Camino de Santiago. Tiene 4 provincias: A Coruña, Lugo, Ourense y Pontevedra.", "Capital: Santiago de Compostela, where the Camino de Santiago ends. 4 provinces: A Coruña, Lugo, Ourense and Pontevedra."]),
+      it("asturias", "Asturias", "com", ["Está entre Galicia y Cantabria, pegada al mar Cantábrico y a los Picos de Europa.", "Between Galicia and Cantabria, hugging the Cantabrian Sea and the Picos de Europa."], ["Capital: Oviedo. Es una comunidad de una sola provincia. Es famosa por la sidra.", "Capital: Oviedo. A single-province community. Famous for its cider."], ["Principado de Asturias"]),
+      it("cantabria", "Cantabria", "com", ["Pequeña, entre Asturias y el País Vasco. Su nombre viene de la Cordillera Cantábrica.", "Small, between Asturias and the Basque Country. It is named after the Cantabrian range."], ["Capital: Santander. Una sola provincia. Aquí están las cuevas de Altamira.", "Capital: Santander. A single province. The Altamira caves are here."]),
+      it("pais_vasco", "País Vasco", "com", ["Está en el norte, entre Cantabria y Navarra, junto a Francia y el golfo de Vizcaya.", "In the north, between Cantabria and Navarra, beside France and the Bay of Biscay."], ["Capital: Vitoria-Gasteiz. Tres provincias: Álava, Guipúzcoa y Vizcaya. En euskera: Euskadi.", "Capital: Vitoria-Gasteiz. Three provinces: Álava, Gipuzkoa and Bizkaia. In Basque: Euskadi."], ["Euskadi", "Pais Vasco"]),
+      it("navarra", "Navarra", "com", ["Está justo debajo del País Vasco y toca los Pirineos y Francia.", "Just below the Basque Country, touching the Pyrenees and France."], ["Capital: Pamplona. Una provincia. Famosa por los Sanfermines, con el encierro de los toros.", "Capital: Pamplona. One province. Famous for San Fermín and the running of the bulls."], ["Comunidad Foral de Navarra"]),
+      it("la_rioja", "La Rioja", "com", ["Es la más pequeña de la península, junto al Ebro, entre el País Vasco y Aragón.", "The smallest on the peninsula, beside the Ebro, between the Basque Country and Aragón."], ["Capital: Logroño. Una provincia. Famosa por su vino tinto.", "Capital: Logroño. One province. Famous for its red wine."], ["Rioja"]),
+      it("aragon", "Aragón", "com", ["Es la comunidad grande de arriba, sin mar. El Ebro la cruza y los Pirineos la cierran por el norte.", "The big one at the top, with no coast. The Ebro crosses it and the Pyrenees close it to the north."], ["Capital: Zaragoza. Tres provincias: Huesca, Zaragoza y Teruel. No tiene costa.", "Capital: Zaragoza. Three provinces: Huesca, Zaragoza and Teruel. It has no coast."], ["Aragon"]),
+      it("cataluna", "Cataluña", "com", ["Es la esquina nordeste, con los Pirineos arriba y el Mediterráneo a la derecha.", "The north-east corner, with the Pyrenees above and the Mediterranean on the right."], ["Capital: Barcelona. Cuatro provincias: Barcelona, Girona, Lleida y Tarragona.", "Capital: Barcelona. Four provinces: Barcelona, Girona, Lleida and Tarragona."], ["Cataluna", "Catalunya"]),
+      it("castilla_leon", "Castilla y León", "com", ["Es la más grande de España, ocupa la meseta norte y rodea Madrid por arriba.", "The biggest in Spain: the northern plateau, wrapping around Madrid from above."], ["Capital: Valladolid. Nueve provincias, ¡más que ninguna otra! Mide unos 94.000 km².", "Capital: Valladolid. Nine provinces, more than any other! About 94,000 km²."], ["Castilla Leon", "Castilla y Leon"]),
+      it("madrid", "Madrid", "com", ["Es pequeña, en el centro exacto de la península, rodeada por Castilla-La Mancha y Castilla y León.", "Small, in the exact centre of the peninsula, ringed by Castilla-La Mancha and Castilla y León."], ["Capital: Madrid, también capital de España. Una provincia.", "Capital: Madrid, which is also the capital of Spain. One province."], ["Comunidad de Madrid"]),
+      it("castilla_la_mancha", "Castilla-La Mancha", "com", ["Está justo debajo de Madrid y arriba de Andalucía: es la del Quijote.", "Just below Madrid and above Andalucía: the land of Don Quijote."], ["Capital: Toledo. Cinco provincias: Albacete, Ciudad Real, Cuenca, Guadalajara y Toledo.", "Capital: Toledo. Five provinces: Albacete, Ciudad Real, Cuenca, Guadalajara and Toledo."], ["Castilla la Mancha", "Castilla-la-Mancha"]),
+      it("extremadura", "Extremadura", "com", ["Está en el oeste, pegada a Portugal, debajo de Castilla y León.", "In the west, up against Portugal, below Castilla y León."], ["Capital: Mérida (con teatro romano). Dos provincias: Cáceres y Badajoz.", "Capital: Mérida (with a Roman theatre). Two provinces: Cáceres and Badajoz."]),
+      it("valenciana", "Comunidad Valenciana", "com", ["Está en la costa este, entre Cataluña y Murcia, mirando al Mediterráneo.", "On the east coast, between Catalonia and Murcia, facing the Mediterranean."], ["Capital: Valencia. Tres provincias: Castellón, Valencia y Alicante.", "Capital: Valencia. Three provinces: Castellón, Valencia and Alicante."], ["Valenciana", "Comunitat Valenciana"]),
+      it("murcia", "Región de Murcia", "com", ["Está en el sureste, pequeña, debajo de la Valenciana y con el Mar Menor.", "In the south-east, small, below Valencia and with the Mar Menor."], ["Capital: Murcia. Una provincia. Tiene el Mar Menor y el cabo de Palos.", "Capital: Murcia. One province. It has the Mar Menor and Cabo de Palos."], ["Murcia", "Region de Murcia"]),
+      it("andalucia", "Andalucía", "com", ["Es la grande del sur: toca el Atlántico y el Mediterráneo y tiene la Sierra Nevada.", "The big one in the south: it touches the Atlantic and the Mediterranean and has the Sierra Nevada."], ["Capital: Sevilla. Ocho provincias. Es la comunidad con más habitantes.", "Capital: Sevilla. Eight provinces. The community with the most people."], ["Andalucia"]),
+      it("baleares", "Islas Baleares", "com", ["Son las islas del Mediterráneo, a la derecha de Valencia: Mallorca, Menorca, Ibiza y Formentera.", "The Mediterranean islands, to the right of Valencia: Mallorca, Menorca, Ibiza and Formentera."], ["Capital: Palma de Mallorca. Una provincia formada por islas.", "Capital: Palma de Mallorca. A single province made of islands."], ["Baleares", "Illes Balears", "Islas Baleares"]),
+      it("canarias", "Canarias", "com", ["Son las islas del Atlántico, frente a África, dibujadas en el recuadro del mapa.", "The Atlantic islands off Africa, drawn in the box on the map."], ["Capital: compartida entre Las Palmas de Gran Canaria y Santa Cruz de Tenerife. Dos provincias.", "Capital: shared between Las Palmas de Gran Canaria and Santa Cruz de Tenerife. Two provinces."], ["Islas Canarias", "Canarias"]),
+      it("ceuta", "Ceuta", "city", ["Es una ciudad autónoma de España en la costa de África, frente a Gibraltar.", "An autonomous city of Spain on the African coast, facing Gibraltar."], ["Es una ciudad autónoma, no una comunidad. Está en Marruecos, junto al estrecho de Gibraltar.", "An autonomous city, not a community. It sits in Morocco, beside the Strait of Gibraltar."]),
+      it("melilla", "Melilla", "city", ["Es la otra ciudad autónoma en África, más al este que Ceuta.", "The other autonomous city in Africa, further east than Ceuta."], ["Es una ciudad autónoma, no una comunidad. Está en el norte de Marruecos, en el Mediterráneo.", "An autonomous city, not a community. In northern Morocco, on the Mediterranean."]),
+  ],
+});
+
 // "Conexiones": multiple-choice questions linking features to places and regions, asked on a blank map.
 // Q(id, topic, answer item id, [question es, en], clue places, clue regions, optional extra hint [es, en])
 // After a wrong answer the map shows the clue (places/regions), then the shape of the answer, then reveals it.
@@ -212,8 +242,106 @@ export const CONNECTIONS = [
   Q('isla_lanzarote', 'islands', 'lanzarote', ['¿Qué isla canaria es la más al noreste y tiene el Parque de Timanfaya?', 'Which Canary island is furthest north-east and has Timanfaya Park?']),
 ];
 
+CONNECTIONS.push(
+  Q('capital_andalucia', 'regions', 'andalucia', ['¿Qué comunidad tiene como capital Sevilla?', 'Which community has Sevilla as its capital?'], ['sevilla']),
+  Q('capital_aragon', 'regions', 'aragon', ['¿Qué comunidad tiene como capital Zaragoza?', 'Which community has Zaragoza as its capital?'], ['zaragoza']),
+  Q('capital_asturias', 'regions', 'asturias', ['¿Qué comunidad tiene como capital Oviedo?', 'Which community has Oviedo as its capital?'], ['oviedo']),
+  Q('capital_baleares', 'regions', 'baleares', ['¿Qué comunidad tiene como capital Palma de Mallorca?', 'Which community has Palma de Mallorca as its capital?'], ['palma']),
+  Q('capital_cantabria', 'regions', 'cantabria', ['¿Qué comunidad tiene como capital Santander?', 'Which community has Santander as its capital?'], ['santander']),
+  Q('capital_cast_leon', 'regions', 'castilla_leon', ['¿Qué comunidad tiene como capital Valladolid?', 'Which community has Valladolid as its capital?'], ['valladolid']),
+  Q('capital_cast_mancha', 'regions', 'castilla_la_mancha', ['¿Qué comunidad tiene como capital Toledo?', 'Which community has Toledo as its capital?'], ['toledo']),
+  Q('capital_cataluna', 'regions', 'cataluna', ['¿Qué comunidad tiene como capital Barcelona?', 'Which community has Barcelona as its capital?'], ['barcelona']),
+  Q('capital_extremadura', 'regions', 'extremadura', ['¿Qué comunidad tiene como capital Mérida?', 'Which community has Mérida as its capital?'], ['merida']),
+  Q('capital_galicia', 'regions', 'galicia', ['¿Qué comunidad tiene como capital Santiago de Compostela?', 'Which community has Santiago de Compostela as its capital?'], ['santiago']),
+  Q('capital_la_rioja', 'regions', 'la_rioja', ['¿Qué comunidad tiene como capital Logroño?', 'Which community has Logroño as its capital?'], ['logrono']),
+  Q('capital_madrid', 'regions', 'madrid', ['¿Qué comunidad tiene como capital Madrid?', 'Which community has Madrid as its capital?'], ['madrid']),
+  Q('capital_murcia', 'regions', 'murcia', ['¿Qué comunidad tiene como capital Murcia?', 'Which community has Murcia as its capital?'], ['murcia']),
+  Q('capital_navarra', 'regions', 'navarra', ['¿Qué comunidad tiene como capital Pamplona?', 'Which community has Pamplona as its capital?'], ['pamplona']),
+  Q('capital_pais_vasco', 'regions', 'pais_vasco', ['¿Qué comunidad tiene como capital Vitoria-Gasteiz?', 'Which community has Vitoria-Gasteiz as its capital?'], ['vitoria']),
+  Q('capital_valenciana', 'regions', 'valenciana', ['¿Qué comunidad tiene como capital Valencia?', 'Which community has Valencia as its capital?'], ['valencia']),
+  Q('capital_canarias', 'regions', 'canarias', ['¿Qué comunidad tiene como capital Las Palmas de Gran Canaria?', 'Which community has Las Palmas de Gran Canaria as its capital?'], ['las_palmas']),
+);
+
 // Silly mnemonics, keyed 'topic:item'. Shown with the tip and after wrong answers.
 const SILLY = {
+
+ "regions:galicia": [
+  "Una GALLINA (galli-cia) con una concha del Camino de Santiago en la esquina noroeste.",
+  "A HEN («gallina» ≈ Galicia) wearing a Camino de Santiago shell in the north-west corner."
+ ],
+ "regions:asturias": [
+  "Un oso asturiano brinda con sidra entre las montañas y el mar.",
+  "An Asturian bear raises a glass of cider between the mountains and the sea."
+ ],
+ "regions:cantabria": [
+  "Un CANTANTE (canta-bria) con una anchoa en la boca canta en la playa de Santander.",
+  "A SINGER («cantante» ≈ Cantabria) with an anchovy in his mouth sings on the beach at Santander."
+ ],
+ "regions:pais_vasco": [
+  "Un VASO de sidra con un pintxo, junto al mar Cantábrico.",
+  "A GLASS («vaso» ≈ vasco) of cider with a pintxo, beside the Cantabrian Sea."
+ ],
+ "regions:navarra": [
+  "Un toro corre por una NAVE estrecha (Nav-arra) en Pamplona.",
+  "A bull runs through a narrow SHIP («nave» ≈ Navarra) in Pamplona."
+ ],
+ "regions:la_rioja": [
+  "Una botella de vino tinto pequeñita, apoyada en el Ebro.",
+  "A tiny bottle of red wine leaning against the Ebro."
+ ],
+ "regions:aragon": [
+  "Un DRAGÓN (Ara-gón) duerme a lo largo del Ebro y tapa la salida al mar.",
+  "A DRAGON («dragón» ≈ Aragón) sleeps along the Ebro and blocks the way to the sea."
+ ],
+ "regions:cataluna": [
+  "Una GATA (cata-luña) con barretina mira la luna desde la esquina nordeste.",
+  "A CAT («gata») in a barretina hat gazes at the moon from the north-east corner."
+ ],
+ "regions:castilla_leon": [
+  "Un LEÓN con un CASTILLO en la cabeza ocupa media meseta: ¡el más grande!",
+  "A LION with a CASTLE on its head fills half the plateau: the biggest one!"
+ ],
+ "regions:madrid": [
+  "Un oso comiendo madroños en el centro exacto de la meseta.",
+  "A bear eating strawberry-tree fruit (madroños) in the exact middle of the plateau."
+ ],
+ "regions:castilla_la_mancha": [
+  "Don Quijote pelea con molinos sobre una gran MANCHA de tinta en el centro.",
+  "Don Quijote fights windmills on a big ink STAIN («mancha») in the middle."
+ ],
+ "regions:extremadura": [
+  "Una tierra EXTREMA y DURA donde viven los cerdos ibéricos, pegada a Portugal.",
+  "An EXTREME and TOUGH land where Iberian pigs roam, right beside Portugal."
+ ],
+ "regions:valenciana": [
+  "Una naranja gigante con una paella dentro, tumbada en la costa este.",
+  "A giant orange with a paella inside, lying on the east coast."
+ ],
+ "regions:murcia": [
+  "Un MURCIÉLAGO colgado sobre el Mar Menor, comiendo verduras de la huerta.",
+  "A BAT («murciélago» ≈ Murcia) hanging over the Mar Menor, eating vegetables from the huerta."
+ ],
+ "regions:andalucia": [
+  "Un bailaor de flamenco gigante, con un pie en cada mar.",
+  "A giant flamenco dancer with one foot in each sea."
+ ],
+ "regions:baleares": [
+  "Una BAILARINA (bale-ares) salta de isla en isla sobre el Mediterráneo.",
+  "A BALLERINA («bailarina» ≈ Baleares) leaps from island to island across the Mediterranean."
+ ],
+ "regions:canarias": [
+  "Siete canarios amarillos sentados dentro de una jaula cuadrada (el recuadro).",
+  "Seven yellow canaries sitting inside a square cage (the box on the map)."
+ ],
+ "regions:ceuta": [
+  "Un cuadradito de España pegado a África, que mira a Gibraltar con prismáticos.",
+  "A tiny square of Spain stuck onto Africa, watching Gibraltar through binoculars."
+ ],
+ "regions:melilla": [
+  "MEL-illa: una islita de miel pegada a África.",
+  "MEL-illa: a little island of honey («miel») stuck to Africa."
+ ]
+,
  "rivers:mino": [
   "Un niño pequeñito («mi niño») llora en la esquina de arriba a la izquierda porque se le ha caído el helado.",
   "A tiny boy («mi niño») is crying in the top-left corner because he dropped his ice cream."

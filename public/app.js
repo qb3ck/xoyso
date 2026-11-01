@@ -529,6 +529,7 @@ function topicIcon(id) {
   if (id === 'capes') return `<svg viewBox="0 0 48 48"><path d="M6 40h14c4 0 6-3 6-8V16c0-4 3-6 7-6h9" ${stroke}/><circle cx="26" cy="16" r="3" fill="currentColor"/></svg>`;
   if (id === 'seas') return `<svg viewBox="0 0 48 48"><path d="M4 18c5-6 9 6 14 0s9 6 14 0 9 6 12 0M4 32c5-6 9 6 14 0s9 6 14 0 9 6 12 0" ${stroke}/></svg>`;
   if (id === 'islands') return `<svg viewBox="0 0 48 48"><path d="M10 30c0-8 8-12 14-12s14 4 14 12c0 5-6 6-14 6s-14-1-14-6z" ${stroke}/><circle cx="40" cy="12" r="3" fill="currentColor"/></svg>`;
+  if (id === 'regions') return `<svg viewBox="0 0 48 48"><path d="M6 14l12-6 10 5 14-3v24l-12 6-10-5-14 4z M18 8v26 M28 13v26" ${stroke}/></svg>`;
   if (id === 'conn') return `<svg viewBox="0 0 48 48"><circle cx="12" cy="14" r="5" fill="currentColor"/><circle cx="36" cy="34" r="5" fill="currentColor"/><path d="M12 14c14 0 6 20 24 20" ${stroke}/></svg>`;
   if (id === 'exam') return `<svg viewBox="0 0 48 48"><rect x="9" y="6" width="30" height="36" rx="4" ${stroke}/><path d="M16 17h16M16 25h16M16 33h9" ${stroke}/></svg>`;
   if (id === 'relief') return `<svg viewBox="0 0 48 48"><path d="M4 36l9-14 6 8 8-16 7 12 6-5 4 15z" ${stroke}/></svg>`;
@@ -941,7 +942,7 @@ const EXAM_LENGTH = 20;
 function buildExam() {
   const last = new Set(store.get('geo.lastExam') || []);
   const fresh = (list, idFn) => { const f = list.filter((x) => !last.has(idFn(x))); return f.length >= Math.min(list.length, 1) ? f : list; };
-  const counts = { rivers: 3, relief: 3, peaks: 1, gulfs: 1, capes: 2, seas: 1, islands: 1 };
+  const counts = { rivers: 3, relief: 3, peaks: 1, gulfs: 1, capes: 2, seas: 1, islands: 1, regions: 2 };
   const modes = shuffle(['find', 'find', 'find', 'find', 'choose', 'choose', 'choose', 'choose', 'choose', 'type', 'type', 'type']);
   const items = [];
   for (const t of TOPICS) {
