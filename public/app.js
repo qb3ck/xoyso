@@ -940,24 +940,17 @@ function askItem({ topic, it, mode }, { title, label, pct, back, onDone }) {
 /* final quiz: 20 questions across everything; one attempt each; different questions each time */
 const EXAM_LENGTH = 20;
 function buildExam() {
+  // 20 plain questions (tap it / name it / spell it) spread over every topic; no "which river passes through…" questions
   const last = new Set(store.get('geo.lastExam') || []);
-  const fresh = (list, idFn) => { const f = list.filter((x) => !last.has(idFn(x))); return f.length >= Math.min(list.length, 1) ? f : list; };
-  const counts = { rivers: 3, relief: 3, peaks: 1, gulfs: 1, capes: 2, seas: 1, islands: 1, regions: 2 };
-  const modes = shuffle(['find', 'find', 'find', 'find', 'choose', 'choose', 'choose', 'choose', 'choose', 'type', 'type', 'type']);
+  const counts = { rivers: 4, relief: 4, peaks: 1, gulfs: 2, capes: 3, seas: 1, islands: 2, regions: 3 };
+  const modes = shuffle([...Array(7).fill('find'), ...Array(8).fill('choose'), ...Array(5).fill('type')]);
   const items = [];
   for (const t of TOPICS) {
-    const pool = t.items.filter((it) => !last.has(`${t.id}:${it.id}`));
-    const src = pool.length >= (counts[t.id] || 1) ? pool : t.items;
-    for (const it of weightedPick(src, (x) => `${t.id}:${x.id}`, counts[t.id] || 1)) items.push({ kind: 'item', topic: t, it });
+    const n = counts[t.id] || 1, pool = t.items.filter((it) => !last.has(`${t.id}:${it.id}`));
+    for (const it of weightedPick(pool.length >= n ? pool : t.items, (x) => `${t.id}:${x.id}`, n)) items.push({ kind: 'item', topic: t, it });
   }
   shuffle(items).forEach((e, i) => { e.mode = modes[i % modes.length]; });
-  const byTopic = new Map();
-  for (const q of shuffle(fresh(CONNECTIONS, (q) => q.id))) { if (!byTopic.has(q.topic)) byTopic.set(q.topic, []); byTopic.get(q.topic).push(q); }
-  const conns = [];
-  while (conns.length < EXAM_LENGTH - items.length && [...byTopic.values()].some((a) => a.length)) {
-    for (const arr of shuffle([...byTopic.values()])) if (arr.length && conns.length < EXAM_LENGTH - items.length) conns.push({ kind: 'conn', q: arr.shift() });
-  }
-  return shuffle([...items, ...conns]);
+  return items;
 }
 function startExam(section) {
   const entries = buildExam();
