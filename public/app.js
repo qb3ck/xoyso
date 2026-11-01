@@ -376,6 +376,12 @@ class MapView {
     const t = s('text', { x, y, class: `item-label ${cls}`, 'data-id': itemId }); t.textContent = text;
     this.labelsG.append(t);
   }
+  // "Pointing" is forgiving: inside the shape, or within a few percent of the map width of it
+  near(itemId, x, y) {
+    const g = geometry(`${this.topic.id}:${itemId}`);
+    return distance(`${this.topic.id}:${itemId}`, x, y) <= (g.kind === 'area' ? 15 : 30);
+  }
+  marker(x, y, cls) { this.labelsG.append(s('circle', { cx: x, cy: y, r: 6 * this.k + 2, class: `tap-marker ${cls}` })); }
   removeLabel(itemId) { this.labelsG.querySelector(`[data-id="${itemId}"]`)?.remove(); }
 }
 
@@ -511,6 +517,7 @@ function renderTopic(topic) {
     h('div', { class: 'mode-grid' },
       mode(['Aprender', 'Learn'], [`Explora el mapa y toca cada ${nEs} para ver su nombre.`, `Explore the map and tap each ${nEn} to see its name.`], ICONS.learn, () => renderLearn(topic)),
       mode(['Encuéntralo', 'Find it'], [`Ves un nombre y tocas ${gd(topic).el === 'la' ? 'esa' : 'ese'} ${nEs} en el mapa.`, `See a name, then tap that ${nEn} on the map.`], ICONS.find, () => startQuiz(topic, 'find'), 'accent'),
+      mode(['Señálalo', 'Point to it'], ['Ves un nombre y señalas más o menos por dónde está. No hace falta acertar con precisión.', 'See a name and point to roughly where it is. It doesn’t need to be exact.'], ICONS.point, () => startQuiz(topic, 'point')),
       mode(['¿Cuál es?', 'Name it'], [`Se ilumina ${gd(topic).un} ${nEs}. Elige su nombre.`, `One ${nEn} lights up. Pick its name.`], ICONS.name, () => startQuiz(topic, 'choose')),
       mode(['Escríbelo', 'Spell it'], ['Como ¿Cuál es?, pero escribes tú el nombre, con sus tildes.', 'Like Name it, but you type the name, accents and all.'], ICONS.spell, () => startQuiz(topic, 'type')),
       mode(['Mi progreso', 'My progress'], ['Mira lo que ya dominas y lo que tienes que practicar.', 'See what you’ve mastered and what needs practice.'], ICONS.progress, () => renderProgress(topic)))));
@@ -520,6 +527,7 @@ const ICONS = {
   find: '<svg viewBox="0 0 32 32"><circle cx="16" cy="13" r="6" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M16 29s-10-8.5-10-16a10 10 0 0120 0c0 7.5-10 16-10 16z" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>',
   name: '<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="6" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="4" y="14" width="24" height="6" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="4" y="22" width="24" height="6" rx="2" fill="currentColor" opacity=".35"/></svg>',
   spell: '<svg viewBox="0 0 32 32"><path d="M5 26l5-16h2l5 16 M7.5 20h7 M20 26V12m0 7c0-4 7-4 7 0v7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 7l3-3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+  point: '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-dasharray="4 3"/><circle cx="16" cy="16" r="3.5" fill="currentColor"/></svg>',
   progress: '<svg viewBox="0 0 32 32"><path d="M5 27V17 M12 27V10 M19 27V14 M26 27V5" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>',
 };
 
@@ -576,9 +584,9 @@ function renderQuiz(round) {
   const feedback = h('div', { class: 'feedback', 'aria-live': 'assertive' });
   const nextBtn = h('button', { class: 'btn primary wide', hidden: true, onclick: () => next() }, tr('Siguiente', 'Next'));
   let locked = false;
-  const map = new MapView(topic, { onTap: (id) => onMapTap(id) });
+  const map = new MapView(topic, { onTap: (id, e) => onMapTap(id, e) });
   const current = () => round.items[round.i];
-  const titles = { find: ['Encuéntralo', 'Find it'], choose: ['¿Cuál es?', 'Name it'], type: ['Escríbelo', 'Spell it'] };
+  const titles = { find: ['Encuéntralo', 'Find it'], point: ['Señálalo', 'Point to it'], choose: ['¿Cuál es?', 'Name it'], type: ['Escríbelo', 'Spell it'] };
   const hintBtn = (box) => { const b = h('button', { type: 'button', class: 'btn ghost', onclick: () => { if (locked) return; b.disabled = true; box.replaceChildren(h('strong', {}, tr('Pista: ', 'Hint: ')), tr(current().fact)); box.hidden = false; } }, tr('💡 Pista', '💡 Hint')); return b; };
   const dontKnow = () => h('button', { type: 'button', class: 'btn ghost', onclick: () => giveUp() }, tr('No lo sé', 'I don’t know'));
 
@@ -589,9 +597,10 @@ function renderQuiz(round) {
     progressBar.firstChild.style.width = `${(100 * round.i) / round.items.length}%`;
     const it = current();
     const counter = h('p', { class: 'eyebrow' }, tr(`Pregunta ${round.i + 1} de ${round.items.length}`, `Question ${round.i + 1} of ${round.items.length}`));
-    if (mode === 'find') {
+    if (mode === 'find' || mode === 'point') {
       map.reset(true);
-      prompt.replaceChildren(counter, h('p', { class: 'ask' }, tr(`Toca ${gd(topic).el} ${nEs}`, `Tap the ${nEn}`)), h('h2', { class: 'big-name' }, it.name));
+      const ask = mode === 'point' ? tr(`Señala ${gd(topic).el} ${nEs}`, `Point to the ${nEn}`) : tr(`Toca ${gd(topic).el} ${nEs}`, `Tap the ${nEn}`);
+      prompt.replaceChildren(counter, h('p', { class: 'ask' }, ask), h('h2', { class: 'big-name' }, it.name));
       answers.append(h('div', { class: 'row' }, hintBtn(box), dontKnow()), box);
     } else {
       map.dimOthers(true); map.setClass(it.id, 'target'); map.focus(it.id);
@@ -624,8 +633,22 @@ function renderQuiz(round) {
     round.missed.push(current());
     feedback.className = 'feedback bad'; feedback.replaceChildren(tr(pair), tipEl(current()));
   }
-  function onMapTap(id) {
-    if (mode !== 'find' || locked) return;
+  function onPoint(ev) {
+    const it = current(), [x, y] = map.toSvg(ev.clientX, ev.clientY);
+    locked = true; answers.replaceChildren();
+    if (map.near(it.id, x, y)) {
+      map.setClass(it.id, 'correct'); map.label(it.id, it.name, 'correct'); map.marker(x, y, 'ok');
+      recordAnswer(`${topic.id}:${it.id}`, true); correctFeedback(); autoNext();
+    } else {
+      map.marker(x, y, 'miss'); map.setClass(it.id, 'correct reveal'); map.label(it.id, it.name, 'correct');
+      recordAnswer(`${topic.id}:${it.id}`, false);
+      wrongFeedback(both(() => L(`Por ahí no. «${it.name}» se muestra en verde.`, `Not there. “${it.name}” is shown in green.`)));
+      map.focus(it.id); nextBtn.hidden = false; nextBtn.focus();
+    }
+  }
+  function onMapTap(id, ev) {
+    if ((mode !== 'find' && mode !== 'point') || locked) return;
+    if (mode === 'point') return onPoint(ev);
     if (!id) { toast(L(`Toca justo encima de ${gd(topic).un} ${nEs}. Si están muy juntos, acerca el mapa con +.`, `Tap right on a ${nEn}. If they’re close together, zoom in with +.`), 3000); return; }
     const it = current(); locked = true; answers.replaceChildren();
     if (id === it.id) {
