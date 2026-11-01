@@ -389,7 +389,9 @@ const gd = (topic) => (topic.g === 'f' ? { el: 'la', un: 'una', o: 'a', cada: 'c
 const art = (topic, it) => `${Lp(it.article || topic.article)} ${it.name}`;          // "el Ebro"
 const artCap = (topic, it) => `${Lp(it.articleCap || topic.articleCap)} ${it.name}`; // "El Ebro"
 const sectionOf = (topic) => SECTIONS.find((s) => s.topics.includes(topic)) || SECTIONS[0];
-const tipEl = (it) => (it.tip ? h('p', { class: 'tip' }, h('strong', {}, tr('💡 Truco: ', '💡 Memory tip: ')), tr(it.tip)) : null);
+const tipEl = (it) => (it.tip ? h('div', { class: 'tip' },
+  h('p', {}, h('strong', {}, tr('💡 Truco: ', '💡 Memory tip: ')), tr(it.tip)),
+  it.silly ? h('p', { class: 'silly' }, h('strong', {}, tr('🤪 Para recordarlo: ', '🤪 Silly way to remember: ')), tr(it.silly)) : null) : null);
 const both = (fn) => [((l) => { const o = lang; lang = l; const r = fn(); lang = o; return r; })('es'), ((l) => { const o = lang; lang = l; const r = fn(); lang = o; return r; })('en')];
 
 function renderLogin(mode = 'signin', message = null) {

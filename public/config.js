@@ -150,6 +150,255 @@ TOPICS.push(
   },
 );
 
+// Silly mnemonics, keyed 'topic:item'. Shown with the tip and after wrong answers.
+const SILLY = {
+ "rivers:mino": [
+  "Un niño pequeñito («mi niño») llora en la esquina de arriba a la izquierda porque se le ha caído el helado.",
+  "A tiny boy («mi niño») is crying in the top-left corner because he dropped his ice cream."
+ ],
+ "rivers:duero": [
+  "Un perro con DOS huesos (du-ero) corre por la meseta hasta llegar a Portugal.",
+  "A dog with TWO bones (du-ero ≈ «dos») runs across the plateau all the way to Portugal."
+ ],
+ "rivers:tajo": [
+  "Un samurái da un TAJO con la espada y parte la meseta en dos, ¡hasta Lisboa!",
+  "A samurai gives a big SLASH («tajo») with his sword and cuts the plateau in two, all the way to Lisbon!"
+ ],
+ "rivers:guadiana": [
+  "Una GUADAÑA gigante (guad-iana) corta recto el borde con Portugal.",
+  "A giant scythe («guadaña» ≈ Guadiana) cuts a straight line along the Portuguese border."
+ ],
+ "rivers:guadalquivir": [
+  "Un gigante grita «¡Qué guay, Guadal-quivir!» y se baña en Sevilla. Es el nombre más largo, ¡el río más grande!",
+  "A giant yells «How cool, Guadal-quivir!» and takes a bath in Sevilla. The longest name, the biggest river!"
+ ],
+ "rivers:ebro": [
+  "Un señor EBRIO (borracho) zigzaguea por el noreste y se cae de bruces en el delta.",
+  "A drunk man («ebrio» ≈ Ebro) zigzags across the north-east and falls flat on his face in the delta."
+ ],
+ "rivers:jucar": [
+  "Un JU-CAR: un coche (car) que da una gran curva en forma de «C» antes de llegar al mar.",
+  "A JU-CAR: a car that takes one huge C-shaped bend before reaching the sea."
+ ],
+ "rivers:turia": [
+  "Un TURISTA con cámara pasea por Valencia por el parque que antes era el río.",
+  "A TOURIST with a camera strolls through Valencia in the park that used to be the river."
+ ],
+ "rivers:segura": [
+  "Una señora muy SEGURA de sí misma toma el sol en Murcia, en el sur de la costa.",
+  "A very SURE-of-herself lady sunbathes in Murcia, on the southern coast."
+ ],
+ "rivers:llobregat": [
+  "Un LOBO con un GATO en la cabeza (llobre-gat) corre por las calles de Barcelona.",
+  "A WOLF with a CAT on his head («llobre-gat») runs through the streets of Barcelona."
+ ],
+ "rivers:nervion": [
+  "Un hombre muy NERVIOSO se come un pincho tras otro junto al museo de Bilbao.",
+  "A very NERVOUS man («nervioso») gobbles pintxos one after another beside the Bilbao museum."
+ ],
+ "rivers:nalon": [
+  "Una NALGA gigante (Na-lón) se sienta en Oviedo y aplasta el río… ¡el primero, la «L»!",
+  "A giant BOTTOM («nalga» ≈ Nalón) sits down in Oviedo and squashes the river… the first one, the «L»!"
+ ],
+ "rivers:navia": [
+  "Una NAVE espacial aterriza casi en Galicia: ¡la V de Nave-V-ia, la última!",
+  "A spaceship («nave» ≈ Navia) lands almost in Galicia: the V comes last in the alphabet!"
+ ],
+ "rivers:bidasoa": [
+  "BI = dos vacas que pastan: una en España y otra en Francia, con el río en medio.",
+  "BI = two cows grazing: one in Spain and one in France, with the river in between."
+ ],
+ "relief:pirineos": [
+  "Dos piratas gigantes se dan la mano sobre la frontera con Francia y forman una pared de mar a mar.",
+  "Two giant pirates shake hands across the French border and make a wall from sea to sea."
+ ],
+ "relief:sistema_central": [
+  "Un ordenador (sistema) gigante en el centro de España con Madrid como pantalla.",
+  "A giant computer («sistema») in the centre of Spain with Madrid as its screen."
+ ],
+ "relief:sistema_iberico": [
+  "Un cerdo ibérico corriendo en diagonal por la montaña… ¡con un jamón bajo el brazo!",
+  "An Iberian pig running diagonally along the mountain… with a ham under its arm!"
+ ],
+ "relief:sierra_morena": [
+  "Una sierra (herramienta) tostada por el sol, bien morena, corta el sur de la meseta.",
+  "A saw («sierra») that has a deep suntan («morena») slicing the southern edge of the plateau."
+ ],
+ "relief:cordillera_cantabrica": [
+  "Una cordera que canta ópera en lo alto de la montaña, junto al mar del norte.",
+  "A little lamb («cordera») singing opera on top of the mountain, beside the northern sea."
+ ],
+ "relief:montes_de_toledo": [
+  "Unos montes con espadas de Toledo clavadas en la cima, como un pinchito gigante.",
+  "Hills with Toledo swords stuck in the top, like a giant kebab skewer."
+ ],
+ "relief:sistema_costero_catalan": [
+  "Un cangrejo con barretina (gorro catalán) camina pegado a la costa de Barcelona.",
+  "A crab wearing a barretina (Catalan hat) walks along the coast of Barcelona."
+ ],
+ "relief:sierra_de_tramuntana": [
+  "Un trombón gigante sopla el viento del norte sobre Mallorca: ¡tra-mun-tana!",
+  "A giant trombone blows the north wind across Mallorca: tra-mun-tana!"
+ ],
+ "relief:sistema_betico": [
+  "Un hincha del Betis con camiseta verde y blanca sube la montaña más alta de Andalucía.",
+  "A Real Betis fan in a green and white shirt climbs the highest mountain in Andalucía."
+ ],
+ "relief:montes_vascos": [
+  "Unos montes con VASOS de sidra encima: un camarero vasco con boina los sirve.",
+  "Hills with GLASSES of cider on top: a Basque waiter in a beret is serving them."
+ ],
+ "relief:macizo_galaico": [
+  "Un gallo MACIZO, con músculos enormes, canta en lo alto de Galicia.",
+  "A MUSCLY rooster («gallo» ≈ Galaico) crowing at the top of Galicia."
+ ],
+ "relief:meseta_central": [
+  "Una MESA enorme con Madrid como una tarta en el centro y montañas como copas alrededor.",
+  "A giant TABLE («mesa» ≈ meseta) with Madrid as a cake in the middle and mountains as glasses around the edge."
+ ],
+ "relief:depresion_del_ebro": [
+  "El Ebro, ebrio y deprimido, llora en un hoyo en Zaragoza.",
+  "The Ebro, drunk and depressed, is sobbing in a hole in Zaragoza."
+ ],
+ "relief:depresion_del_guadalquivir": [
+  "Otro hoyo con un río triste, pero con sol y flamenco: ¡se anima en Sevilla!",
+  "Another hole with a sad river, but with sunshine and flamenco: it cheers up in Sevilla!"
+ ],
+ "peaks:teide": [
+  "Un TÉ hirviendo: el volcán echa humo como una tetera gigante en Tenerife.",
+  "A boiling cup of TEA («té»): the volcano puffs steam like a giant teapot on Tenerife."
+ ],
+ "peaks:aneto": [
+  "Un pato (ánade ≈ A-neto) con bufanda de nieve en los Pirineos.",
+  "A duck («ánade» ≈ A-neto) wearing a snowy scarf in the Pyrenees."
+ ],
+ "peaks:mulhacen": [
+  "Una MULA con gorro de nieve trepa Sierra Nevada y dice «¡hace frío!» (mul-HACE-n).",
+  "A MULE with a snow hat climbs Sierra Nevada and says «it’s cold!» (mul-HACE-n)."
+ ],
+ "gulfs:vizcaya": [
+  "Una vaca gigante bebe del golfo más grande, el de arriba del todo.",
+  "A giant cow drinks from the biggest gulf, the one right at the top."
+ ],
+ "gulfs:leon": [
+  "Un LEÓN de verdad nada en el mar al norte de Cataluña, ¡pero frente a Francia!",
+  "A real LION swims in the sea north of Catalonia, off the coast of France!"
+ ],
+ "gulfs:valencia": [
+  "Una naranja gigante flota en el golfo frente a Valencia, y se hace zumo sola.",
+  "A giant orange floats in the gulf off Valencia and squeezes itself into juice."
+ ],
+ "gulfs:almeria": [
+  "Un almendro con gafas de sol mira el mar en el desierto del sureste.",
+  "An almond tree in sunglasses looks out to sea in the south-eastern desert."
+ ],
+ "gulfs:cadiz": [
+  "Una CADERA que baila flamenco en el suroeste, justo antes de Gibraltar.",
+  "A HIP («cadera» ≈ Cádiz) dancing flamenco in the south-west, just before Gibraltar."
+ ],
+ "capes:estaca_de_bares": [
+  "Una estaca clavada en lo más alto del mapa con un bar encima: ¡el camarero está en el norte!",
+  "A stake driven into the very top of the map with a bar on it: the waiter is in the far north!"
+ ],
+ "capes:fisterra": [
+  "Un pirata llega al FIN de la tierra, mira el borde plano del mundo y dice «¡ay!».",
+  "A pirate reaches the END of the earth («finis terrae»), looks over the flat edge of the world and says «oops!»"
+ ],
+ "capes:san_vicente": [
+  "San Vicente con alas come sardinas en la esquina suroeste… ¡en Portugal!",
+  "Saint Vincent with wings eats sardines in the south-west corner… in Portugal!"
+ ],
+ "capes:trafalgar": [
+  "Nelson, con un solo ojo, mira la batalla y grita «¡Tra-fal-gar!» como una canción.",
+  "One-eyed Nelson watches the battle and shouts «Tra-fal-gar!» like a song."
+ ],
+ "capes:gata": [
+  "Una GATA con gafas de sol toma el sol en el desierto de Almería.",
+  "A cat («gata») in sunglasses sunbathes in the Almería desert."
+ ],
+ "capes:palos": [
+  "Un buceador con un PALO clavado en el suelo justo debajo del Mar Menor.",
+  "A diver with a big STICK («palo») planted in the seabed right under the Mar Menor."
+ ],
+ "capes:la_nao": [
+  "Una NAO (barco pirata) apunta con su proa a Ibiza.",
+  "A NAO (pirate ship) points its bow straight at Ibiza."
+ ],
+ "capes:creus": [
+  "Una CRUZ marca el tesoro en la esquina nordeste: ¡«creus» = cruces en catalán!",
+  "A CROSS marks the treasure in the north-east corner: «creus» means crosses in Catalan!"
+ ],
+ "seas:mar_mediterraneo": [
+  "Un sándwich: pan de Europa arriba y pan de África abajo… ¡y el mar en MEDIO!",
+  "A sandwich: Europe the top bread, Africa the bottom bread… and the sea in the MIDDLE!"
+ ],
+ "seas:mar_cantabrico": [
+  "Un cantante en el muelle del norte canta con las olas: ¡cantá-brico!",
+  "A singer on the northern pier sings along with the waves: cantá-brico!"
+ ],
+ "seas:oceano_atlantico": [
+  "Una ciudad perdida, la Atlántida, hundida a la izquierda con un pulpo enorme.",
+  "The lost city of Atlantis sunk on the left, guarded by a huge octopus."
+ ],
+ "seas:estrecho_de_gibraltar": [
+  "Un mono salta del Peñón de Europa a África por un puente estrecho de 14 km.",
+  "A monkey leaps from the Rock in Europe to Africa across a narrow 14 km bridge."
+ ],
+ "seas:delta_del_ebro": [
+  "Un plato de paella con forma de triángulo Δ servido por el Ebro.",
+  "A triangle-shaped Δ paella served up by the Ebro."
+ ],
+ "seas:mar_menor": [
+  "Un mar enano con sombrero juega a los barquitos, protegido por una tira de arena.",
+  "A tiny dwarf sea in a hat playing with toy boats, guarded by a strip of sand."
+ ],
+ "islands:mallorca": [
+  "Un gigante MAYOR se sienta en el centro y se come una ensaimada enorme.",
+  "A BIG («mayor») giant sits in the middle eating an enormous ensaimada pastry."
+ ],
+ "islands:menorca": [
+  "Un niño MENOR (pequeño) con un helado en el extremo este.",
+  "A little kid («menor») with an ice cream at the far east end."
+ ],
+ "islands:ibiza": [
+  "Un DJ con gafas blancas pincha música en la isla de la fiesta, sobre Formentera.",
+  "A DJ in white sunglasses spins records on the party island, above Formentera."
+ ],
+ "islands:formentera": [
+  "Una gota de trigo (frumento) con una sombrilla, justo debajo de Ibiza.",
+  "A grain of wheat with a beach umbrella, right under Ibiza."
+ ],
+ "islands:el_hierro": [
+  "Una barra de HIERRO clavada como un clavo en el extremo oeste, y cuelga el cartel «fin del mundo».",
+  "An iron («hierro») bar hammered like a nail into the far west, with an «end of the world» sign on it."
+ ],
+ "islands:la_palma": [
+  "Una PALMA gigante, una mano que saluda desde el noroeste.",
+  "A giant PALM leaf, a hand waving from the north-west."
+ ],
+ "islands:la_gomera": [
+  "Una GOMA de borrar pequeña y redonda, que borra los errores del mapa.",
+  "A small round ERASER («goma»), rubbing out the mistakes on the map."
+ ],
+ "islands:tenerife": [
+  "Un TENEDOR con el Teide pinchado: ¡un pincho de volcán!",
+  "A FORK («tenedor» ≈ Tenerife) with the Teide stuck on it: a volcano kebab!"
+ ],
+ "islands:gran_canaria": [
+  "Un canario amarillo, gordo y redondo como una pelota: ¡un GRAN canario!",
+  "A fat yellow canary, round as a ball: a GREAT canary!"
+ ],
+ "islands:fuerteventura": [
+  "Un ventilador muy FUERTE sopla: la isla larga se despeina con el VIENTO.",
+  "A very STRONG fan blows: the long island gets its hair messed up by the WIND («viento»)."
+ ],
+ "islands:lanzarote": [
+  "Un caballero LANZA un cohete rojo hacia el noreste: ¡la última de la fila!",
+  "A knight THROWS («lanza») a red rocket to the north-east: the last one in the row!"
+ ]
+};
+for (const t of TOPICS) for (const x of t.items) x.silly = SILLY[`${t.id}:${x.id}`];
+
 // Subjects / courses shown on the home screen. Each section groups several topics.
 export const SECTIONS = [
   {

@@ -293,3 +293,5 @@ main { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding: 18px 16
 .items .item.point.lvl-learning { stroke: var(--accent); stroke-width: 13; stroke-dasharray: none; }
 .items .item.point.lvl-new { stroke: var(--muted); stroke-width: 11; stroke-dasharray: none; }
 .item.t-relief { stroke: none !important; }
+.tip p { margin: 0; }
+.tip .silly { margin-top: .6em; padding-top: .6em; border-top: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent); }
