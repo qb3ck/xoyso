@@ -8,7 +8,7 @@ export const SUPABASE_KEY = 'sb_publishable_oCp4ddN1B4gnipZOulgqBg_Gr9qTKEf';
 // To add a topic: add its shapes to the map build, then add it here.
 export const TOPICS = [
   {
-    id: 'rivers',
+    id: 'rivers', g: 'm',
     title: ['Ríos', 'Rivers'],
     blurb: ['Los principales ríos de España', 'The main rivers of Spain'],
     noun: ['río', 'river'],
@@ -39,6 +39,116 @@ export const TOPICS = [
     ],
   },
 ];
+
+// helper: it(id, name, group, [tipEs, tipEn], [factEs, factEn], alternative accepted spellings)
+const it = (id, name, group, tip, fact, alt = []) => ({ id, name, group, tip, fact, alt });
+
+TOPICS.push(
+  {
+    id: 'relief', g: 'm',
+    title: ['Relieve', 'Relief'],
+    blurb: ['Cordilleras, mesetas y depresiones', 'Mountain ranges, plateaus and depressions'],
+    noun: ['relieve', 'landform'],
+    learnTitle: ['Aprende el relieve', 'Learn the relief'],
+    groupLabel: { range: ['Cordilleras y sistemas', 'Mountain ranges'], plateau: ['Meseta', 'Plateau'], depression: ['Depresiones', 'Depressions'] },
+    items: [
+      it('pirineos', 'Pirineos', 'range', ['Los Pirineos son la pared que separa España de Francia: están arriba del todo, de mar a mar.', 'The Pyrenees are the wall between Spain and France: right across the top, from sea to sea.'], ['Van del Cantábrico al Mediterráneo (unos 430 km). Su pico más alto es el Aneto (3.404 m).', 'They run from the Cantabrian Sea to the Mediterranean (about 430 km). The highest peak is the Aneto (3,404 m).']),
+      it('sistema_central', 'Sistema Central', 'range', ['Está en el centro y parte la meseta en dos: norte y sur. Pasa junto a Madrid (Guadarrama) y Ávila (Gredos).', 'It sits in the middle and splits the plateau in two: north and south. It runs past Madrid (Guadarrama) and Ávila (Gredos).'], ['Incluye las sierras de Gredos y Guadarrama. El pico Almanzor (2.592 m) es el más alto.', 'It includes the Gredos and Guadarrama ranges. Pico Almanzor (2,592 m) is the highest point.']),
+      it('sistema_iberico', 'Sistema Ibérico', 'range', ['«Ibérico» como la península Ibérica: es la cordillera que baja en diagonal desde Burgos hacia el Mediterráneo y cierra la meseta por el este.', '«Ibérico» like the Iberian Peninsula: the range that runs diagonally from Burgos down toward the Mediterranean, closing the plateau on the east.'], ['Allí nacen ríos como el Duero y el Tajo. Su pico más alto es el Moncayo (2.314 m).', 'Rivers such as the Duero and the Tajo rise there. Its highest peak is the Moncayo (2,314 m).']),
+      it('sierra_morena', 'Sierra Morena', 'range', ['Morena = oscura. Imagina una línea oscura que forma el borde sur de la meseta, justo encima del Guadalquivir.', 'Morena = dark. Picture a dark line forming the southern edge of the plateau, just above the Guadalquivir.'], ['Separa la Meseta Central de la depresión del Guadalquivir. No es muy alta (unos 1.300 m).', 'It separates the Central Plateau from the Guadalquivir depression. It isn’t very high (about 1,300 m).']),
+      it('cordillera_cantabrica', 'Cordillera Cantábrica', 'range', ['Está pegada al mar Cantábrico y corre paralela a la costa del norte, de oeste a este.', 'It hugs the Cantabrian Sea and runs parallel to the northern coast, west to east.'], ['Aquí están los Picos de Europa. Torre Cerredo (2.650 m) es su pico más alto.', 'The Picos de Europa are here. Torre Cerredo (2,650 m) is its highest peak.']),
+      it('montes_de_toledo', 'Montes de Toledo', 'range', ['El nombre lo dice: son los montes que rodean Toledo, al sur del Tajo.', 'The name says it: the hills around Toledo, south of the Tajo.'], ['Separan las cuencas del Tajo y del Guadiana. Son bajos y redondeados (Rocigalgo, 1.447 m).', 'They separate the Tajo and Guadiana basins. Low and rounded (Rocigalgo, 1,447 m).']),
+      it('sistema_costero_catalan', 'Sistema Costero-Catalán', 'range', ['Va pegado a la costa de Cataluña, como un muro entre Barcelona y el interior: «costero» = de la costa.', 'It hugs the Catalan coast like a wall between Barcelona and the interior: «costero» = coastal.'], ['Tiene dos cadenas paralelas (litoral y prelitoral). La más alta es el Montseny (unos 1.700 m).', 'It has two parallel chains (coastal and pre-coastal). The highest is the Montseny (about 1,700 m).'], ['Sistema Costero Catalán']),
+      it('sierra_de_tramuntana', 'Sierra de Tramuntana', 'range', ['La tramuntana es el viento del norte: la sierra está en el norte de Mallorca.', 'The tramuntana is the north wind: the range is in the north of Mallorca.'], ['Su pico más alto es el Puig Major (1.445 m). Es Patrimonio de la Humanidad de la UNESCO.', 'Its highest peak is Puig Major (1,445 m). It is a UNESCO World Heritage Site.']),
+      it('sistema_betico', 'Sistema Bético', 'range', ['Bética era el nombre romano de Andalucía: es la cordillera del sur, la más alta de la península.', 'Baetica was the Roman name for Andalucía: the southern range, the highest on the peninsula.'], ['Incluye Sierra Nevada, con el Mulhacén (3.479 m), el pico más alto de la península.', 'It includes Sierra Nevada, with the Mulhacén (3,479 m), the highest peak on the peninsula.'], ['Sistema Betico']),
+      it('montes_vascos', 'Montes Vascos', 'range', ['Vascos = País Vasco: son las montañas pequeñas que unen la Cordillera Cantábrica con los Pirineos.', 'Vascos = Basque Country: the small mountains that link the Cantabrian range to the Pyrenees.'], ['Son una cadena baja que hace de puente entre la Cantábrica y los Pirineos (Aizkorri, 1.523 m).', 'A low chain acting as a bridge between the Cantabrian range and the Pyrenees (Aizkorri, 1,523 m).']),
+      it('macizo_galaico', 'Macizo Galaico', 'range', ['Galaico = de Galicia, en el noroeste. Un macizo es un bloque de montañas muy antiguas y gastadas.', 'Galaico = from Galicia, in the north-west. A massif is a block of very old, worn-down mountains.'], ['Son de las montañas más antiguas de España. Su cima es Pena Trevinca (2.127 m).', 'Some of the oldest mountains in Spain. The top is Pena Trevinca (2,127 m).'], ['Macizo Galaico-Leonés']),
+      it('meseta_central', 'Meseta Central', 'plateau', ['Es el «corazón» de la península: una gran llanura alta (600–800 m) rodeada de montañas, con Madrid en el centro.', 'The «heart» of the peninsula: a big high plain (600–800 m) ringed by mountains, with Madrid in the middle.'], ['Ocupa casi la mitad de la península. El Sistema Central la divide en Submeseta Norte y Submeseta Sur.', 'It covers nearly half the peninsula. The Central System divides it into a northern and a southern sub-plateau.']),
+      it('depresion_del_ebro', 'Depresión del Ebro', 'depression', ['Una depresión es un valle hundido. Esta es la del Ebro, con Zaragoza dentro, entre los Pirineos y el Sistema Ibérico.', 'A depression is a sunken basin. This one belongs to the Ebro, with Zaragoza inside, between the Pyrenees and the Iberian System.'], ['Es un valle ancho y seco, rodeado de montañas por tres lados y abierto al Mediterráneo.', 'A wide, dry basin ringed by mountains on three sides and open to the Mediterranean.']),
+      it('depresion_del_guadalquivir', 'Depresión del Guadalquivir', 'depression', ['Es el valle llano del Guadalquivir (Córdoba, Sevilla), entre Sierra Morena y las Béticas, abierto al Atlántico.', 'The flat Guadalquivir valley (Córdoba, Sevilla), between Sierra Morena and the Betic ranges, open to the Atlantic.'], ['Es una de las zonas más fértiles de España. Se abre al océano Atlántico por el golfo de Cádiz.', 'One of the most fertile areas in Spain. It opens onto the Atlantic through the Gulf of Cádiz.']),
+    ],
+  },
+  {
+    id: 'peaks', g: 'f',
+    title: ['Montañas', 'Peaks'],
+    blurb: ['Los picos más altos', 'The highest peaks'],
+    noun: ['montaña', 'mountain'],
+    learnTitle: ['Aprende las montañas', 'Learn the peaks'],
+    items: [
+      it('teide', 'Teide', 'p', ['Teide = Tenerife: el volcán de las Canarias. Es la montaña más alta de España y la más alta de las tres.', 'Teide = Tenerife: the Canary volcano. The highest mountain in Spain, and the tallest of the three.'], ['Mide 3.715 m. Orden de altura: Teide (3.715) → Mulhacén (3.479) → Aneto (3.404).', 'It is 3,715 m. Order by height: Teide (3,715) → Mulhacén (3,479) → Aneto (3,404).']),
+      it('aneto', 'Aneto', 'p', ['Aneto → Pirineos: los dos están arriba, en el norte, en Huesca, junto a Francia.', 'Aneto → Pyrenees: both are at the top, in the north, in Huesca beside France.'], ['Mide 3.404 m y es el pico más alto de los Pirineos.', 'It is 3,404 m and the highest peak in the Pyrenees.']),
+      it('mulhacen', 'Mulhacén', 'p', ['Mulhacén = Sierra Nevada (Granada). Se llama así por el rey Muley Hacén, que según la leyenda está enterrado en la cima.', 'Mulhacén = Sierra Nevada (Granada). Named after King Muley Hacén, who legend says is buried on the summit.'], ['Mide 3.479 m: es el pico más alto de la península Ibérica.', 'It is 3,479 m: the highest peak of the Iberian Peninsula.'], ['Mulhacen']),
+    ],
+  },
+  {
+    id: 'gulfs', g: 'm',
+    title: ['Golfos', 'Gulfs'],
+    blurb: ['Los grandes golfos de la costa', 'The big gulfs along the coast'],
+    noun: ['golfo', 'gulf'],
+    learnTitle: ['Aprende los golfos', 'Learn the gulfs'],
+    items: [
+      it('vizcaya', 'Golfo de Vizcaya', 'g', ['Vizcaya es una provincia vasca, pero el golfo es enorme: baña el norte de España y el oeste de Francia. Es el de arriba del todo.', 'Vizcaya is a Basque province, but the gulf is huge: it laps northern Spain and western France. It’s the one at the very top.'], ['Es famoso por sus temporales. En inglés se llama Bay of Biscay.', 'Famous for its storms. In English it is the Bay of Biscay.'], ['Vizcaya']),
+      it('leon', 'Golfo de León', 'g', ['No tiene nada que ver con la ciudad de León: es el golfo del sur de Francia, frente al cabo de Creus. «León» viene de «lion».', 'Nothing to do with the city of León: it’s the gulf off southern France, facing Cap de Creus. «León» comes from «lion».'], ['Está en el Mediterráneo noroccidental, entre el cabo de Creus y la Provenza.', 'It lies in the north-west Mediterranean, between Cap de Creus and Provence.'], ['León']),
+      it('valencia', 'Golfo de Valencia', 'g', ['El que está frente a la ciudad de Valencia, entre el delta del Ebro y el cabo de la Nao.', 'The one facing the city of Valencia, between the Ebro delta and Cabo de la Nao.'], ['Es un golfo ancho y poco profundo de la costa mediterránea.', 'A wide, shallow gulf on the Mediterranean coast.'], ['Valencia']),
+      it('almeria', 'Golfo de Almería', 'g', ['Está en el sureste, frente a Almería, justo al oeste del cabo de Gata.', 'In the south-east, facing Almería, just west of Cabo de Gata.'], ['Es un golfo del Mediterráneo en la costa andaluza, protegido por el cabo de Gata.', 'A Mediterranean gulf on the Andalusian coast, sheltered by Cabo de Gata.'], ['Almería', 'Almeria']),
+      it('cadiz', 'Golfo de Cádiz', 'g', ['Es el del suroeste, en el Atlántico, entre Huelva y Cádiz, justo antes del estrecho de Gibraltar.', 'The one in the south-west, on the Atlantic, between Huelva and Cádiz, just before the Strait of Gibraltar.'], ['Está en el Atlántico, entre el cabo de San Vicente y el cabo de Trafalgar. Aquí desemboca el Guadalquivir.', 'On the Atlantic, between Cape St Vincent and Cabo de Trafalgar. The Guadalquivir reaches the sea here.'], ['Cádiz', 'Cadiz']),
+    ],
+  },
+  {
+    id: 'capes', g: 'm',
+    title: ['Cabos', 'Capes'],
+    blurb: ['Los cabos y puntas de la costa', 'The capes and points of the coast'],
+    noun: ['cabo', 'cape'],
+    learnTitle: ['Aprende los cabos', 'Learn the capes'],
+    items: [
+      it('estaca_de_bares', 'Punta Estaca de Bares', 'c', ['Es una estaca clavada en el norte: el punto más al norte de la península, en Galicia.', 'A stake driven in at the top: the northernmost point of the peninsula, in Galicia.'], ['Está en A Coruña. Separa el mar Cantábrico del océano Atlántico.', 'In A Coruña. It marks the boundary between the Cantabrian Sea and the Atlantic.'], ['Estaca de Bares', 'Cabo Estaca de Bares']),
+      it('fisterra', 'Cabo Fisterra', 'c', ['Fisterra = «finis terrae»: el fin de la tierra. Los romanos creían que aquí acababa el mundo, en el oeste de Galicia.', 'Fisterra = «finis terrae»: the end of the earth. The Romans thought the world ended here, in western Galicia.'], ['Está en la Costa da Morte (A Coruña). Es meta del Camino de Santiago.', 'On the Costa da Morte (A Coruña). A finishing point of the Camino de Santiago.'], ['Fisterra', 'Finisterre', 'Cabo Finisterre']),
+      it('san_vicente', 'Cabo de San Vicente', 'c', ['San Vicente es la esquina suroeste de la península: ¡y está en Portugal! Es el más al oeste-sur.', 'San Vicente is the south-west corner of the peninsula: and it’s in Portugal! The south-western tip.'], ['Está en el Algarve (Portugal), cerca de Sagres. Es el punto más suroccidental de Europa continental.', 'In the Algarve (Portugal), near Sagres. The south-westernmost point of mainland Europe.'], ['San Vicente', 'Cabo San Vicente']),
+      it('trafalgar', 'Cabo de Trafalgar', 'c', ['Trafalgar = la famosa batalla naval de 1805 entre Nelson y la flota franco-española. Está en Cádiz, antes del estrecho.', 'Trafalgar = the famous 1805 naval battle between Nelson and the Franco-Spanish fleet. It’s in Cádiz, just before the strait.'], ['Está cerca de Barbate (Cádiz), en el Atlántico, a la entrada del estrecho de Gibraltar.', 'Near Barbate (Cádiz), on the Atlantic, at the entrance to the Strait of Gibraltar.'], ['Trafalgar']),
+      it('gata', 'Cabo de Gata', 'c', ['Gata = gato: imagina un gato asomado al mar en Almería, en el sureste.', 'Gata = cat: picture a cat peering out to sea in Almería, in the south-east.'], ['Está en Almería. Es una zona volcánica y desértica, muy seca.', 'In Almería. A volcanic, desert-like and very dry area.'], ['Gata']),
+      it('palos', 'Cabo de Palos', 'c', ['Palos está en Murcia, justo debajo del Mar Menor: busca el cabo bajo la laguna.', 'Palos is in Murcia, right under the Mar Menor: look for the cape below the lagoon.'], ['Tiene un faro famoso y es un gran lugar de buceo. Está donde acaba La Manga del Mar Menor.', 'It has a famous lighthouse and is a great diving spot. It’s where La Manga del Mar Menor ends.'], ['Palos', 'Cabo Palos']),
+      it('la_nao', 'Cabo de la Nao', 'c', ['La nao era un barco antiguo. Es el cabo de Jávea (Alicante) que más se acerca a Ibiza, justo al sur del golfo de Valencia.', 'La nao was an old type of ship. It’s the cape at Jávea (Alicante) that reaches closest to Ibiza, just south of the Gulf of Valencia.'], ['Está en Alicante, entre Jávea y Denia. Es el punto de la costa más cercano a las Baleares.', 'In Alicante, between Jávea and Dénia. The point of the mainland coast closest to the Balearic Islands.'], ['La Nao', 'Cabo la Nao']),
+      it('creus', 'Cabo de Creus', 'c', ['Creus es la esquina nordeste, donde los Pirineos se hunden en el mar. Es el punto más oriental de la península.', 'Creus is the north-east corner, where the Pyrenees sink into the sea. The easternmost point of the peninsula.'], ['Está en Girona, cerca de Cadaqués (la casa de Dalí). Sale en el golfo de León.', 'In Girona, near Cadaqués (Dalí’s home). It faces the Gulf of León.'], ['Creus', 'Cap de Creus']),
+    ],
+  },
+  {
+    id: 'seas', g: 'm',
+    title: ['Mares y otros', 'Seas and more'],
+    blurb: ['Mares, océano, estrecho, delta y laguna', 'Seas, ocean, strait, delta and lagoon'],
+    noun: ['lugar', 'place'],
+    learnTitle: ['Aprende mares y otros', 'Learn the seas and more'],
+    groupLabel: { sea: ['Mares y océano', 'Seas and ocean'], other: ['Otros lugares', 'Other places'] },
+    items: [
+      it('mar_mediterraneo', 'Mar Mediterráneo', 'sea', ['«Medi-terráneo» = en medio de las tierras: el mar entre Europa y África. Baña el este y el sur.', '«Medi-terráneo» = in the middle of the lands: the sea between Europe and Africa. It washes the east and south coasts.'], ['Baña las costas de Cataluña, Valencia, Murcia, Andalucía oriental y las Baleares.', 'It washes the coasts of Catalonia, Valencia, Murcia, eastern Andalucía and the Balearics.'], ['Mediterráneo', 'Mediterraneo']),
+      it('mar_cantabrico', 'Mar Cantábrico', 'sea', ['Cantábrico = el mar de la Cordillera Cantábrica: el del norte, encima de Asturias y Cantabria.', 'Cantábrico = the sea of the Cantabrian range: the northern one, above Asturias and Cantabria.'], ['Baña la costa norte, de Galicia al País Vasco. Es la parte sur del golfo de Vizcaya.', 'It washes the north coast, from Galicia to the Basque Country. It’s the southern part of the Bay of Biscay.'], ['Cantábrico', 'Cantabrico']),
+      it('oceano_atlantico', 'Océano Atlántico', 'sea', ['Es el océano grande de la izquierda (oeste): baña Galicia, Portugal, Huelva, Cádiz y las Canarias.', 'The big ocean on the left (west): it washes Galicia, Portugal, Huelva, Cádiz and the Canaries.'], ['Es el segundo océano más grande del mundo. En España baña Galicia, el golfo de Cádiz y Canarias.', 'The second-largest ocean in the world. In Spain it touches Galicia, the Gulf of Cádiz and the Canaries.'], ['Atlántico', 'Atlantico', 'Océano Atlantico', 'Oceano Atlantico']),
+      it('estrecho_de_gibraltar', 'Estrecho de Gibraltar', 'other', ['Gibraltar es la puerta entre dos mares: Atlántico y Mediterráneo. Europa y África quedan a solo unos 14 km.', 'Gibraltar is the door between two seas: Atlantic and Mediterranean. Europe and Africa are only about 14 km apart.'], ['Une el Atlántico con el Mediterráneo y separa España (Europa) de Marruecos (África).', 'It joins the Atlantic and the Mediterranean and separates Spain (Europe) from Morocco (Africa).'], ['Gibraltar']),
+      it('delta_del_ebro', 'Delta del Ebro', 'other', ['Un delta tiene forma de triángulo, como la letra griega Δ. El Ebro lo forma al llegar al mar, en Tarragona.', 'A delta is a triangle, like the Greek letter Δ. The Ebro builds it where it meets the sea, in Tarragona.'], ['Es una gran zona de arrozales y humedales, un parque natural importante para las aves.', 'A large area of rice fields and wetlands, an important nature reserve for birds.']),
+      it('mar_menor', 'Mar Menor', 'other', ['Menor = más pequeño: es una laguna de agua salada, separada del Mediterráneo (el «mayor») por una franja de arena, La Manga.', 'Menor = smaller: a salt-water lagoon separated from the Mediterranean (the «bigger» one) by a sand strip, La Manga.'], ['Está en Murcia y es la mayor laguna de agua salada de España.', 'In Murcia, the biggest salt-water lagoon in Spain.']),
+    ],
+  },
+  {
+    id: 'islands', g: 'f',
+    title: ['Islas', 'Islands'],
+    blurb: ['Las islas Baleares y Canarias', 'The Balearic and Canary Islands'],
+    noun: ['isla', 'island'],
+    learnTitle: ['Aprende las islas', 'Learn the islands'],
+    groupLabel: { baleares: ['Islas Baleares', 'Balearic Islands'], canarias: ['Islas Canarias', 'Canary Islands'] },
+    items: [
+      it('mallorca', 'Mallorca', 'baleares', ['Mallorca viene de «mayor»: es la más grande de las Baleares, en el centro.', 'Mallorca comes from «mayor» (bigger): the largest of the Balearics, in the middle.'], ['Su capital es Palma. Tiene la Sierra de Tramuntana al noroeste.', 'Its capital is Palma. The Sierra de Tramuntana runs along the north-west.']),
+      it('menorca', 'Menorca', 'baleares', ['Menorca viene de «menor» (más pequeña): es la isla del extremo este, más pequeña que Mallorca.', 'Menorca comes from «menor» (smaller): the island at the far east, smaller than Mallorca.'], ['Es la más oriental de las Baleares y es Reserva de la Biosfera.', 'The easternmost of the Balearics, and a UNESCO Biosphere Reserve.']),
+      it('ibiza', 'Ibiza', 'baleares', ['Ibiza es la isla de las fiestas, al suroeste de Mallorca; la «i» de Ibiza, justo encima de Formentera.', 'Ibiza is the party island, south-west of Mallorca, just above Formentera.'], ['Se llama Eivissa en catalán. Es la «isla blanca» y es famosa por sus playas y su vida nocturna.', 'Called Eivissa in Catalan. The «white island», famous for its beaches and nightlife.'], ['Eivissa']),
+      it('formentera', 'Formentera', 'baleares', ['Formentera, «frumentaria»: tierra de trigo (frumentum). Es la más pequeña y la más al sur, debajo de Ibiza.', 'Formentera comes from Latin «frumentum» (wheat). The smallest and most southerly, just below Ibiza.'], ['Se llega a ella en barco desde Ibiza. Es famosa por sus playas de aguas turquesa.', 'Reached by boat from Ibiza. Famous for its turquoise beaches.']),
+      it('el_hierro', 'El Hierro', 'canarias', ['El Hierro es la más pequeña y la más al oeste: como el «fin del mundo» de las Canarias.', 'El Hierro is the smallest and the furthest west: like the «end of the world» of the Canaries.'], ['Fue el meridiano cero de los mapas antiguos. Hoy es muy conocida por su energía renovable.', 'It was the zero meridian on old maps. Today it is known for its renewable energy.'], ['Hierro']),
+      it('la_palma', 'La Palma', 'canarias', ['La Palma, al noroeste: se parece a una hoja de palma y tiene forma de gota. Es la «isla bonita».', 'La Palma, in the north-west: shaped a bit like a palm leaf or a drop. The «beautiful island».'], ['Tiene un volcán, la Cumbre Vieja, que entró en erupción en 2021.', 'It has a volcano, Cumbre Vieja, which erupted in 2021.']),
+      it('la_gomera', 'La Gomera', 'canarias', ['La Gomera es la pequeña redonda entre El Hierro y Tenerife.', 'La Gomera is the small round one between El Hierro and Tenerife.'], ['Su Parque Nacional de Garajonay tiene un bosque de laurisilva. Allí se habla el «silbo gomero».', 'Garajonay National Park has a laurel forest. People there use the whistled language «silbo gomero».'], ['Gomera']),
+      it('tenerife', 'Tenerife', 'canarias', ['Tenerife es la más grande de las Canarias y tiene el Teide, el volcán en forma de cono, en el medio.', 'Tenerife is the biggest of the Canaries and has the Teide, the cone-shaped volcano, in the middle.'], ['Es la isla más grande y poblada de las Canarias. Aquí está el Teide (3.715 m).', 'The largest and most populated of the Canaries. The Teide (3,715 m) is here.']),
+      it('gran_canaria', 'Gran Canaria', 'canarias', ['Gran Canaria es casi redonda como una tarta, al este de Tenerife. Su capital es Las Palmas.', 'Gran Canaria is nearly round like a cake, east of Tenerife. Its capital is Las Palmas.'], ['Tiene dunas en Maspalomas y mucha variedad de paisajes en poco espacio.', 'It has dunes at Maspalomas and a huge variety of scenery in a small space.']),
+      it('fuerteventura', 'Fuerteventura', 'canarias', ['Fuerte-ventura: fuerte viento. Es larga y plana, con muchas playas de arena y vientos fuertes.', 'Fuerte-ventura: strong wind. It’s long and flat, with lots of sandy beaches and strong winds.'], ['Es la segunda isla más grande de las Canarias y la más cercana a África.', 'The second-largest island of the Canaries and one of the closest to Africa.']),
+      it('lanzarote', 'Lanzarote', 'canarias', ['Lanzarote es la más al noreste (la última de la fila), volcánica, con paisaje rojo y negro.', 'Lanzarote is the furthest north-east (last in the row), volcanic, with a red and black landscape.'], ['Tiene el Parque Nacional de Timanfaya, con volcanes. El artista César Manrique diseñó muchos lugares allí.', 'It has Timanfaya National Park, full of volcanoes. The artist César Manrique designed many sites there.']),
+    ],
+  },
+);
 
 // Subjects / courses shown on the home screen. Each section groups several topics.
 export const SECTIONS = [

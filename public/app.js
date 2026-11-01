@@ -172,7 +172,7 @@ function geometry(key) {
     seg.replace(/[MZ]/g, '').split('L').map((p) => p.split(',').map(Number)));
   // label anchor: middle point of the longest part
   const longest = parts.reduce((a, b) => (b.length > a.length ? b : a));
-  const g = { kind: item.kind, parts, box: item.box, anchor: longest[Math.floor(longest.length / 2)] };
+  const g = { kind: item.kind, parts, box: item.box, inset: !!item.inset, anchor: item.a || longest[Math.floor(longest.length / 2)] };
   parsed.set(key, g); return g;
 }
 function distToSeg(px, py, [ax, ay], [bx, by]) {
@@ -208,8 +208,17 @@ class MapView {
       s('rect', { x: -200, y: -200, width: MAP.width + 400, height: MAP.height + 400, class: 'sea' }),
       s('path', { d: MAP.neighbours, class: 'land-other' }),
       s('path', { d: MAP.spain, class: 'land-spain' }),
+      s('path', { d: MAP.bg.meseta, class: 'bg-meseta' }),
+      s('path', { d: MAP.bg.depr, class: 'bg-depr' }),
+      s('path', { d: MAP.bg.ranges, class: 'bg-ranges' }),
       s('path', { d: MAP.regions, class: 'regions' }),
     );
+    if (topic.id !== 'rivers') {   // rivers are always visible, so he can see them running between the mountains
+      svg.append(s('path', { d: Object.entries(MAP.items).filter(([k]) => k.startsWith('rivers:')).map(([, v]) => v.d).join(''), class: 'bg-rivers' }));
+    }
+    const I = MAP.inset;
+    svg.append(s('rect', { x: I.x, y: I.y, width: I.w, height: I.h, class: 'inset-box' }), s('path', { d: I.land, class: 'land-spain inset-land' }));
+    const il = s('text', { x: I.x + I.w - 6, y: I.y + I.h - 6, class: 'inset-label' }); il.textContent = I.label; svg.append(il);
     this.labelsBg = s('g', { class: 'place-labels' });
     for (const c of MAP.countryLabels) {
       const t = s('text', { x: c.x, y: c.y, class: c.name === c.name.toUpperCase() ? 'country' : 'sea-label' }); t.textContent = c.name; this.labelsBg.append(t);
@@ -220,7 +229,7 @@ class MapView {
     for (const it of topic.items) {
       const key = `${topic.id}:${it.id}`; const item = MAP.items[key];
       if (!item) { console.warn('No map shape for', key); continue; }
-      const p = s('path', { d: item.d, class: `item ${item.kind}`, 'data-id': it.id });
+      const p = s('path', { d: item.d, class: `item ${item.kind} t-${topic.id}`, 'data-id': it.id });
       this.paths.set(it.id, p); this.itemsG.append(p);
     }
     svg.append(this.itemsG);
@@ -285,6 +294,11 @@ class MapView {
     const box = geometry(`${this.topic.id}:${itemId}`).box;
     const bw = box[2] - box[0], bh = box[3] - box[1];
     if (Math.max(bw, bh) > 220) { this.reset(true); return; }
+    if (geometry(`${this.topic.id}:${itemId}`).inset) {
+      const I = MAP.inset, w = I.w * 1.7, hgt = w * (MAP.height / MAP.width);
+      const save = this.vb; this.vb = [I.x + I.w / 2 - w / 2, I.y + I.h / 2 - hgt / 2, w, hgt]; this.clamp(); const t = this.vb; this.vb = save;
+      this.animateTo(t); return;
+    }
     const w = Math.max(360, bw * 2.4), hgt = w * (MAP.height / MAP.width);
     const cx = (box[0] + box[2]) / 2, cy = (box[1] + box[3]) / 2;
     const target = [cx - w / 2, cy - hgt / 2, w, hgt];
@@ -299,8 +313,10 @@ class MapView {
   hitTest(clientX, clientY, maxPx = 26) {
     const [x, y] = this.toSvg(clientX, clientY); const ppu = this.pxPerUnit();
     let best = null, bestD = Infinity;
+    const I = MAP.inset, inInset = x >= I.x && x <= I.x + I.w && y >= I.y && y <= I.y + I.h;
     for (const it of this.topic.items) {
       if (!this.paths.has(it.id)) continue;
+      if (geometry(`${this.topic.id}:${it.id}`).inset !== inInset) continue;   // Canary shapes only count inside the inset box
       const d = distance(`${this.topic.id}:${it.id}`, x, y) * ppu;
       if (d < bestD) { bestD = d; best = it.id; }
     }
@@ -350,7 +366,7 @@ class MapView {
     }, { passive: false });
   }
   /* --- state of items --- */
-  setClass(itemId, cls) { this.paths.get(itemId)?.setAttribute('class', `item ${MAP.items[`${this.topic.id}:${itemId}`].kind} ${cls || ''}`.trim()); if (cls) this.itemsG.append(this.paths.get(itemId)); }
+  setClass(itemId, cls) { this.paths.get(itemId)?.setAttribute('class', `item ${MAP.items[`${this.topic.id}:${itemId}`].kind} t-${this.topic.id} ${cls || ''}`.trim()); if (cls) this.itemsG.append(this.paths.get(itemId)); }
   clearAll() { for (const id of this.paths.keys()) this.setClass(id, ''); this.labelsG.replaceChildren(); }
   dimOthers(on) { this.itemsG.classList.toggle('dim', on); }
   label(itemId, text, cls = '') {
@@ -369,6 +385,7 @@ function setUserArea() {
   if (signedIn) $('#userChip').textContent = state.session.username;
 }
 function screen(...children) { app.replaceChildren(...children); window.scrollTo(0, 0); }
+const gd = (topic) => (topic.g === 'f' ? { el: 'la', un: 'una', o: 'a', cada: 'cada' } : { el: 'el', un: 'un', o: 'o', cada: 'cada' });
 const art = (topic, it) => `${Lp(it.article || topic.article)} ${it.name}`;          // "el Ebro"
 const artCap = (topic, it) => `${Lp(it.articleCap || topic.articleCap)} ${it.name}`; // "El Ebro"
 const sectionOf = (topic) => SECTIONS.find((s) => s.topics.includes(topic)) || SECTIONS[0];
@@ -457,19 +474,22 @@ function renderSection(section) {
         h('div', { class: 'meter' }, h('span', { style: `width:${(100 * mastered) / total}%` })),
         h('p', { class: 'small' }, tr(`${mastered} de ${total} dominados`, `${mastered} of ${total} mastered`))));
   });
-  const coming = h('div', { class: 'card topic-card soon' },
-    h('div', { class: 'topic-icon', html: topicIcon('more') }),
-    h('div', { class: 'topic-text' }, h('h2', {}, tr('Próximamente', 'Coming soon')),
-      h('p', { class: 'muted' }, tr('Aquí aparecerán las islas, las montañas y más.', 'Islands, mountains and more will appear here.'))));
   screen(h('section', { class: 'home' },
     h('button', { class: 'back', onclick: renderHome }, '← ', tr('Inicio', 'Home')),
     h('h1', {}, tr(section.title)),
     h('p', { class: 'muted lead' }, tr('Elige un tema para repasar.', 'Choose a topic to revise.')),
-    h('div', { class: 'topic-grid' }, ...cards, coming)));
+    h('div', { class: 'topic-grid' }, ...cards)));
 }
 function topicIcon(id) {
   if (id === 'geo1eso') return '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="17" fill="none" stroke="currentColor" stroke-width="4"/><path d="M7 24h34M24 7c-9 9-9 25 0 34M24 7c9 9 9 25 0 34" fill="none" stroke="currentColor" stroke-width="3"/></svg>';
   if (id === 'rivers') return '<svg viewBox="0 0 48 48"><path d="M6 12c10 0 10 9 20 9s9 15 16 15" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></svg>';
+  const stroke = 'fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"';
+  if (id === 'peaks') return `<svg viewBox="0 0 48 48"><path d="M5 40L20 12l8 14 5-8 10 22z" ${stroke}/></svg>`;
+  if (id === 'gulfs') return `<svg viewBox="0 0 48 48"><path d="M8 10c14 0 20 6 20 14S22 38 8 38" ${stroke}/><path d="M32 14c4 3 4 17 0 20" ${stroke}/></svg>`;
+  if (id === 'capes') return `<svg viewBox="0 0 48 48"><path d="M6 40h14c4 0 6-3 6-8V16c0-4 3-6 7-6h9" ${stroke}/><circle cx="26" cy="16" r="3" fill="currentColor"/></svg>`;
+  if (id === 'seas') return `<svg viewBox="0 0 48 48"><path d="M4 18c5-6 9 6 14 0s9 6 14 0 9 6 12 0M4 32c5-6 9 6 14 0s9 6 14 0 9 6 12 0" ${stroke}/></svg>`;
+  if (id === 'islands') return `<svg viewBox="0 0 48 48"><path d="M10 30c0-8 8-12 14-12s14 4 14 12c0 5-6 6-14 6s-14-1-14-6z" ${stroke}/><circle cx="40" cy="12" r="3" fill="currentColor"/></svg>`;
+  if (id === 'relief') return `<svg viewBox="0 0 48 48"><path d="M4 36l9-14 6 8 8-16 7 12 6-5 4 15z" ${stroke}/></svg>`;
   return '<svg viewBox="0 0 48 48"><path d="M6 38l12-20 8 12 5-7 11 15z" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></svg>';
 }
 
@@ -487,8 +507,8 @@ function renderTopic(topic) {
       `${mastered} of ${total} mastered. Get one right ${MASTERED_STREAK} times in a row to master it.`)),
     h('div', { class: 'mode-grid' },
       mode(['Aprender', 'Learn'], [`Explora el mapa y toca cada ${nEs} para ver su nombre.`, `Explore the map and tap each ${nEn} to see its name.`], ICONS.learn, () => renderLearn(topic)),
-      mode(['Encuéntralo', 'Find it'], [`Ves un nombre y tocas ese ${nEs} en el mapa.`, `See a name, then tap that ${nEn} on the map.`], ICONS.find, () => startQuiz(topic, 'find'), 'accent'),
-      mode(['¿Cuál es?', 'Name it'], [`Se ilumina un ${nEs}. Elige su nombre.`, `One ${nEn} lights up. Pick its name.`], ICONS.name, () => startQuiz(topic, 'choose')),
+      mode(['Encuéntralo', 'Find it'], [`Ves un nombre y tocas ${gd(topic).el === 'la' ? 'esa' : 'ese'} ${nEs} en el mapa.`, `See a name, then tap that ${nEn} on the map.`], ICONS.find, () => startQuiz(topic, 'find'), 'accent'),
+      mode(['¿Cuál es?', 'Name it'], [`Se ilumina ${gd(topic).un} ${nEs}. Elige su nombre.`, `One ${nEn} lights up. Pick its name.`], ICONS.name, () => startQuiz(topic, 'choose')),
       mode(['Escríbelo', 'Spell it'], ['Como ¿Cuál es?, pero escribes tú el nombre, con sus tildes.', 'Like Name it, but you type the name, accents and all.'], ICONS.spell, () => startQuiz(topic, 'type')),
       mode(['Mi progreso', 'My progress'], ['Mira lo que ya dominas y lo que tienes que practicar.', 'See what you’ve mastered and what needs practice.'], ICONS.progress, () => renderProgress(topic)))));
 }
@@ -508,7 +528,7 @@ function renderLearn(topic) {
   const chips = h('div', { class: 'chips' });
   const map = new MapView(topic, { onTap: (id) => { if (id) select(id, false); } });
   const drawCard = () => {
-    if (!selected) { card.replaceChildren(h('p', { class: 'muted' }, tr(`Toca un ${topic.noun[0]} en el mapa o un nombre de abajo.`, `Tap a ${topic.noun[1]} on the map, or a name below.`))); return; }
+    if (!selected) { card.replaceChildren(h('p', { class: 'muted' }, tr(`Toca ${gd(topic).un} ${topic.noun[0]} en el mapa o un nombre de abajo.`, `Tap a ${topic.noun[1]} on the map, or a name below.`))); return; }
     const it = topic.items.find((i) => i.id === selected);
     card.replaceChildren(h('p', { class: 'eyebrow' }, topic.groupLabel?.[it.group] ? tr(topic.groupLabel[it.group]) : ''), h('h2', { class: 'big-name' }, it.name), h('p', {}, tr(it.fact)), tipEl(it));
   };
@@ -523,7 +543,7 @@ function renderLearn(topic) {
   const labelAll = () => topic.items.forEach((it) => map.label(it.id, it.name));
   const groups = [...new Set(topic.items.map((i) => i.group))];
   for (const g of groups) {
-    chips.append(h('p', { class: 'chip-group' }, topic.groupLabel?.[g] ? tr(topic.groupLabel[g]) : g));
+    if (groups.length > 1) chips.append(h('p', { class: 'chip-group' }, topic.groupLabel?.[g] ? tr(topic.groupLabel[g]) : g));
     for (const it of topic.items.filter((i) => i.group === g)) chips.append(h('button', { class: 'chip', 'data-id': it.id, onclick: () => select(it.id, true) }, it.name));
   }
   const toggle = h('label', { class: 'toggle' }, h('input', { type: 'checkbox', onchange: (e) => {
@@ -568,11 +588,11 @@ function renderQuiz(round) {
     const counter = h('p', { class: 'eyebrow' }, tr(`Pregunta ${round.i + 1} de ${round.items.length}`, `Question ${round.i + 1} of ${round.items.length}`));
     if (mode === 'find') {
       map.reset(true);
-      prompt.replaceChildren(counter, h('p', { class: 'ask' }, tr(`Toca el ${nEs}`, `Tap the ${nEn}`)), h('h2', { class: 'big-name' }, it.name));
+      prompt.replaceChildren(counter, h('p', { class: 'ask' }, tr(`Toca ${gd(topic).el} ${nEs}`, `Tap the ${nEn}`)), h('h2', { class: 'big-name' }, it.name));
       answers.append(h('div', { class: 'row' }, hintBtn(box), dontKnow()), box);
     } else {
       map.dimOthers(true); map.setClass(it.id, 'target'); map.focus(it.id);
-      prompt.replaceChildren(counter, h('p', { class: 'ask' }, tr(`¿Qué ${nEs} está iluminado?`, `Which ${nEn} is lit up?`)));
+      prompt.replaceChildren(counter, h('p', { class: 'ask' }, tr(`¿Qué ${nEs} está iluminad${gd(topic).o}?`, `Which ${nEn} is lit up?`)));
       if (mode === 'choose') {
         const others = shuffle(topic.items.filter((x) => x.id !== it.id));
         // include some options from the same group, so it isn't too easy
@@ -603,7 +623,7 @@ function renderQuiz(round) {
   }
   function onMapTap(id) {
     if (mode !== 'find' || locked) return;
-    if (!id) { toast(L(`Toca justo encima de un ${nEs}. Si están muy juntos, acerca el mapa con +.`, `Tap right on a ${nEn}. If they’re close together, zoom in with +.`), 3000); return; }
+    if (!id) { toast(L(`Toca justo encima de ${gd(topic).un} ${nEs}. Si están muy juntos, acerca el mapa con +.`, `Tap right on a ${nEn}. If they’re close together, zoom in with +.`), 3000); return; }
     const it = current(); locked = true; answers.replaceChildren();
     if (id === it.id) {
       map.setClass(id, 'correct'); map.label(id, it.name, 'correct'); recordAnswer(`${topic.id}:${it.id}`, true); correctFeedback();
@@ -613,8 +633,8 @@ function renderQuiz(round) {
       map.setClass(id, 'wrong'); map.label(id, tapped.name, 'wrong');
       map.setClass(it.id, 'correct reveal'); map.label(it.id, it.name, 'correct');
       recordAnswer(`${topic.id}:${it.id}`, false);
-      wrongFeedback(both(() => L(`${Lp(topic.pronoun)} es ${art(topic, tapped)}. ${artCap(topic, it)} está en verde.`,
-        `${Lp(topic.pronoun)}’s ${art(topic, tapped)}. ${artCap(topic, it)} is shown in green.`)));
+      wrongFeedback(both(() => L(`Has tocado: ${tapped.name}. La respuesta, ${it.name}, está en verde.`,
+        `You tapped: ${tapped.name}. The answer, ${it.name}, is shown in green.`)));
       map.focus(it.id); nextBtn.hidden = false; nextBtn.focus();
     }
   }
@@ -625,14 +645,15 @@ function renderQuiz(round) {
     if (id === it.id) { recordAnswer(`${topic.id}:${it.id}`, true); correctFeedback(); autoNext(); }
     else {
       btn.classList.add('wrong'); recordAnswer(`${topic.id}:${it.id}`, false);
-      wrongFeedback(both(() => L(`Es ${art(topic, it)}.`, `It’s ${art(topic, it)}.`)));
+      wrongFeedback(both(() => L(`Respuesta: ${it.name}.`, `Answer: ${it.name}.`)));
       nextBtn.hidden = false; nextBtn.focus();
     }
   }
   function typed(value, input) {
     if (locked) return; const it = current();
-    const exact = value.trim().toLowerCase() === it.name.toLowerCase();
-    const close = plain(value) === plain(it.name);
+    const names = [it.name, ...(it.alt || [])];
+    const exact = names.some((n) => value.trim().toLowerCase() === n.toLowerCase());
+    const close = names.some((n) => plain(value) === plain(n));
     locked = true; input.disabled = true; answers.querySelectorAll('button').forEach((b) => { b.disabled = true; });
     map.setClass(it.id, 'correct'); map.label(it.id, it.name, 'correct');
     if (exact) { recordAnswer(`${topic.id}:${it.id}`, true); correctFeedback(); autoNext(); }
@@ -643,7 +664,7 @@ function renderQuiz(round) {
       nextBtn.hidden = false; nextBtn.focus();
     } else {
       recordAnswer(`${topic.id}:${it.id}`, false);
-      wrongFeedback(both(() => L(`Es ${art(topic, it)}.`, `It’s ${art(topic, it)}.`)));
+      wrongFeedback(both(() => L(`Respuesta: ${it.name}.`, `Answer: ${it.name}.`)));
       feedback.append(h('span', { class: 'small' }, ' ', tr(`Has escrito «${value.trim()}».`, `You wrote “${value.trim()}”.`)));
       nextBtn.hidden = false; nextBtn.focus();
     }
@@ -652,7 +673,7 @@ function renderQuiz(round) {
     if (locked) return; locked = true; const it = current(); answers.replaceChildren();
     map.setClass(it.id, 'correct reveal'); map.label(it.id, it.name, 'correct'); map.focus(it.id);
     recordAnswer(`${topic.id}:${it.id}`, false);
-    wrongFeedback(both(() => L(`Aquí está ${art(topic, it)}. Volverá a salir pronto.`, `Here’s ${art(topic, it)}. It’ll come up again soon.`)));
+    wrongFeedback(both(() => L(`Aquí está: ${it.name}. Volverá a salir pronto.`, `Here it is: ${it.name}. It’ll come up again soon.`)));
     nextBtn.hidden = false; nextBtn.focus();
   }
   let autoTimer;

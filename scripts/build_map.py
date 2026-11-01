@@ -4,7 +4,7 @@ Usage: python3 scripts/build_map.py"""
 import json, math
 
 W = 1000  # viewBox width; height follows the bounding box
-BBOX = (-9.8, 35.7, 4.6, 44.9)  # lon/lat window to show (peninsula + Balearics)
+BBOX = (-10.8, 35.0, 5.6, 44.9)  # lon/lat window to show (peninsula, Balearics, room for the Canary inset)
 
 # Lambert conformal conic, standard parallels 37N / 43N, centre 40N 3.7W
 phi1, phi2, phi0, lam0 = map(math.radians, (37, 43, 40, -3.7))
@@ -75,8 +75,7 @@ out['spain'] = ''.join(poly_path(f['geometry'], 0.35) for f in land['features'] 
 out['neighbours'] = ''.join(poly_path(f['geometry'], 0.6) for f in land['features'] if f['properties']['kind'] != 'spain')
 out['regions'] = ''.join(poly_path(f['geometry'], 0.5) for f in regions['features'])
 out['countryLabels'] = [{'name': n, 'x': round(proj(*ll)[0]), 'y': round(proj(*ll)[1])} for n, ll in
-                        [('PORTUGAL', (-8.0, 40.25)), ('FRANCIA', (-0.2, 44.25)),
-                         ('Océano Atlántico', (-9.3, 43.75)), ('Mar Mediterráneo', (2.6, 38.6)), ('Mar Cantábrico', (-5.0, 43.85))]]
+                        [('PORTUGAL', (-8.0, 40.25)), ('FRANCIA', (-0.2, 44.25))]]
 # Quiz items, keyed 'topic:id'. kind: line (rivers), area (islands, ranges) or point (peaks)
 out['items'] = {}
 for f in rivers['features']:
@@ -84,6 +83,7 @@ for f in rivers['features']:
     xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
     out['items']['rivers:' + f['properties']['id']] = {
         'kind': 'line', 'd': d, 'box': [round(min(xs)), round(min(ys)), round(max(xs)), round(max(ys))]}
+exec(open('scripts/features.py').read())
 out['cities'] = [{'name': f['properties']['name'], 'x': round(proj(*f['geometry']['coordinates'])[0], 1),
                   'y': round(proj(*f['geometry']['coordinates'])[1], 1)} for f in cities['features']]
 
