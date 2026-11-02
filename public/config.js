@@ -180,87 +180,139 @@ TOPICS.push({
   ],
 });
 
-// "Conexiones": multiple-choice questions linking features to places and regions, asked on a blank map.
-// Q(id, topic, answer item id, [question es, en], clue places, clue regions, optional extra hint [es, en])
-// After a wrong answer the map shows the clue (places/regions), then the shape of the answer, then reveals it.
-const Q = (id, topic, answer, q, places = [], areas = [], hint = null) => ({ id, topic, answer, q, places, areas, hint });
+// "Conexiones": multiple-choice questions that relate the things he is tested on to each other (no cities), asked on a blank map.
+// Q(id, topic of the answer, answer, [question es, en], options, refs, hint)
+//   options: the answer plus wrong choices that are certainly wrong (fixed list), or { pool: [...] } to draw 3 wrong ones at random.
+//   refs: items ('topic:id') that are shown, named, after a first wrong answer. After a second wrong answer the shape of the answer is shown.
+const Q = (id, topic, answer, q, opts, refs = [], hint = null) => ({ id, topic, answer, q, opts: Array.isArray(opts) ? opts : null, pool: opts && opts.pool ? opts.pool : null, refs, hint });
+const SEA = { atl: ['seas:oceano_atlantico', 'el océano Atlántico', 'the Atlantic Ocean'], med: ['seas:mar_mediterraneo', 'el mar Mediterráneo', 'the Mediterranean Sea'], cant: ['seas:mar_cantabrico', 'el mar Cantábrico', 'the Cantabrian Sea'] };
 export const CONNECTIONS = [
-  Q('tajo_toledo', 'rivers', 'tajo', ['¿Qué río pasa por Toledo?', 'Which river flows through Toledo?'], ['toledo']),
-  Q('ebro_zaragoza', 'rivers', 'ebro', ['¿Qué río pasa por Zaragoza?', 'Which river flows through Zaragoza?'], ['zaragoza']),
-  Q('guadalquivir_sevilla', 'rivers', 'guadalquivir', ['¿Qué río pasa por Córdoba y Sevilla?', 'Which river flows through Córdoba and Sevilla?'], ['cordoba', 'sevilla']),
-  Q('turia_valencia', 'rivers', 'turia', ['¿Qué río atraviesa la ciudad de Valencia?', 'Which river runs through the city of Valencia?'], ['valencia']),
-  Q('segura_murcia', 'rivers', 'segura', ['¿Qué río pasa por Murcia?', 'Which river flows through Murcia?'], ['murcia']),
-  Q('nervion_bilbao', 'rivers', 'nervion', ['¿Qué río pasa por Bilbao?', 'Which river flows through Bilbao?'], ['bilbao']),
-  Q('nalon_oviedo', 'rivers', 'nalon', ['¿Qué río pasa cerca de Oviedo?', 'Which river flows near Oviedo?'], ['oviedo']),
-  Q('guadiana_badajoz', 'rivers', 'guadiana', ['¿Qué río pasa por Mérida y Badajoz?', 'Which river flows through Mérida and Badajoz?'], ['merida', 'badajoz']),
-  Q('llobregat_barcelona', 'rivers', 'llobregat', ['¿Qué río desemboca justo al sur de Barcelona?', 'Which river reaches the sea just south of Barcelona?'], ['barcelona']),
-  Q('duero_zamora', 'rivers', 'duero', ['¿Qué río pasa por Soria y Zamora y acaba en Oporto?', 'Which river flows through Soria and Zamora and ends at Porto?'], ['soria', 'zamora', 'oporto']),
-  Q('jucar_cuenca', 'rivers', 'jucar', ['¿Qué río pasa por Cuenca y llega al mar al sur de Valencia?', 'Which river passes Cuenca and reaches the sea south of Valencia?'], ['cuenca', 'valencia']),
-  Q('mino_ourense', 'rivers', 'mino', ['¿Qué río pasa por Lugo y Ourense, en Galicia?', 'Which river flows through Lugo and Ourense, in Galicia?'], ['lugo', 'ourense']),
-  Q('tajo_lisboa', 'rivers', 'tajo', ['¿Qué río desemboca en Lisboa?', 'Which river reaches the sea at Lisbon?'], ['lisboa']),
-  Q('ebro_delta', 'rivers', 'ebro', ['¿Qué río forma un delta junto a Tarragona?', 'Which river forms a delta near Tarragona?'], ['tarragona']),
-  Q('bidasoa_irun', 'rivers', 'bidasoa', ['¿Qué río hace de frontera con Francia en Irún?', 'Which river forms the border with France at Irún?'], ['irun']),
-  Q('navia_galicia', 'rivers', 'navia', ['¿Qué río nace en Galicia y desemboca en Asturias?', 'Which river rises in Galicia and reaches the sea in Asturias?'], [], ['galicia', 'asturias']),
-  Q('pirineos_francia', 'relief', 'pirineos', ['¿Qué cordillera separa España de Francia?', 'Which mountain range separates Spain from France?'], ['pamplona', 'girona'], ['francia']),
-  Q('betico_granada', 'relief', 'sistema_betico', ['¿Qué sistema montañoso está en Granada y Almería, en el sur?', 'Which mountain system is in Granada and Almería, in the south?'], ['granada', 'almeria']),
-  Q('costero_cataluna', 'relief', 'sistema_costero_catalan', ['¿Qué sistema montañoso está pegado a la costa de Cataluña?', 'Which mountain system hugs the coast of Catalonia?'], ['barcelona'], ['cataluna']),
-  Q('central_madrid', 'relief', 'sistema_central', ['¿Qué sistema montañoso está al norte de Madrid, con Ávila y Segovia?', 'Which mountain system lies north of Madrid, by Ávila and Segovia?'], ['madrid', 'avila', 'segovia']),
-  Q('morena_cordoba', 'relief', 'sierra_morena', ['¿Qué sierra está justo al norte de Córdoba?', 'Which range lies just north of Córdoba?'], ['cordoba', 'ciudad_real']),
-  Q('cantabrica_asturias', 'relief', 'cordillera_cantabrica', ['¿Qué cordillera cruza Asturias y Cantabria, junto al mar?', 'Which range runs through Asturias and Cantabria, beside the sea?'], ['oviedo', 'santander', 'leon'], ['asturias', 'cantabria']),
-  Q('iberico_soria', 'relief', 'sistema_iberico', ['¿Qué sistema montañoso pasa por Soria y Teruel?', 'Which mountain system passes Soria and Teruel?'], ['soria', 'teruel']),
-  Q('galaico_galicia', 'relief', 'macizo_galaico', ['¿Qué macizo antiguo está en Galicia?', 'Which ancient massif is in Galicia?'], ['ourense', 'lugo'], ['galicia']),
-  Q('meseta_madrid', 'relief', 'meseta_central', ['¿Qué gran llanura alta rodea a Madrid y Toledo?', 'Which big high plain surrounds Madrid and Toledo?'], ['madrid', 'toledo']),
-  Q('ebro_zaragoza_dep', 'relief', 'depresion_del_ebro', ['¿Qué depresión rodea a Zaragoza?', 'Which depression surrounds Zaragoza?'], ['zaragoza']),
-  Q('guad_sevilla_dep', 'relief', 'depresion_del_guadalquivir', ['¿Qué depresión rodea a Sevilla y Córdoba?', 'Which depression surrounds Sevilla and Córdoba?'], ['sevilla', 'cordoba']),
-  Q('toledo_montes', 'relief', 'montes_de_toledo', ['¿Qué montes están justo al sur de Toledo?', 'Which hills lie just south of Toledo?'], ['toledo', 'ciudad_real']),
-  Q('tramuntana_mallorca', 'relief', 'sierra_de_tramuntana', ['¿Qué sierra está en el norte de Mallorca?', 'Which range is in the north of Mallorca?'], ['palma'], ['baleares']),
-  Q('vascos_pais_vasco', 'relief', 'montes_vascos', ['¿Qué montes están en el País Vasco?', 'Which hills are in the Basque Country?'], ['bilbao'], ['pais_vasco']),
-  Q('teide_canarias', 'peaks', 'teide', ['¿Qué montaña de Tenerife es la más alta de España?', 'Which mountain on Tenerife is the highest in Spain?'], ['sc_tenerife']),
-  Q('aneto_pirineos', 'peaks', 'aneto', ['¿Qué pico es el más alto de los Pirineos?', 'Which peak is the highest in the Pyrenees?'], ['pamplona', 'girona'], [], ['Está en Huesca (Aragón).', 'It is in Huesca (Aragón).']),
-  Q('mulhacen_granada', 'peaks', 'mulhacen', ['¿Qué pico de Sierra Nevada, cerca de Granada, es el más alto de la península?', 'Which Sierra Nevada peak, near Granada, is the highest on the peninsula?'], ['granada']),
-  Q('golfo_cadiz', 'gulfs', 'cadiz', ['¿Qué golfo está frente a Huelva y Cádiz, en el Atlántico?', 'Which gulf lies off Huelva and Cádiz, on the Atlantic?'], ['huelva', 'cadiz']),
-  Q('golfo_valencia', 'gulfs', 'valencia', ['¿Qué golfo baña la costa de la ciudad de Valencia?', 'Which gulf washes the coast by the city of Valencia?'], ['valencia']),
-  Q('golfo_almeria', 'gulfs', 'almeria', ['¿Qué golfo está frente a Almería?', 'Which gulf is off Almería?'], ['almeria']),
-  Q('golfo_leon', 'gulfs', 'leon', ['¿Qué golfo del Mediterráneo está frente a la costa sur de Francia?', 'Which Mediterranean gulf lies off the south coast of France?'], ['girona'], ['francia']),
-  Q('golfo_vizcaya', 'gulfs', 'vizcaya', ['¿Qué golfo baña el País Vasco y el oeste de Francia?', 'Which gulf washes the Basque Country and western France?'], ['bilbao'], ['pais_vasco', 'francia']),
-  Q('cabo_palos', 'capes', 'palos', ['¿Qué cabo está junto al Mar Menor, en Murcia?', 'Which cape is next to the Mar Menor, in Murcia?'], ['cartagena', 'murcia']),
-  Q('cabo_gata', 'capes', 'gata', ['¿Qué cabo de Almería es una zona volcánica y seca?', 'Which cape in Almería is a dry, volcanic area?'], ['almeria']),
-  Q('cabo_fisterra', 'capes', 'fisterra', ['¿Qué cabo gallego se llamó «el fin de la tierra»?', 'Which Galician cape was called «the end of the earth»?'], ['a_coruna'], ['galicia']),
-  Q('cabo_creus', 'capes', 'creus', ['¿Qué cabo de Girona es el punto más oriental de la península?', 'Which cape in Girona is the easternmost point of the peninsula?'], ['girona'], ['cataluna']),
-  Q('cabo_trafalgar', 'capes', 'trafalgar', ['¿Qué cabo de Cádiz es famoso por una batalla naval de 1805?', 'Which cape in Cádiz is famous for a naval battle in 1805?'], ['cadiz']),
-  Q('cabo_nao', 'capes', 'la_nao', ['¿Qué cabo de Alicante es el que más se acerca a Ibiza?', 'Which cape in Alicante reaches closest to Ibiza?'], ['alicante', 'valencia']),
-  Q('estrecho_gibraltar', 'seas', 'estrecho_de_gibraltar', ['¿Qué estrecho separa Europa de África y une el Atlántico con el Mediterráneo?', 'Which strait separates Europe from Africa and joins the Atlantic and the Mediterranean?'], ['cadiz']),
-  Q('delta_tarragona', 'seas', 'delta_del_ebro', ['¿Qué delta está en Tarragona, con arrozales?', 'Which delta, with rice fields, is in Tarragona?'], ['tarragona']),
-  Q('laguna_murcia', 'seas', 'mar_menor', ['¿Qué laguna de agua salada está en Murcia?', 'Which salt-water lagoon is in Murcia?'], ['cartagena', 'murcia']),
-  Q('mar_asturias', 'seas', 'mar_cantabrico', ['¿Qué mar baña Asturias, Cantabria y el País Vasco?', 'Which sea washes Asturias, Cantabria and the Basque Country?'], ['oviedo', 'santander', 'bilbao']),
-  Q('mar_valencia', 'seas', 'mar_mediterraneo', ['¿Qué mar baña Barcelona, Valencia y Murcia?', 'Which sea washes Barcelona, Valencia and Murcia?'], ['barcelona', 'valencia', 'murcia']),
-  Q('oceano_galicia', 'seas', 'oceano_atlantico', ['¿Qué océano baña Galicia, Portugal y las Canarias?', 'Which ocean washes Galicia, Portugal and the Canaries?'], ['a_coruna', 'lisboa']),
-  Q('isla_mayor', 'islands', 'mallorca', ['¿Qué isla balear, con Palma de capital, es la más grande?', 'Which Balearic island, with Palma as its capital, is the biggest?'], ['palma'], ['baleares']),
-  Q('isla_teide', 'islands', 'tenerife', ['¿Qué isla canaria tiene el Teide?', 'Which Canary island has the Teide?'], [], [], ['Es la isla más grande de las Canarias.', 'It is the biggest of the Canary Islands.']),
-  Q('isla_oeste', 'islands', 'el_hierro', ['¿Qué isla canaria es la más pequeña y la más al oeste?', 'Which Canary island is the smallest and furthest west?']),
-  Q('isla_sur_ibiza', 'islands', 'formentera', ['¿Qué isla balear está justo debajo de Ibiza?', 'Which Balearic island lies right below Ibiza?'], [], ['baleares']),
-  Q('isla_lanzarote', 'islands', 'lanzarote', ['¿Qué isla canaria es la más al noreste y tiene el Parque de Timanfaya?', 'Which Canary island is furthest north-east and has Timanfaya Park?']),
+  // --- rivers
+  Q('r_frontera_fr', 'rivers', 'bidasoa', ['¿Qué río hace de frontera con Francia en su tramo final?', 'Which river forms the border with France in its final stretch?'], ['bidasoa', 'nervion', 'nalon', 'navia']),
+  Q('r_frontera_pt', 'rivers', 'guadiana', ['¿Qué río hace de frontera con Portugal en su tramo final?', 'Which river forms the border with Portugal in its final stretch?'], ['guadiana', 'jucar', 'turia', 'llobregat']),
+  Q('r_delta', 'rivers', 'ebro', ['¿Qué río forma un delta al llegar al mar?', 'Which river forms a delta where it meets the sea?'], ['ebro', 'tajo', 'segura', 'duero'], ['seas:delta_del_ebro']),
+  Q('r_largo', 'rivers', 'tajo', ['¿Cuál de estos ríos es el más largo de la península ibérica?', 'Which of these rivers is the longest in the Iberian Peninsula?'], ['tajo', 'jucar', 'turia', 'segura']),
+  Q('r_tajo_entre', 'rivers', 'tajo', ['¿Qué río corre entre el Sistema Central y los Montes de Toledo?', 'Which river runs between the Central System and the Montes de Toledo?'], ['tajo', 'duero', 'guadiana', 'ebro'], ['relief:sistema_central', 'relief:montes_de_toledo']),
+  Q('r_guad_entre', 'rivers', 'guadalquivir', ['¿Qué río corre entre Sierra Morena y el Sistema Bético?', 'Which river runs between Sierra Morena and the Betic System?'], ['guadalquivir', 'tajo', 'duero', 'ebro'], ['relief:sierra_morena', 'relief:sistema_betico']),
+  Q('r_ebro_entre', 'rivers', 'ebro', ['¿Qué río corre entre los Pirineos y el Sistema Ibérico?', 'Which river runs between the Pyrenees and the Iberian System?'], ['ebro', 'tajo', 'duero', 'guadiana'], ['relief:pirineos', 'relief:sistema_iberico']),
+  Q('r_duero_entre', 'rivers', 'duero', ['¿Qué río corre entre el Sistema Central y la Cordillera Cantábrica?', 'Which river runs between the Central System and the Cantabrian Mountains?'], ['duero', 'guadiana', 'segura', 'jucar'], ['relief:sistema_central', 'relief:cordillera_cantabrica']),
+  Q('r_atl_norte', 'rivers', 'mino', ['¿Cuál de estos ríos del Atlántico está más al norte?', 'Which of these Atlantic rivers is furthest north?'], ['mino', 'tajo', 'guadiana', 'guadalquivir'], ['seas:oceano_atlantico']),
+  Q('r_atl_sur', 'rivers', 'guadalquivir', ['¿Cuál de estos ríos del Atlántico está más al sur?', 'Which of these Atlantic rivers is furthest south?'], ['guadalquivir', 'mino', 'duero', 'tajo'], ['seas:oceano_atlantico']),
+  Q('r_entre_atl', 'rivers', 'tajo', ['¿Qué río del Atlántico está entre el Duero y el Guadiana?', 'Which Atlantic river lies between the Duero and the Guadiana?'], ['tajo', 'mino', 'guadalquivir'], ['rivers:duero', 'rivers:guadiana']),
+  Q('r_med_sur', 'rivers', 'segura', ['¿Cuál de estos ríos del Mediterráneo desemboca más al sur?', 'Which of these Mediterranean rivers reaches the sea furthest south?'], ['segura', 'ebro', 'llobregat', 'turia'], ['seas:mar_mediterraneo']),
+  Q('r_med_norte', 'rivers', 'llobregat', ['¿Cuál de estos ríos del Mediterráneo desemboca más al norte?', 'Which of these Mediterranean rivers reaches the sea furthest north?'], ['llobregat', 'ebro', 'jucar', 'segura'], ['seas:mar_mediterraneo']),
+  // --- relief
+  Q('re_central', 'relief', 'sistema_central', ['¿Qué sistema montañoso divide la Meseta Central en Meseta Norte y Meseta Sur?', 'Which mountain system divides the Central Plateau into a northern and a southern half?'], ['sistema_central', 'sierra_morena', 'montes_de_toledo', 'sistema_iberico'], ['relief:meseta_central']),
+  Q('re_norte', 'relief', 'cordillera_cantabrica', ['¿Qué cordillera cierra la Meseta por el norte?', 'Which range closes the plateau on the north?'], ['cordillera_cantabrica', 'sierra_morena', 'sistema_iberico', 'macizo_galaico'], ['relief:meseta_central']),
+  Q('re_este', 'relief', 'sistema_iberico', ['¿Qué sistema montañoso cierra la Meseta por el este?', 'Which mountain system closes the plateau on the east?'], ['sistema_iberico', 'cordillera_cantabrica', 'sierra_morena', 'macizo_galaico'], ['relief:meseta_central']),
+  Q('re_sur', 'relief', 'sierra_morena', ['¿Qué sierra cierra la Meseta por el sur?', 'Which range closes the plateau on the south?'], ['sierra_morena', 'cordillera_cantabrica', 'sistema_iberico', 'macizo_galaico'], ['relief:meseta_central']),
+  Q('re_separa', 'relief', 'sierra_morena', ['¿Qué sierra separa la Meseta Central de la Depresión del Guadalquivir?', 'Which range separates the Central Plateau from the Guadalquivir Depression?'], ['sierra_morena', 'sistema_central', 'sistema_iberico', 'macizo_galaico'], ['relief:meseta_central', 'relief:depresion_del_guadalquivir']),
+  Q('re_betico', 'relief', 'sistema_betico', ['¿Qué sistema montañoso está al sur de la Depresión del Guadalquivir?', 'Which mountain system lies south of the Guadalquivir Depression?'], ['sistema_betico', 'sierra_morena', 'sistema_central', 'cordillera_cantabrica'], ['relief:depresion_del_guadalquivir']),
+  Q('re_pirineos', 'relief', 'pirineos', ['¿Qué cordillera separa España de Francia?', 'Which range separates Spain from France?'], ['pirineos', 'cordillera_cantabrica', 'sistema_iberico', 'sistema_central']),
+  Q('re_aneto', 'relief', 'pirineos', ['¿En qué cordillera está el Aneto?', 'In which range is the Aneto?'], ['pirineos', 'sistema_central', 'sistema_iberico', 'sistema_betico'], ['peaks:aneto']),
+  Q('re_mulhacen', 'relief', 'sistema_betico', ['¿En qué sistema montañoso está el Mulhacén?', 'In which mountain system is the Mulhacén?'], ['sistema_betico', 'pirineos', 'sistema_central', 'sistema_iberico'], ['peaks:mulhacen']),
+  Q('re_isla', 'relief', 'sierra_de_tramuntana', ['¿Qué sierra está en una isla?', 'Which range is on an island?'], ['sierra_de_tramuntana', 'sistema_central', 'sierra_morena', 'montes_de_toledo'], ['islands:mallorca']),
+  Q('re_mar_cant', 'relief', 'cordillera_cantabrica', ['¿Qué cordillera está junto al mar Cantábrico?', 'Which range lies next to the Cantabrian Sea?'], ['cordillera_cantabrica', 'sierra_morena', 'sistema_iberico', 'sistema_central'], ['seas:mar_cantabrico']),
+  Q('re_mar_med', 'relief', 'sistema_costero_catalan', ['¿Qué sistema montañoso está pegado al Mediterráneo, en el nordeste?', 'Which mountain system hugs the Mediterranean, in the north-east?'], ['sistema_costero_catalan', 'cordillera_cantabrica', 'sistema_central', 'sierra_morena'], ['seas:mar_mediterraneo']),
+  Q('re_depr_ebro', 'relief', 'depresion_del_ebro', ['¿Qué depresión está entre los Pirineos y el Sistema Ibérico?', 'Which depression lies between the Pyrenees and the Iberian System?'], ['depresion_del_ebro', 'depresion_del_guadalquivir', 'meseta_central', 'montes_vascos'], ['relief:pirineos', 'relief:sistema_iberico']),
+  Q('re_depr_guad', 'relief', 'depresion_del_guadalquivir', ['¿Qué depresión está entre Sierra Morena y el Sistema Bético?', 'Which depression lies between Sierra Morena and the Betic System?'], ['depresion_del_guadalquivir', 'depresion_del_ebro', 'meseta_central', 'macizo_galaico'], ['relief:sierra_morena', 'relief:sistema_betico']),
+  Q('re_vascos', 'relief', 'montes_vascos', ['¿Qué montes unen la Cordillera Cantábrica con los Pirineos?', 'Which hills link the Cantabrian Mountains with the Pyrenees?'], ['montes_vascos', 'macizo_galaico', 'montes_de_toledo', 'sistema_costero_catalan'], ['relief:cordillera_cantabrica', 'relief:pirineos']),
+  Q('re_toledo', 'relief', 'montes_de_toledo', ['¿Qué montes están justo al sur del río Tajo?', 'Which hills lie just south of the River Tajo?'], ['montes_de_toledo', 'sistema_central', 'pirineos', 'cordillera_cantabrica'], ['rivers:tajo']),
+  Q('re_galaico', 'relief', 'macizo_galaico', ['¿Qué macizo antiguo está en el noroeste, junto al río Miño?', 'Which ancient massif is in the north-west, beside the River Miño?'], ['macizo_galaico', 'montes_vascos', 'sistema_costero_catalan', 'sierra_de_tramuntana'], ['rivers:mino']),
+  Q('re_meseta', 'relief', 'meseta_central', ['¿Qué gran llanura alta está rodeada por la Cordillera Cantábrica, el Sistema Ibérico y Sierra Morena?', 'Which big high plain is ringed by the Cantabrian Mountains, the Iberian System and Sierra Morena?'], ['meseta_central', 'depresion_del_ebro', 'depresion_del_guadalquivir'], ['relief:cordillera_cantabrica', 'relief:sistema_iberico', 'relief:sierra_morena']),
+  // --- peaks
+  Q('p_isla', 'peaks', 'teide', ['¿Qué montaña está en una isla?', 'Which mountain is on an island?'], ['teide', 'aneto', 'mulhacen'], ['islands:tenerife']),
+  Q('p_pirineos', 'peaks', 'aneto', ['¿Qué montaña está en los Pirineos?', 'Which mountain is in the Pyrenees?'], ['aneto', 'teide', 'mulhacen'], ['relief:pirineos']),
+  Q('p_betico', 'peaks', 'mulhacen', ['¿Qué montaña está en el Sistema Bético?', 'Which mountain is in the Betic System?'], ['mulhacen', 'teide', 'aneto'], ['relief:sistema_betico']),
+  Q('p_alta', 'peaks', 'teide', ['¿Cuál es la montaña más alta de España?', 'Which is the highest mountain in Spain?'], ['teide', 'aneto', 'mulhacen']),
+  Q('p_alta_pen', 'peaks', 'mulhacen', ['¿Cuál es la montaña más alta de la península ibérica?', 'Which is the highest mountain on the Iberian Peninsula?'], ['mulhacen', 'teide', 'aneto']),
+  Q('p_norte', 'peaks', 'aneto', ['¿Cuál de estas montañas está más al norte?', 'Which of these mountains is furthest north?'], ['aneto', 'teide', 'mulhacen']),
+  Q('p_sur', 'peaks', 'teide', ['¿Cuál de estas montañas está más al sur?', 'Which of these mountains is furthest south?'], ['teide', 'aneto', 'mulhacen']),
+  Q('p_norte_ebro', 'peaks', 'aneto', ['¿Qué montaña está al norte del río Ebro?', 'Which mountain lies north of the River Ebro?'], ['aneto', 'teide', 'mulhacen'], ['rivers:ebro']),
+  // --- gulfs
+  Q('g_guad', 'gulfs', 'cadiz', ['¿En qué golfo desemboca el río Guadalquivir?', 'Into which gulf does the Guadalquivir flow?'], ['cadiz', 'valencia', 'almeria', 'leon'], ['rivers:guadalquivir']),
+  Q('g_turia', 'gulfs', 'valencia', ['¿Qué golfo está frente a la desembocadura del río Turia?', 'Which gulf lies off the mouth of the River Turia?'], ['valencia', 'cadiz', 'almeria', 'leon'], ['rivers:turia']),
+  Q('g_gata', 'gulfs', 'almeria', ['¿Qué golfo está junto al cabo de Gata?', 'Which gulf is next to Cabo de Gata?'], ['almeria', 'valencia', 'leon', 'vizcaya'], ['capes:gata']),
+  Q('g_nao', 'gulfs', 'valencia', ['¿Qué golfo termina en el cabo de la Nao?', 'Which gulf ends at Cabo de la Nao?'], ['valencia', 'almeria', 'leon', 'cadiz'], ['capes:la_nao']),
+  Q('g_creus', 'gulfs', 'leon', ['¿Qué golfo está frente al cabo de Creus?', 'Which gulf lies off Cabo de Creus?'], ['leon', 'valencia', 'almeria', 'cadiz'], ['capes:creus']),
+  Q('g_caps', 'gulfs', 'cadiz', ['¿Qué golfo está entre el cabo de San Vicente y el cabo de Trafalgar?', 'Which gulf lies between Cabo de San Vicente and Cabo de Trafalgar?'], ['cadiz', 'valencia', 'almeria', 'vizcaya'], ['capes:san_vicente', 'capes:trafalgar']),
+  Q('g_cant', 'gulfs', 'vizcaya', ['¿Qué golfo está junto al mar Cantábrico?', 'Which gulf is next to the Cantabrian Sea?'], ['vizcaya', 'cadiz', 'almeria', 'valencia'], ['seas:mar_cantabrico']),
+  // --- capes
+  Q('c_menor', 'capes', 'palos', ['¿Qué cabo está junto al Mar Menor?', 'Which cape is next to the Mar Menor?'], ['palos', 'fisterra', 'creus', 'san_vicente'], ['seas:mar_menor']),
+  Q('c_ibiza', 'capes', 'la_nao', ['¿Qué cabo de la costa es el más cercano a Ibiza?', 'Which cape on the coast is the closest to Ibiza?'], ['la_nao', 'gata', 'palos', 'creus'], ['islands:ibiza']),
+  Q('c_gib', 'capes', 'trafalgar', ['¿Qué cabo está cerca de la entrada del estrecho de Gibraltar, por el Atlántico?', 'Which cape is near the Atlantic entrance of the Strait of Gibraltar?'], ['trafalgar', 'creus', 'palos', 'la_nao'], ['seas:estrecho_de_gibraltar']),
+  Q('c_leon', 'capes', 'creus', ['¿Qué cabo mira al golfo de León?', 'Which cape faces the Gulf of León?'], ['creus', 'fisterra', 'trafalgar', 'gata'], ['gulfs:leon']),
+  Q('c_alm', 'capes', 'gata', ['¿Qué cabo está junto al golfo de Almería?', 'Which cape is next to the Gulf of Almería?'], ['gata', 'creus', 'fisterra', 'estaca_de_bares'], ['gulfs:almeria']),
+  Q('c_norte', 'capes', 'estaca_de_bares', ['¿Cuál de estos cabos está más al norte?', 'Which of these capes is furthest north?'], ['estaca_de_bares', 'fisterra', 'creus', 'gata']),
+  Q('c_sur', 'capes', 'trafalgar', ['¿Cuál de estos cabos está más al sur?', 'Which of these capes is furthest south?'], ['trafalgar', 'san_vicente', 'gata', 'palos']),
+  Q('c_este', 'capes', 'creus', ['¿Cuál de estos cabos está más al este?', 'Which of these capes is furthest east?'], ['creus', 'la_nao', 'palos', 'gata']),
+  Q('c_oeste', 'capes', 'fisterra', ['¿Cuál de estos cabos está más al oeste?', 'Which of these capes is furthest west?'], ['fisterra', 'estaca_de_bares', 'trafalgar', 'gata']),
+  // --- seas and others
+  Q('s_gib', 'seas', 'estrecho_de_gibraltar', ['¿Qué estrecho une el océano Atlántico con el mar Mediterráneo?', 'Which strait joins the Atlantic Ocean with the Mediterranean Sea?'], ['estrecho_de_gibraltar', 'delta_del_ebro', 'mar_menor', 'mar_cantabrico'], ['seas:oceano_atlantico', 'seas:mar_mediterraneo']),
+  Q('s_menor', 'seas', 'mar_menor', ['¿Qué laguna de agua salada está separada del Mediterráneo por una franja de arena?', 'Which salt-water lagoon is separated from the Mediterranean by a strip of sand?'], ['mar_menor', 'delta_del_ebro', 'estrecho_de_gibraltar', 'mar_cantabrico'], ['seas:mar_mediterraneo']),
+  Q('s_delta', 'seas', 'delta_del_ebro', ['¿Qué delta forma el río Ebro?', 'Which delta does the River Ebro form?'], ['delta_del_ebro', 'mar_menor', 'estrecho_de_gibraltar', 'mar_mediterraneo'], ['rivers:ebro']),
+  Q('s_cant', 'seas', 'mar_cantabrico', ['¿Qué mar baña la costa norte de España?', 'Which sea washes the north coast of Spain?'], ['mar_cantabrico', 'mar_mediterraneo', 'oceano_atlantico', 'mar_menor']),
+  Q('s_balear', 'seas', 'mar_mediterraneo', ['¿Qué mar baña las islas Baleares?', 'Which sea washes the Balearic Islands?'], ['mar_mediterraneo', 'mar_cantabrico', 'oceano_atlantico', 'mar_menor'], ['islands:mallorca']),
+  Q('s_canarias', 'seas', 'oceano_atlantico', ['¿Qué océano baña las islas Canarias?', 'Which ocean washes the Canary Islands?'], ['oceano_atlantico', 'mar_mediterraneo', 'mar_cantabrico', 'mar_menor'], ['islands:tenerife']),
+  Q('s_mino', 'seas', 'oceano_atlantico', ['¿Dónde desemboca el río Miño?', 'Where does the River Miño reach the sea?'], ['oceano_atlantico', 'mar_mediterraneo', 'mar_cantabrico', 'mar_menor'], ['rivers:mino']),
+  Q('s_ebro', 'seas', 'mar_mediterraneo', ['¿Dónde desemboca el río Ebro?', 'Where does the River Ebro reach the sea?'], ['mar_mediterraneo', 'oceano_atlantico', 'mar_cantabrico', 'mar_menor'], ['rivers:ebro']),
+  Q('s_nalon', 'seas', 'mar_cantabrico', ['¿Dónde desemboca el río Nalón?', 'Where does the River Nalón reach the sea?'], ['mar_cantabrico', 'mar_mediterraneo', 'oceano_atlantico', 'mar_menor'], ['rivers:nalon']),
+  // --- islands
+  Q('i_teide', 'islands', 'tenerife', ['¿En qué isla está el Teide, la montaña más alta de España?', 'On which island is the Teide, the highest mountain in Spain?'], ['tenerife', 'gran_canaria', 'la_palma', 'lanzarote'], ['peaks:teide']),
+  Q('i_tramuntana', 'islands', 'mallorca', ['¿En qué isla está la Sierra de Tramuntana?', 'On which island is the Sierra de Tramuntana?'], ['mallorca', 'menorca', 'ibiza', 'formentera'], ['relief:sierra_de_tramuntana']),
+  Q('i_grande', 'islands', 'mallorca', ['¿Cuál es la isla balear más grande?', 'Which is the biggest Balearic island?'], ['mallorca', 'menorca', 'ibiza', 'formentera']),
+  Q('i_peq', 'islands', 'formentera', ['¿Cuál es la isla balear más pequeña?', 'Which is the smallest Balearic island?'], ['formentera', 'mallorca', 'menorca', 'ibiza']),
+  Q('i_este', 'islands', 'menorca', ['¿Qué isla balear está más al este?', 'Which Balearic island is furthest east?'], ['menorca', 'mallorca', 'ibiza', 'formentera']),
+  Q('i_sur', 'islands', 'formentera', ['¿Qué isla balear está más al sur?', 'Which Balearic island is furthest south?'], ['formentera', 'mallorca', 'menorca', 'ibiza']),
+  Q('i_oeste', 'islands', 'el_hierro', ['¿Qué isla canaria está más al oeste?', 'Which Canary island is furthest west?'], ['el_hierro', 'tenerife', 'gran_canaria', 'lanzarote']),
+  Q('i_este_can', 'islands', 'lanzarote', ['¿Cuál de estas islas canarias está más al este?', 'Which of these Canary islands is furthest east?'], ['lanzarote', 'tenerife', 'la_palma', 'la_gomera']),
+  Q('i_norte_can', 'islands', 'lanzarote', ['¿Cuál de estas islas canarias está más al norte?', 'Which of these Canary islands is furthest north?'], ['lanzarote', 'gran_canaria', 'el_hierro', 'la_gomera']),
+  Q('i_africa', 'islands', 'fuerteventura', ['¿Cuál de estas islas está más cerca de África?', 'Which of these islands is closest to Africa?'], ['fuerteventura', 'mallorca', 'menorca', 'ibiza']),
+  Q('i_gomera', 'islands', 'la_gomera', ['¿Qué isla canaria está entre El Hierro y Tenerife?', 'Which Canary island lies between El Hierro and Tenerife?'], ['la_gomera', 'la_palma', 'gran_canaria', 'fuerteventura'], ['islands:el_hierro', 'islands:tenerife']),
+  // --- comunidades autónomas
+  Q('reg_ast', 'regions', 'asturias', ['¿Qué comunidad está entre Galicia y Cantabria?', 'Which community lies between Galicia and Cantabria?'], ['asturias', 'pais_vasco', 'la_rioja', 'navarra'], ['regions:galicia', 'regions:cantabria']),
+  Q('reg_cant', 'regions', 'cantabria', ['¿Qué comunidad está entre Asturias y el País Vasco?', 'Which community lies between Asturias and the Basque Country?'], ['cantabria', 'galicia', 'la_rioja', 'aragon'], ['regions:asturias', 'regions:pais_vasco']),
+  Q('reg_rioja', 'regions', 'la_rioja', ['¿Qué comunidad pequeña está entre el País Vasco, Navarra y Aragón?', 'Which small community lies between the Basque Country, Navarra and Aragón?'], ['la_rioja', 'madrid', 'cantabria', 'extremadura'], ['regions:pais_vasco', 'regions:navarra', 'regions:aragon']),
+  Q('reg_madrid', 'regions', 'madrid', ['¿Qué comunidad está rodeada por Castilla y León y Castilla-La Mancha?', 'Which community is surrounded by Castilla y León and Castilla-La Mancha?'], ['madrid', 'extremadura', 'murcia', 'aragon'], ['regions:castilla_leon', 'regions:castilla_la_mancha']),
+  Q('reg_extre', 'regions', 'extremadura', ['¿Qué comunidad está debajo de Castilla y León y hace frontera con Portugal?', 'Which community lies below Castilla y León and borders Portugal?'], ['extremadura', 'aragon', 'murcia', 'la_rioja'], ['regions:castilla_leon']),
+  Q('reg_cat', 'regions', 'cataluna', ['¿Qué comunidad está en la esquina nordeste, junto a Francia y al Mediterráneo?', 'Which community is in the north-east corner, beside France and the Mediterranean?'], ['cataluna', 'galicia', 'valenciana', 'aragon']),
+  Q('reg_val', 'regions', 'valenciana', ['¿Qué comunidad está al sur de Cataluña, en la costa mediterránea?', 'Which community lies south of Catalonia, on the Mediterranean coast?'], ['valenciana', 'aragon', 'navarra', 'madrid'], ['regions:cataluna']),
+  Q('reg_mur', 'regions', 'murcia', ['¿Qué comunidad está al sur de la Comunidad Valenciana, en la costa?', 'Which community lies south of the Valencian Community, on the coast?'], ['murcia', 'aragon', 'navarra', 'galicia'], ['regions:valenciana']),
+  Q('reg_gal', 'regions', 'galicia', ['¿Qué comunidad del noroeste hace frontera con Portugal y mira al Atlántico?', 'Which north-western community borders Portugal and faces the Atlantic?'], ['galicia', 'asturias', 'cantabria', 'pais_vasco']),
+  Q('reg_balear', 'regions', 'baleares', ['¿Qué comunidad está formada por islas del Mediterráneo?', 'Which community is made of Mediterranean islands?'], ['baleares', 'canarias', 'murcia', 'valenciana'], ['seas:mar_mediterraneo']),
+  Q('reg_canarias', 'regions', 'canarias', ['¿Qué comunidad está formada por islas del Atlántico?', 'Which community is made of Atlantic islands?'], ['canarias', 'baleares', 'galicia', 'andalucia'], ['seas:oceano_atlantico']),
+  Q('reg_grande', 'regions', 'castilla_leon', ['¿Cuál es la comunidad más grande de España?', 'Which is the biggest community in Spain?'], ['castilla_leon', 'madrid', 'la_rioja', 'cantabria']),
+  Q('reg_peq', 'regions', 'la_rioja', ['¿Cuál es la comunidad más pequeña de la península?', 'Which is the smallest community on the peninsula?'], ['la_rioja', 'aragon', 'galicia', 'andalucia']),
+  Q('reg_ceuta', 'regions', 'ceuta', ['¿Qué ciudad autónoma está más al oeste?', 'Which autonomous city is further west?'], ['ceuta', 'melilla']),
+  Q('reg_melilla', 'regions', 'melilla', ['¿Qué ciudad autónoma está más al este?', 'Which autonomous city is further east?'], ['melilla', 'ceuta']),
+  Q('reg_and', 'regions', 'andalucia', ['¿Qué comunidad del sur tiene costa en el Atlántico y en el Mediterráneo?', 'Which southern community has both an Atlantic and a Mediterranean coast?'], ['andalucia', 'galicia', 'murcia', 'cataluna']),
 ];
 
-CONNECTIONS.push(
-  Q('capital_andalucia', 'regions', 'andalucia', ['¿Qué comunidad tiene como capital Sevilla?', 'Which community has Sevilla as its capital?'], ['sevilla']),
-  Q('capital_aragon', 'regions', 'aragon', ['¿Qué comunidad tiene como capital Zaragoza?', 'Which community has Zaragoza as its capital?'], ['zaragoza']),
-  Q('capital_asturias', 'regions', 'asturias', ['¿Qué comunidad tiene como capital Oviedo?', 'Which community has Oviedo as its capital?'], ['oviedo']),
-  Q('capital_baleares', 'regions', 'baleares', ['¿Qué comunidad tiene como capital Palma de Mallorca?', 'Which community has Palma de Mallorca as its capital?'], ['palma']),
-  Q('capital_cantabria', 'regions', 'cantabria', ['¿Qué comunidad tiene como capital Santander?', 'Which community has Santander as its capital?'], ['santander']),
-  Q('capital_cast_leon', 'regions', 'castilla_leon', ['¿Qué comunidad tiene como capital Valladolid?', 'Which community has Valladolid as its capital?'], ['valladolid']),
-  Q('capital_cast_mancha', 'regions', 'castilla_la_mancha', ['¿Qué comunidad tiene como capital Toledo?', 'Which community has Toledo as its capital?'], ['toledo']),
-  Q('capital_cataluna', 'regions', 'cataluna', ['¿Qué comunidad tiene como capital Barcelona?', 'Which community has Barcelona as its capital?'], ['barcelona']),
-  Q('capital_extremadura', 'regions', 'extremadura', ['¿Qué comunidad tiene como capital Mérida?', 'Which community has Mérida as its capital?'], ['merida']),
-  Q('capital_galicia', 'regions', 'galicia', ['¿Qué comunidad tiene como capital Santiago de Compostela?', 'Which community has Santiago de Compostela as its capital?'], ['santiago']),
-  Q('capital_la_rioja', 'regions', 'la_rioja', ['¿Qué comunidad tiene como capital Logroño?', 'Which community has Logroño as its capital?'], ['logrono']),
-  Q('capital_madrid', 'regions', 'madrid', ['¿Qué comunidad tiene como capital Madrid?', 'Which community has Madrid as its capital?'], ['madrid']),
-  Q('capital_murcia', 'regions', 'murcia', ['¿Qué comunidad tiene como capital Murcia?', 'Which community has Murcia as its capital?'], ['murcia']),
-  Q('capital_navarra', 'regions', 'navarra', ['¿Qué comunidad tiene como capital Pamplona?', 'Which community has Pamplona as its capital?'], ['pamplona']),
-  Q('capital_pais_vasco', 'regions', 'pais_vasco', ['¿Qué comunidad tiene como capital Vitoria-Gasteiz?', 'Which community has Vitoria-Gasteiz as its capital?'], ['vitoria']),
-  Q('capital_valenciana', 'regions', 'valenciana', ['¿Qué comunidad tiene como capital Valencia?', 'Which community has Valencia as its capital?'], ['valencia']),
-  Q('capital_canarias', 'regions', 'canarias', ['¿Qué comunidad tiene como capital Las Palmas de Gran Canaria?', 'Which community has Las Palmas de Gran Canaria as its capital?'], ['las_palmas']),
-);
+// Questions made from a rule, so every item gets its own: "which of these drains into the Mediterranean?" etc.
+const itemsOf = (topic) => TOPICS.find((t) => t.id === topic).items;
+const addSea = (idPrefix, topic, label, seaOf, poolOf) => {
+  for (const it of itemsOf(topic)) {
+    const sea = seaOf(it); if (!sea) continue;
+    const [ref, es, en] = SEA[sea];
+    CONNECTIONS.push(Q(`${idPrefix}_${it.id}`, topic, it.id, [`¿Cuál de estos ${label[0]} ${label[2]} en ${es}?`, `Which of these ${label[1]} ${label[3]} ${en}?`], { pool: poolOf(it, sea) }, [ref]));
+  }
+};
+{
+  const riverSea = (r) => ({ Atlantic: 'atl', Mediterranean: 'med', Cantabrian: 'cant' }[r.group]);
+  addSea('rsea', 'rivers', ['ríos', 'rivers', 'desemboca', 'flows into'], riverSea, (r) => itemsOf('rivers').filter((x) => riverSea(x) !== riverSea(r)).map((x) => x.id));
+  const gulfSea = (g) => ({ cadiz: 'atl', vizcaya: 'atl', valencia: 'med', almeria: 'med', leon: 'med' }[g.id]);
+  addSea('gsea', 'gulfs', ['golfos', 'gulfs', 'está', 'lies in'], gulfSea, (g) => itemsOf('gulfs').filter((x) => gulfSea(x) !== gulfSea(g)).map((x) => x.id));
+  const capeSea = (c) => ({ fisterra: 'atl', san_vicente: 'atl', trafalgar: 'atl', creus: 'med', gata: 'med', la_nao: 'med', palos: 'med' }[c.id]);
+  addSea('csea', 'capes', ['cabos', 'capes', 'está', 'lies on'], capeSea, (c) => itemsOf('capes').filter((x) => capeSea(x) && capeSea(x) !== capeSea(c)).map((x) => x.id));
+  const islandSea = (i) => (i.group === 'baleares' ? 'med' : 'atl');
+  addSea('isea', 'islands', ['islas', 'islands', 'está', 'lies in'], islandSea, (i) => itemsOf('islands').filter((x) => islandSea(x) !== islandSea(i)).map((x) => x.id));
+  const coast = { none: ['aragon', 'madrid', 'castilla_leon', 'castilla_la_mancha', 'extremadura', 'la_rioja', 'navarra'], med: ['cataluna', 'valenciana', 'murcia', 'baleares'], cant: ['asturias', 'cantabria', 'pais_vasco'] };
+  const other = { none: ['andalucia', 'galicia', 'asturias', 'cantabria', 'pais_vasco', 'cataluna', 'valenciana', 'murcia', 'baleares', 'canarias'],
+    med: [...coast.none, 'asturias', 'cantabria', 'pais_vasco', 'galicia', 'canarias'], cant: [...coast.none, 'cataluna', 'valenciana', 'murcia', 'baleares', 'canarias'] };
+  const text = { none: ['¿Cuál de estas comunidades no tiene costa?', 'Which of these communities has no coast?'],
+    med: ['¿Cuál de estas comunidades tiene costa en el Mediterráneo?', 'Which of these communities has a Mediterranean coast?'], cant: ['¿Cuál de estas comunidades tiene costa en el Cantábrico?', 'Which of these communities has a Cantabrian coast?'] };
+  for (const k of Object.keys(coast)) for (const id of coast[k]) CONNECTIONS.push(Q(`rco_${id}`, 'regions', id, text[k], { pool: other[k] }, k === 'none' ? [] : [k === 'med' ? 'seas:mar_mediterraneo' : 'seas:mar_cantabrico']));
+}
 
 // Silly mnemonics, keyed 'topic:item'. Shown with the tip and after wrong answers.
 const SILLY = {

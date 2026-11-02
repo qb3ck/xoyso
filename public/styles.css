@@ -315,3 +315,9 @@ main { flex: 1; width: 100%; max-width: 1280px; margin: 0 auto; padding: 18px 16
 .break-row { display: flex; justify-content: space-between; padding: 6px 2px; border-bottom: 1px solid var(--line); }
 .toggle.examopt { display: flex; gap: 8px; align-items: flex-start; text-align: left; margin: 1em 0; }
 .toggle.examopt input { margin-top: 4px; width: 20px; height: 20px; }
+
+/* items shown as references in Conexiones */
+.items .item.ref { stroke: var(--brand); stroke-width: 5; opacity: 1; }
+.items .item.area.ref { fill: color-mix(in srgb, var(--brand) 28%, transparent); stroke-width: 2; }
+.items .item.point.ref { stroke-width: 14; }
+.item-label.ref { fill: var(--brand); }

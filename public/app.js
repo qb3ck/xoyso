@@ -396,9 +396,17 @@ class MapView {
       const t = s('text', { x: pl.x + 8 * this.k, y: pl.y - 6 * this.k, class: 'place-label' }); t.textContent = pl.name; return [dot, t];
     }));
   }
+  showRefs(q) {   // the items the question mentions, drawn and named
+    for (const ref of q.refs) {
+      const [tp, id] = ref.split(':');
+      if (this.itemsG.querySelector(`[data-ref="${ref}"]`)) continue;
+      this.drawShape(ref, 'ref').setAttribute('data-ref', ref);
+      this.labelKey(ref, topicById(tp).items.find((x) => x.id === id).name, 'ref');
+    }
+  }
   drawShape(key, cls) {
     const item = MAP.items[key], [tp] = key.split(':');
-    this.itemsG.append(s('path', { d: item.d, class: `item ${item.kind} t-${tp} ${cls}` }));
+    const el = s('path', { d: item.d, class: `item ${item.kind} t-${tp} ${cls}` }); this.itemsG.append(el); return el;
   }
   labelKey(key, text, cls = '') {
     const [x, y] = geometry(key).anchor, t = s('text', { x, y, class: `item-label ${cls}` }); t.textContent = text; this.labelsG.append(t);
@@ -530,7 +538,7 @@ function renderSection(section) {
     h('div', { class: 'topic-text' }, h('h2', {}, tr(title)), h('p', { class: 'muted' }, tr(blurb)), meter == null ? null : h('div', { class: 'meter' }, h('span', { style: `width:${100 * meter}%` })), h('p', { class: 'small' }, tr(line))));
   const qs = scopedQuestions(section), connMastered = qs.filter((q) => level(`conn:${q.id}`) === 'mastered').length, best = store.get(bestKey(section)), size = examSize(section);
   const specials = [
-    bigCard('conn', ['Conexiones', 'Connections'], ['Une ríos, montañas, costas y ciudades en un mapa en blanco.', 'Link rivers, mountains, coasts and cities on a blank map.'],
+    bigCard('conn', ['Conexiones', 'Connections'], ['Relaciona lo que estudias entre sí, en un mapa en blanco.', 'Relate the things you’re studying to each other, on a blank map.'],
       [`${connMastered} de ${qs.length} dominadas`, `${connMastered} of ${qs.length} mastered`], connMastered / qs.length, () => startConnections(section)),
     bigCard('exam', ['Examen final', 'Final quiz'], [`${size} preguntas de todo este apartado. Cada vez salen otras.`, `${size} questions on this whole part. Different ones each time.`],
       best ? [`Mejor nota: ${best.score} / ${best.total}`, `Best score: ${best.score} / ${best.total}`] : ['Todavía no lo has hecho', 'Not tried yet'], null, () => startExam(section))];
@@ -858,10 +866,9 @@ function resultsScreen({ eyebrow, score, total, missed, extra, again, againLabel
 
 /* one multiple-choice "connection" question on a blank map. staged = clues appear after each wrong answer */
 function connOptions(q) {
-  const topic = topicById(q.topic), ans = topic.items.find((i) => i.id === q.answer);
-  const others = shuffle(topic.items.filter((x) => x.id !== ans.id));
-  const same = others.filter((x) => x.group === ans.group).slice(0, 2);
-  return shuffle([ans, ...same, ...others.filter((x) => !same.includes(x))].slice(0, 4));
+  const topic = topicById(q.topic), byId = (id) => topic.items.find((x) => x.id === id);
+  if (q.opts) return shuffle(q.opts.map(byId));
+  return shuffle([byId(q.answer), ...shuffle(q.pool).slice(0, 3).map(byId)]);
 }
 function askConn(q, { staged, title, label, pct, back, onDone }) {
   setUserArea();
@@ -873,7 +880,7 @@ function askConn(q, { staged, title, label, pct, back, onDone }) {
   const nextBtn = h('button', { class: 'btn primary wide', hidden: true, onclick: () => onDone(wrongs === 0) }, tr('Siguiente', 'Next'));
   const say = (cls, ...kids) => { feedback.className = `feedback ${cls}`; feedback.replaceChildren(...kids); };
   const finish = (good) => {
-    locked = true; map.showClue(q); map.drawShape(key, good ? 'correct' : 'correct reveal'); map.labelKey(key, ans.name, 'correct');
+    locked = true; map.showRefs(q); map.drawShape(key, good ? 'correct' : 'correct reveal'); map.labelKey(key, ans.name, 'correct');
     answers.querySelectorAll('button').forEach((b) => { b.disabled = true; if (b.dataset.id === q.answer) b.classList.add('right'); });
     recordAnswer(`conn:${q.id}`, good && wrongs === 0);
     if (good && wrongs === 0) say('good', h('strong', {}, tr(pick(PRAISE))), tipEl(ans));
@@ -881,10 +888,11 @@ function askConn(q, { staged, title, label, pct, back, onDone }) {
     else say('bad', tr(both(() => L(`Respuesta: ${ans.name}.`, `Answer: ${ans.name}.`))), tipEl(ans));
     nextBtn.hidden = false; nextBtn.focus();
   };
+  const steps = q.refs.length ? ['refs', 'shape'] : ['shape'];
   const advance = () => {   // reveal the next help; after the last help, show the answer
-    stage++;
-    if (stage === 1) { map.showClue(q); say('bad', tr('Casi. Mira el mapa: te enseño dónde está.', 'Not quite. Look at the map: I’ll show you where it is.'), q.hint ? h('p', { class: 'small' }, tr(q.hint)) : null); }
-    else if (stage === 2) { map.drawShape(key, 'target'); say('bad', tr('Otra vez. Ahora ves la forma o la zona.', 'Try again. Now you can see the shape or the area.')); }
+    const step = steps[stage++];
+    if (step === 'refs') { map.showRefs(q); say('bad', tr('Casi. Mira el mapa: te enseño lo que se nombra en la pregunta.', 'Not quite. Look at the map: I’ll show you what the question mentions.')); }
+    else if (step === 'shape') { map.drawShape(key, 'target'); say('bad', tr('Otra vez. Ahora ves la forma o la zona.', 'Try again. Now you can see the shape or the area.')); }
     else finish(false);
   };
   const pickOpt = (id, btn) => {
@@ -995,7 +1003,7 @@ function startExam(section) {
     h('p', { class: 'eyebrow' }, tr('Examen final', 'Final quiz')),
     h('h2', {}, tr(`${examSize(section)} preguntas de todo este apartado`, `${examSize(section)} questions on this whole part`)),
     h('p', { class: 'muted' }, tr('Tocar, nombrar y escribir. Un solo intento por pregunta y sin pistas.', 'Tap, name and spell. One try per question and no hints.')),
-    h('label', { class: 'toggle examopt', for: 'withConn' }, box, ' ', tr('Incluir 6 preguntas de conexiones (por ejemplo «¿qué comunidad tiene como capital Mérida?»)', 'Include 6 connection questions (e.g. “which community has Mérida as its capital?”)')),
+    h('label', { class: 'toggle examopt', for: 'withConn' }, box, ' ', section.id === 'comunidades' ? tr('Incluir 6 preguntas de conexiones (por ejemplo «¿qué comunidad no tiene costa?»)', 'Include 6 connection questions (e.g. “which community has no coast?”)') : tr('Incluir 6 preguntas de conexiones (por ejemplo «¿qué río desemboca en el Mediterráneo?»)', 'Include 6 connection questions (e.g. “which river flows into the Mediterranean?”)')),
     h('div', { class: 'row center' },
       h('button', { class: 'btn primary', onclick: () => { store.set('geo.examConn', box.checked); runExam(section, box.checked); } }, tr('Empezar', 'Start')),
       h('button', { class: 'btn ghost', onclick: () => renderSection(section) }, tr('Volver', 'Back'))))));
