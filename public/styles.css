@@ -334,3 +334,6 @@ button.crumb:hover { opacity: 1; }
   .crumbs > :nth-last-child(n+4) { display: none; }   /* phones: show only the last two steps */
   .crumb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 }
+
+button.user-chip { border: 0; color: inherit; font: inherit; cursor: pointer; }
+button.user-chip:hover { filter: brightness(1.15); }

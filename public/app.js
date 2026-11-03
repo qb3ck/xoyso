@@ -59,6 +59,7 @@ const ERRORS = {
   wrong_login: ['El nombre y el PIN no coinciden. Inténtalo otra vez.', 'That name and PIN don’t match. Try again.'],
   username_taken: ['Ese nombre ya existe. Elige otro o entra con él.', 'That name is already taken. Pick another, or sign in.'],
   bad_username: ['El nombre puede tener letras, números y _ (de 2 a 20).', 'Names can use letters, numbers and _ (2–20 characters).'],
+  wrong_pin: ['Ese no es tu PIN actual.', 'That isn’t your current PIN.'],
   bad_pin: ['El PIN tiene que tener de 4 a 6 cifras.', 'The PIN needs to be 4 to 6 digits.'],
   locked: ['Demasiados intentos. Espera 5 minutos.', 'Too many tries. Wait 5 minutes and try again.'],
   not_signed_in: ['Vuelve a entrar, por favor.', 'Please sign in again.'],
@@ -483,6 +484,49 @@ function renderLogin(mode = 'signin', message = null) {
       tr(signin ? ['¿Primera vez? Crea un jugador', 'First time? Create a player'] : ['¿Ya tienes jugador? Entra', 'Already have a player? Sign in'])));
   screen(h('section', { class: 'login' }, h('div', { class: 'hero-map', html: heroMapSvg() }), form));
   nameInput.focus();
+}
+function renderChangePin() {
+  setUserArea(); setCrumbs([{ t: ['Cambiar PIN', 'Change PIN'] }]);
+  const steps = [
+    { h: ['Tu PIN actual', 'Your current PIN'], b: ['Escríbelo para confirmar que eres tú.', 'Enter it to show it’s you.'] },
+    { h: ['Nuevo PIN', 'New PIN'], b: ['Elige de 4 a 6 cifras que recuerdes.', 'Choose 4–6 digits you’ll remember.'] },
+    { h: ['Repite el nuevo PIN', 'Repeat the new PIN'], b: ['Escríbelo otra vez.', 'Type it once more.'] }];
+  let step = 0, pin = '', oldPin = '', newPin = '';
+  const title = h('h1', {}), sub = h('p', { class: 'muted' }), dots = h('div', { class: 'pin-dots', 'aria-label': 'PIN' }), err = h('p', { class: 'form-error', role: 'alert' });
+  const next = h('button', { class: 'btn primary wide', type: 'submit' });
+  const draw = () => {
+    title.replaceChildren(tr(steps[step].h)); sub.replaceChildren(tr(steps[step].b));
+    dots.replaceChildren(...Array.from({ length: Math.max(4, pin.length) }, (_, i) => h('span', { class: i < pin.length ? 'on' : '' })));
+    next.replaceChildren(tr(step === 2 ? ['Guardar PIN', 'Save PIN'] : ['Siguiente', 'Next']));
+  };
+  const press = (d) => { if (d === 'del') pin = pin.slice(0, -1); else if (pin.length < 6) pin += d; draw(); err.replaceChildren(); };
+  const pad = h('div', { class: 'pinpad' },
+    ...['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((d) => h('button', { type: 'button', onclick: () => press(d) }, d)),
+    h('span'), h('button', { type: 'button', onclick: () => press('0') }, '0'),
+    h('button', { type: 'button', 'aria-label': L('Borrar', 'Delete'), onclick: () => press('del') }, '⌫'));
+  document.onkeydown = (e) => { if (/^[0-9]$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('del'); };
+  const fail = (pair) => err.replaceChildren(tr(pair));
+  const form = h('form', { class: 'card login-card', onsubmit: async (e) => {
+    e.preventDefault(); err.replaceChildren();
+    if (pin.length < 4) { fail(ERRORS.bad_pin); return; }
+    if (step === 0) { oldPin = pin; pin = ''; step = 1; draw(); return; }
+    if (step === 1) {
+      if (pin === oldPin) { fail(['El PIN nuevo tiene que ser distinto.', 'The new PIN needs to be different.']); pin = ''; draw(); return; }
+      newPin = pin; pin = ''; step = 2; draw(); return;
+    }
+    if (pin !== newPin) { fail(['Los dos PIN no coinciden. Empieza el nuevo otra vez.', 'The two PINs don’t match. Start the new one again.']); pin = ''; step = 1; draw(); return; }
+    next.disabled = true;
+    try {
+      await api('change_pin', { p_token: state.session.token, p_old_pin: oldPin, p_new_pin: newPin });
+      document.onkeydown = null; renderHome(); toast(L('PIN cambiado. En otros aparatos tendrás que entrar de nuevo.', 'PIN changed. On other devices you’ll need to sign in again.'), 4500);
+    } catch (ex) {
+      if (ex.code === 'wrong_pin') { oldPin = ''; newPin = ''; pin = ''; step = 0; draw(); }
+      fail(ERRORS[ex.code] || (ex.offline ? ERRORS.offline : ERRORS.generic)); next.disabled = false;
+    }
+  } }, title, sub, dots, pad, err, next,
+    h('button', { type: 'button', class: 'link-btn', onclick: () => { document.onkeydown = null; renderHome(); } }, tr('Cancelar', 'Cancel')));
+  draw();
+  screen(h('section', { class: 'login' }, form));
 }
 function heroMapSvg() {
   const rivers = Object.entries(MAP.items).filter(([k]) => k.startsWith('rivers:')).map(([, v]) => `<path d="${v.d}"/>`).join('');
@@ -1079,6 +1123,7 @@ async function signOut(expired) {
   renderLogin('signin', expired ? ERRORS.not_signed_in : null);
 }
 $('#logoutBtn').addEventListener('click', () => signOut(false));
+$('#userChip').addEventListener('click', () => { if (state.session) renderChangePin(); });
 $('#langBtn').addEventListener('click', () => setLang(lang === 'es' ? 'en' : 'es'));
 setLang(lang);
 $('#homeBtn').addEventListener('click', () => (state.session ? renderHome() : renderLogin()));

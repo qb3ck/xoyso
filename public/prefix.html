@@ -254,7 +254,8 @@ const BUILD = {
     h.innerHTML = `<p class="eyebrow">Build the word</p>
       <div class="build"><span class="chip ${x.pre}">${x.pre}</span><span>+</span><span class="chip">${x.root}</span><span>=</span></div>
       <p class="clue">It means <b>${x.mean}</b>.</p>
-      <div class="hear">${HEAR}</div>
+      <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
+      <div class="hear">${HEAR}${HEAR_SENT}</div>
       <input class="txt" id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the whole word">
       <button class="btn primary" id="chk">Check</button>`;
     const inp = $('#in',h); inp.focus({preventScroll:true});
@@ -267,7 +268,8 @@ const BUILD = {
     do { letters = shuffle(x.w.split('')); } while(letters.join('')===x.w);
     h.innerHTML = `<p class="eyebrow">Word scramble</p>
       <p class="clue">Unscramble the letters to make a word that means <b>${x.mean}</b>.</p>
-      <div class="hear">${HEAR}</div>
+      <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
+      <div class="hear">${HEAR}${HEAR_SENT}</div>
       <div class="slots" id="slots"></div><div class="pool" id="pool"></div>
       <button class="btn" id="clr">Clear</button>`;
     const slots=$('#slots',h), pool=$('#pool',h);
@@ -291,7 +293,8 @@ const BUILD = {
     const hide = new Set(shuffle([...Array(n).keys()]).slice(0,k));
     h.innerHTML = `<p class="eyebrow">Missing letters</p>
       <p class="clue">Fill in the missing letters. The word means <b>${x.mean}</b>.</p>
-      <div class="hear">${HEAR}</div>
+      <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
+      <div class="hear">${HEAR}${HEAR_SENT}</div>
       <div class="boxes" id="bx">${x.w.split('').map((c,i)=> hide.has(i)
          ? `<input class="lb" data-i="${i}" maxlength="1" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Missing letter ${i+1}">`
          : `<input class="lb fixed" value="${c}" readonly tabindex="-1" aria-label="Letter ${i+1}">`).join('')}</div>
