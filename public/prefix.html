@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Prefix Workshop</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: one column workshop. Orange = re- (again), teal = inter- (between), used the same way on every screen. */
+:root{
+  --bg:#eef4f8; --card:#ffffff; --ink:#13233f; --muted:#56677f; --line:#d3dfeb;
+  --re:#d9480f; --re-soft:#ffe9dc;
+  --inter:#0a7c86; --inter-soft:#d8f1f3;
+  --good:#1b7f45; --good-soft:#dcf5e5;
+  --bad:#c2362b; --bad-soft:#fde4e1;
+  --display:'Fredoka','Trebuchet MS',system-ui,sans-serif;
+  --body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1829; --card:#172540; --ink:#e8eefb; --muted:#9db0cf; --line:#2a3b59;
+  --re:#ff9a5c; --re-soft:#3a2416; --inter:#4fd1d9; --inter-soft:#0f3a42;
+  --good:#4cd98a; --good-soft:#12382a; --bad:#ff8a80; --bad-soft:#3d1a1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1829; --card:#172540; --ink:#e8eefb; --muted:#9db0cf; --line:#2a3b59;
+  --re:#ff9a5c; --re-soft:#3a2416; --inter:#4fd1d9; --inter-soft:#0f3a42;
+  --good:#4cd98a; --good-soft:#12382a; --bad:#ff8a80; --bad-soft:#3d1a1a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;margin:0;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#app{max-width:880px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance;line-height:1.1}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--inter);outline-offset:2px}
+.pre.re,.chip.re{color:var(--re)} .pre.inter,.chip.inter{color:var(--inter)}
+.pre{font-weight:800}
+
+/* home */
+.hero{display:grid;gap:16px;margin-bottom:28px}
+.hero h1{font-size:clamp(2.2rem,7vw,3.4rem)}
+.hero p{margin:0;color:var(--muted);max-width:56ch}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.key{border-radius:18px;padding:16px 18px;border:2px solid;display:grid;gap:4px}
+.key.re{background:var(--re-soft);border-color:var(--re)} .key.inter{background:var(--inter-soft);border-color:var(--inter)}
+.key b{font-family:var(--display);font-size:2rem;font-weight:600}
+.key.re b{color:var(--re)} .key.inter b{color:var(--inter)}
+.key span{color:var(--ink)}
+.sec{font-family:var(--display);font-size:1.25rem;margin:26px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.act{text-align:left;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px 18px;display:grid;gap:6px;min-width:0;transition:transform .12s,border-color .12s}
+.act:hover{transform:translateY(-2px);border-color:var(--ink)}
+.act .demo{font-family:var(--display);font-size:1.7rem;font-weight:600;letter-spacing:.02em;min-height:2.2rem;overflow-wrap:anywhere}
+.act h3{font-size:1.15rem} .act p{margin:0;color:var(--muted);font-size:.95rem}
+.act .stars{font-size:1.1rem;letter-spacing:.15em;color:var(--re);min-height:1.4rem}
+.act .stars i{font-style:normal;color:var(--line)}
+.act .stars i.on{color:var(--re)}
+.act.wide{border-style:dashed}
+
+/* learn */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.link{background:none;border:0;padding:8px 4px;font-weight:800;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.words{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.wc{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;gap:4px;min-width:0}
+.wc .w{font-family:var(--display);font-size:1.6rem;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wc .sum{color:var(--muted);font-size:.9rem;font-weight:700}
+.wc p{margin:0}
+.say{flex:none;width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center}
+.say:hover{border-color:var(--ink)} .say svg{width:22px;height:22px;fill:var(--ink)}
+
+/* play */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.count{font-weight:800;color:var(--muted)}
+.track{height:10px;border-radius:99px;background:var(--line);margin:6px 0 18px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--inter);border-radius:99px;transition:width .25s}
+.qcard{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:clamp(16px,4vw,28px);display:grid;gap:16px;justify-items:center;text-align:center}
+.eyebrow{margin:0;font-weight:800;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.big{font-family:var(--display);font-size:clamp(2.4rem,10vw,4rem);font-weight:600;overflow-wrap:anywhere;line-height:1.1}
+.gap{display:inline-block;min-width:1.4em;border-bottom:4px solid var(--ink);color:var(--muted);margin-right:.08em}
+.clue{margin:0;color:var(--muted);max-width:44ch}
+.clue b{color:var(--ink)}
+.sent{font-size:1.25rem;font-weight:700;max-width:34ch;margin:0}
+.blank{display:inline-block;min-width:4.5em;border-bottom:3px solid var(--ink)}
+.opts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;width:100%}
+.opt{min-height:56px;padding:10px 22px;border-radius:16px;border:2px solid var(--line);background:var(--bg);font-family:var(--display);font-size:1.5rem;font-weight:500;min-width:130px}
+.opt.re{color:var(--re);border-color:var(--re);background:var(--re-soft)}
+.opt.inter{color:var(--inter);border-color:var(--inter);background:var(--inter-soft)}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.opt:disabled{cursor:default}
+.build{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;font-family:var(--display);font-size:clamp(1.8rem,7vw,2.6rem);font-weight:600}
+.chip{padding:2px 16px;border-radius:14px;background:var(--bg);border:2px solid var(--line)}
+.chip.re{border-color:var(--re);background:var(--re-soft)} .chip.inter{border-color:var(--inter);background:var(--inter-soft)}
+.txt{width:min(100%,420px);font:600 1.6rem var(--display);text-align:center;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);letter-spacing:.03em}
+.txt.ok{border-color:var(--good);background:var(--good-soft)} .txt.no{border-color:var(--bad);background:var(--bad-soft)}
+.boxes{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.lb{width:clamp(22px,7.2vw,42px);height:clamp(36px,10vw,54px);padding:0;text-align:center;font:600 clamp(1.1rem,4.6vw,1.7rem) var(--display);border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.lb.fixed{background:var(--card);border-color:transparent;color:var(--ink)}
+.lb.ok{border-color:var(--good);background:var(--good-soft)} .lb.no{border-color:var(--bad);background:var(--bad-soft)}
+.slots,.pool{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.slot,.tile{width:clamp(26px,7.4vw,44px);height:clamp(38px,10vw,54px);border-radius:10px;font:600 clamp(1.1rem,4.6vw,1.7rem) var(--display);display:grid;place-items:center;padding:0}
+.slot{border:2px dashed var(--line);background:var(--bg);color:var(--ink)}
+.slot.full{border-style:solid;border-color:var(--ink)}
+.slot.ok{border-color:var(--good);background:var(--good-soft);border-style:solid} .slot.no{border-color:var(--bad);background:var(--bad-soft);border-style:solid}
+.tile{border:2px solid var(--inter);background:var(--inter-soft);color:var(--inter)}
+.tile:disabled{opacity:.25;cursor:default}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}.act,.track i{transition:none}}
+.btn{min-height:50px;padding:10px 26px;border-radius:14px;border:2px solid var(--ink);background:var(--card);font-weight:800}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn:disabled{opacity:.4;cursor:default}
+.hear{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.hear .btn{display:inline-flex;align-items:center;gap:8px}
+.hear svg{width:22px;height:22px;fill:currentColor}
+.fb{min-height:3.2rem;margin:14px 0 0;text-align:center;font-weight:800;font-size:1.1rem;padding:8px 14px;border-radius:14px}
+.fb.good{background:var(--good-soft);color:var(--good)} .fb.bad{background:var(--bad-soft);color:var(--bad)}
+.actions{display:flex;justify-content:center;margin-top:12px;min-height:54px}
+
+/* result */
+.res{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,32px);display:grid;gap:14px;justify-items:center;text-align:center}
+.res .score{font-family:var(--display);font-size:clamp(3rem,14vw,5rem);font-weight:600;line-height:1}
+.res .stars{font-size:2.4rem;letter-spacing:.2em;color:var(--line)} .res .stars .on{color:var(--re)}
+.again{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-family:var(--display);font-size:1.4rem;font-weight:600}
+.again span{padding:2px 12px;border-radius:12px;background:var(--bg);border:2px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+</style>
+</head><body>
+
+<div id="app"></div>
+
+<script>
+const WORDS = [
+ {w:'interview',pre:'inter',root:'view',mean:'a meeting where you ask someone questions',sent:'The reporter wants to ___ the footballer after the match.',bad:['intaview','interveiw']},
+ {w:'rename',pre:'re',root:'name',mean:'to give something a new name',sent:'We decided to ___ our hamster Biscuit.',bad:['renaim','reneme']},
+ {w:'rewrite',pre:'re',root:'write',mean:'to write something again',sent:'I had to ___ my story because it got wet.',bad:['rewright','rewrit']},
+ {w:'redo',pre:'re',root:'do',mean:'to do something again',sent:'Please ___ the sum because it is not right.',bad:['reedo','redoo']},
+ {w:'interlink',pre:'inter',root:'link',mean:'to join things together so they connect',sent:'The rings ___ to make a long chain.',bad:['interlinc','enterlink']},
+ {w:'international',pre:'inter',root:'national',mean:'between different countries',sent:'The World Cup is an ___ football tournament.',bad:['interational','internashional']},
+ {w:'interaction',pre:'inter',root:'action',mean:'when people or things talk, play or work with each other',sent:'Chatting with friends is a kind of social ___.',bad:['interacsion','interaktion']},
+ {w:'react',pre:'re',root:'act',mean:'to do something because of what just happened',sent:'How did you ___ when you saw the surprise?',bad:['reakt','reacct']},
+ {w:'revalue',pre:'re',root:'value',mean:'to work out how much something is worth again',sent:'The shop will ___ the old toys to see what they are worth now.',bad:['revalu','revallue']},
+ {w:'relocate',pre:'re',root:'locate',mean:'to move to a new place',sent:'Our family will ___ to a new house by the sea.',bad:['relokate','relocat']},
+ {w:'reassemble',pre:'re',root:'assemble',mean:'to put something back together',sent:'Dad had to ___ the shelves after we moved.',bad:['reasemble','reasemmble']},
+ {w:'redial',pre:'re',root:'dial',mean:'to dial a phone number again',sent:'The line was busy, so I had to ___ the number.',bad:['redail','redyal']},
+ {w:'reclaim',pre:'re',root:'claim',mean:'to get back something that was yours',sent:'You can ___ your lost coat from the office.',bad:['reclame','reclaym']},
+ {w:'reunite',pre:'re',root:'unite',mean:'to bring people back together',sent:'The puppy was so happy to ___ with its owner.',bad:['reunight','reunit']},
+ {w:'redeliver',pre:'re',root:'deliver',mean:'to deliver something again',sent:'The postman will ___ the parcel tomorrow.',bad:['redelivre','redelever']},
+ {w:'reappear',pre:'re',root:'appear',mean:'to appear again',sent:'The sun will ___ from behind the cloud.',bad:['reapear','reapper']},
+ {w:'revision',pre:'re',root:'vision',mean:'looking over your work again so you remember it',sent:'I do some ___ every night before the spelling test.',bad:['revission','revizion']},
+ {w:'intercity',pre:'inter',root:'city',mean:'going between cities',sent:'We took the ___ train from Leeds to London.',bad:['intersity','intercitty']},
+ {w:'reorganise',pre:'re',root:'organise',mean:'to organise something again',sent:'Let us ___ the bookshelf by colour.',bad:['reorganice','reorgonise']}
+];
+const ACTS = [
+ {id:'prefix',t:'Pick the prefix',d:'Is it re- or inter-?',demo:'<span class="pre re">re</span> / <span class="pre inter">inter</span>',n:8},
+ {id:'build',t:'Build the word',d:'Join the prefix to the root word.',demo:'<span class="pre re">re</span>+name',n:8},
+ {id:'anagram',t:'Word scramble',d:'Tap the letters in the right order.',demo:'d · o · e · r',n:8},
+ {id:'missing',t:'Missing letters',d:'Fill in the letters that are hidden.',demo:'r_d_al',n:8},
+ {id:'listen',t:'Listen and spell',d:'Hear the word, then type it.',demo:'“redo”',n:8},
+ {id:'spell',t:'Spot the spelling',d:'Pick the one spelt correctly.',demo:'redail ✕ redial ✓',n:8},
+ {id:'mixed',t:'Mixed challenge',d:'Twelve questions, every kind.',demo:'? ? ? ?',n:12}
+];
+const KINDS = ['prefix','build','anagram','missing','listen','spell'];
+const byW = Object.fromEntries(WORDS.map(x=>[x.w,x]));
+const $ = (s,r=document)=>r.querySelector(s);
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+const colored = w => `<span class="pre ${byW[w].pre}">${byW[w].pre}</span>${byW[w].root}`;
+const SPEAKER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+
+/* storage (best stars per activity) */
+const store = { get(){ try{ return JSON.parse(localStorage.getItem('prefix-workshop')||'{}'); }catch(e){ return {}; } },
+  set(o){ try{ localStorage.setItem('prefix-workshop', JSON.stringify(o)); }catch(e){} } };
+
+/* speech */
+const canSpeak = 'speechSynthesis' in window;
+function speak(text){
+  if(!canSpeak) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang='en-GB'; u.rate=.8;
+    const v = speechSynthesis.getVoices().find(v=>/en[-_]GB/i.test(v.lang)); if(v) u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* picks 8 (or n) words, making sure inter- words show up */
+function pickWords(n, from=WORDS){
+  const inter = shuffle(from.filter(x=>x.pre==='inter')), re = shuffle(from.filter(x=>x.pre==='re'));
+  const take = Math.min(inter.length, Math.max(2, Math.round(n*.25)));
+  return shuffle([...inter.slice(0,take), ...re.slice(0,n-take)].concat(n>from.length?[]:[])).slice(0,n);
+}
+
+/* ---------- home ---------- */
+function home(){
+  const best = store.get();
+  const stars = id => { const s = best[id]||0; return [1,2,3].map(i=>`<i class="${i<=s?'on':''}">★</i>`).join(''); };
+  $('#app').innerHTML = `
+  <header class="hero">
+    <h1>Prefix Workshop</h1>
+    <p>A prefix goes at the start of a word and changes what it means. Practise 19 words that start with re- or inter-.</p>
+    <div class="keys">
+      <div class="key re"><b>re-</b><span>means <strong>again</strong> or <strong>back</strong></span><span><span class="pre re">re</span>do, <span class="pre re">re</span>write, <span class="pre re">re</span>claim</span></div>
+      <div class="key inter"><b>inter-</b><span>means <strong>between</strong> or <strong>among</strong></span><span><span class="pre inter">inter</span>city, <span class="pre inter">inter</span>national</span></div>
+    </div>
+  </header>
+  <h2 class="sec">Learn the words</h2>
+  <div class="grid"><button class="act wide" id="learn"><span class="demo">19 words</span><h3>Word book</h3><p>See every word with its meaning, and hear it read out.</p></button></div>
+  <h2 class="sec">Practise</h2>
+  <div class="grid">${ACTS.map(a=>`<button class="act" data-a="${a.id}"><span class="demo">${a.demo}</span><h3>${a.t}</h3><p>${a.d}</p><span class="stars" aria-label="${best[a.id]||0} of 3 stars">${stars(a.id)}</span></button>`).join('')}</div>`;
+  $('#learn').onclick = learn;
+  document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>start(b.dataset.a));
+  scrollTo(0,0);
+}
+
+/* ---------- word book ---------- */
+function learn(){
+  const card = x => `<div class="wc"><div class="w"><span>${colored(x.w)}</span><button class="say" data-s="${x.w}" aria-label="Hear ${x.w}">${SPEAKER}</button></div><div class="sum"><span class="pre ${x.pre}">${x.pre}</span> + ${x.root}</div><p>${x.mean}</p></div>`;
+  $('#app').innerHTML = `<div class="top"><button class="link" id="back">← Home</button></div>
+  <h1 style="margin-bottom:6px">Word book</h1>
+  <p style="color:var(--muted);margin:0 0 4px">Tap the speaker to hear a word.${canSpeak?'':' (This browser cannot read words aloud.)'}</p>
+  <h2 class="sec"><span class="pre re">re-</span> means again or back</h2>
+  <div class="words">${WORDS.filter(x=>x.pre==='re').map(card).join('')}</div>
+  <h2 class="sec"><span class="pre inter">inter-</span> means between</h2>
+  <div class="words">${WORDS.filter(x=>x.pre==='inter').map(card).join('')}</div>`;
+  $('#back').onclick = home;
+  document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>speak(b.dataset.s));
+  scrollTo(0,0);
+}
+
+/* ---------- question builders: each returns {retry, reveal} ---------- */
+const BUILD = {
+  prefix(x, h, api){
+    h.innerHTML = `<p class="eyebrow">Pick the prefix</p>
+      <div class="big"><span class="gap" id="g">?</span>${x.root}</div>
+      <p class="clue">The word means <b>${x.mean}</b>.</p>
+      <div class="opts"><button class="opt re" data-v="re">re-</button><button class="opt inter" data-v="inter">inter-</button></div>`;
+    const done = () => { $('#g').outerHTML = `<span class="pre ${x.pre}">${x.pre}</span>`; h.querySelectorAll('.opt').forEach(b=>{b.disabled=true; if(b.dataset.v===x.pre) b.classList.add('ok');}); };
+    h.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if(b.dataset.v===x.pre){ api.attempt(true); } else { b.disabled=true; b.classList.add('no'); api.attempt(false); }
+    });
+    return {retry(){}, reveal:done, correct:done};
+  },
+  build(x, h, api){
+    h.innerHTML = `<p class="eyebrow">Build the word</p>
+      <div class="build"><span class="chip ${x.pre}">${x.pre}</span><span>+</span><span class="chip">${x.root}</span><span>=</span></div>
+      <p class="clue">It means <b>${x.mean}</b>.</p>
+      <input class="txt" id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the whole word">
+      <button class="btn primary" id="chk">Check</button>`;
+    const inp = $('#in',h); inp.focus({preventScroll:true});
+    const check = () => { const v = inp.value.trim().toLowerCase(); if(!v) return; if(v===x.w){ inp.classList.add('ok'); inp.disabled=true; $('#chk',h).disabled=true; api.attempt(true);} else { inp.classList.add('no'); api.attempt(false); } };
+    $('#chk',h).onclick = check; inp.onkeydown = e=>{ if(e.key==='Enter') check(); }; inp.oninput = ()=>inp.classList.remove('no');
+    return {retry(){ inp.select(); }, reveal(){ inp.value=x.w; inp.disabled=true; inp.classList.add('ok'); $('#chk',h).disabled=true; }};
+  },
+  anagram(x, h, api){
+    let letters, placed = [];
+    do { letters = shuffle(x.w.split('')); } while(letters.join('')===x.w);
+    h.innerHTML = `<p class="eyebrow">Word scramble</p>
+      <p class="clue">Unscramble the letters to make a word that means <b>${x.mean}</b>.</p>
+      <div class="slots" id="slots"></div><div class="pool" id="pool"></div>
+      <button class="btn" id="clr">Clear</button>`;
+    const slots=$('#slots',h), pool=$('#pool',h);
+    let locked=false;
+    const draw = (cls='') => {
+      slots.innerHTML = x.w.split('').map((_,i)=>`<button class="slot ${placed[i]!==undefined?'full':''} ${cls}" data-i="${i}" aria-label="Letter ${i+1}">${placed[i]!==undefined?letters[placed[i]]:''}</button>`).join('');
+      pool.innerHTML = letters.map((l,i)=>`<button class="tile" data-i="${i}" ${placed.includes(i)||locked?'disabled':''}>${l}</button>`).join('');
+      slots.querySelectorAll('.slot').forEach(s=>s.onclick=()=>{ if(locked) return; const i=+s.dataset.i; if(placed[i]!==undefined){ placed.splice(i,1); draw(); } });
+      pool.querySelectorAll('.tile').forEach(t=>t.onclick=()=>{ if(locked) return; placed.push(+t.dataset.i); draw(); if(placed.length===x.w.length) check(); });
+    };
+    const check = () => { const guess = placed.map(i=>letters[i]).join('');
+      if(guess===x.w){ locked=true; draw('ok'); api.attempt(true); }
+      else { slots.classList.add('shake'); setTimeout(()=>slots.classList.remove('shake'),400); draw('no'); api.attempt(false); } };
+    $('#clr',h).onclick = ()=>{ if(!locked){ placed=[]; draw(); } };
+    draw();
+    return {retry(){ setTimeout(()=>{ placed=[]; draw(); },700); },
+      reveal(){ locked=true; letters=x.w.split(''); placed=letters.map((_,i)=>i); draw('ok'); }};
+  },
+  missing(x, h, api){
+    const n=x.w.length, k=Math.min(n-2, Math.max(2, Math.round(n*.4)));
+    const hide = new Set(shuffle([...Array(n).keys()]).slice(0,k));
+    h.innerHTML = `<p class="eyebrow">Missing letters</p>
+      <p class="clue">Fill in the missing letters. The word means <b>${x.mean}</b>.</p>
+      <div class="boxes" id="bx">${x.w.split('').map((c,i)=> hide.has(i)
+         ? `<input class="lb" data-i="${i}" maxlength="1" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Missing letter ${i+1}">`
+         : `<input class="lb fixed" value="${c}" readonly tabindex="-1" aria-label="Letter ${i+1}">`).join('')}</div>
+      <button class="btn primary" id="chk">Check</button>`;
+    const inputs = [...h.querySelectorAll('.lb:not(.fixed)')];
+    inputs[0].focus({preventScroll:true});
+    inputs.forEach((el,j)=>{
+      el.oninput = ()=>{ el.value = el.value.replace(/[^a-z]/gi,'').toLowerCase().slice(-1); el.classList.remove('no'); if(el.value && inputs[j+1]) inputs[j+1].focus(); };
+      el.onkeydown = e=>{ if(e.key==='Backspace' && !el.value && inputs[j-1]){ inputs[j-1].focus(); inputs[j-1].value=''; }
+        else if(e.key==='ArrowLeft'&&inputs[j-1]) inputs[j-1].focus(); else if(e.key==='ArrowRight'&&inputs[j+1]) inputs[j+1].focus(); else if(e.key==='Enter') check(); };
+    });
+    const build = () => [...h.querySelectorAll('.lb')].map(e=>e.value||'_').join('');
+    const check = () => { if(inputs.some(e=>!e.value)){ inputs.find(e=>!e.value).focus(); return; }
+      if(build()===x.w){ inputs.forEach(e=>{e.classList.add('ok'); e.readOnly=true;}); $('#chk',h).disabled=true; api.attempt(true); }
+      else { inputs.forEach((e,j)=>{ if(e.value!==x.w[+e.dataset.i]) e.classList.add('no'); }); api.attempt(false); } };
+    $('#chk',h).onclick = check;
+    return {retry(){ const bad = inputs.filter(e=>e.classList.contains('no')); bad.forEach(e=>e.value=''); (bad[0]||inputs[0]).focus(); },
+      reveal(){ inputs.forEach(e=>{ e.value=x.w[+e.dataset.i]; e.classList.remove('no'); e.classList.add('ok'); e.readOnly=true; }); $('#chk',h).disabled=true; }};
+  },
+  listen(x, h, api){
+    const sentence = x.sent.replace('___', x.w);
+    h.innerHTML = `<p class="eyebrow">Listen and spell</p>
+      <p class="clue">${canSpeak?'Press the button, listen, then type the word.':'This browser cannot read words aloud, so use the meaning: <b>'+x.mean+'</b>.'}</p>
+      <div class="hear"><button class="btn primary" id="h1">${SPEAKER}Hear the word</button><button class="btn" id="h2">${SPEAKER}In a sentence</button></div>
+      <input class="txt" id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the word you heard">
+      <button class="btn primary" id="chk">Check</button>`;
+    $('#h1',h).onclick = ()=>speak(x.w); $('#h2',h).onclick = ()=>speak(sentence);
+    if(!canSpeak){ $('.hear',h).hidden = true; }
+    const inp=$('#in',h);
+    setTimeout(()=>speak(x.w),250);
+    const check = () => { const v=inp.value.trim().toLowerCase(); if(!v) return; if(v===x.w){ inp.classList.add('ok'); inp.disabled=true; $('#chk',h).disabled=true; api.attempt(true);} else { inp.classList.add('no'); api.attempt(false, `It starts with “${x.w.slice(0,3)}”.`);} };
+    $('#chk',h).onclick=check; inp.onkeydown=e=>{ if(e.key==='Enter') check(); }; inp.oninput=()=>inp.classList.remove('no');
+    return {retry(){ inp.select(); speak(x.w); }, reveal(){ inp.value=x.w; inp.disabled=true; inp.classList.add('ok'); $('#chk',h).disabled=true; }};
+  },
+  spell(x, h, api){
+    h.innerHTML = `<p class="eyebrow">Spot the spelling</p>
+      <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
+      <p class="clue">Which spelling is right?</p>
+      <div class="opts">${shuffle([x.w,...x.bad]).map(o=>`<button class="opt" data-v="${o}">${o}</button>`).join('')}</div>`;
+    const btns=[...h.querySelectorAll('.opt')];
+    const done = () => { btns.forEach(b=>{ b.disabled=true; if(b.dataset.v===x.w) b.classList.add('ok'); }); };
+    btns.forEach(b=>b.onclick=()=>{ if(b.dataset.v===x.w){ api.attempt(true); } else { b.disabled=true; b.classList.add('no'); api.attempt(false); } });
+    return {retry(){}, reveal:done, correct:done};
+  }
+};
+
+/* ---------- session ---------- */
+let S=null;
+function start(actId, onlyWords){
+  const act = ACTS.find(a=>a.id===actId);
+  const words = onlyWords && onlyWords.length ? shuffle(onlyWords).slice(0,act.n) : pickWords(act.n);
+  while(words.length < act.n) words.push(...shuffle(WORDS).filter(x=>!words.includes(x)).slice(0, act.n-words.length));
+  const qs = words.map((x,i)=>({x, kind: actId==='mixed' ? KINDS[i%KINDS.length] : actId}));
+  if(actId==='mixed') shuffle(qs);
+  S = {actId, qs, i:0, pts:0, missed:[], tries:0, locked:false, ctl:null};
+  showQ();
+}
+function showQ(){
+  const q=S.qs[S.i]; S.tries=0; S.locked=false;
+  $('#app').innerHTML = `<div class="bar"><button class="link" id="quit">← Stop</button><span class="count">Question ${S.i+1} of ${S.qs.length}</span></div>
+    <div class="track"><i style="width:${S.i/S.qs.length*100}%"></i></div>
+    <section class="qcard" id="qc"></section><div class="fb" id="fb" aria-live="polite"></div>
+    <div class="actions"><button class="btn primary" id="next" hidden>${S.i===S.qs.length-1?'See my score':'Next'}</button></div>`;
+  $('#quit').onclick = home;
+  $('#next').onclick = ()=>{ S.i++; S.i<S.qs.length ? showQ() : finish(); };
+  S.ctl = BUILD[q.kind](q.x, $('#qc'), {attempt});
+  scrollTo(0,0);
+}
+function attempt(ok, hint=''){
+  if(S.locked) return;
+  const q=S.qs[S.i], fb=$('#fb'); S.tries++;
+  const lock = () => { S.locked=true; $('#next').hidden=false; $('#next').focus({preventScroll:true}); };
+  if(ok){
+    if(S.tries===1) S.pts++; else S.missed.push(q.x);
+    if(S.ctl.correct) S.ctl.correct();
+    fb.className='fb good'; fb.innerHTML = (S.tries===1?'Perfect! ':'You got it! ') + colored(q.x.w); lock();
+  } else if(S.tries<2){
+    fb.className='fb bad'; fb.textContent = 'Not quite. Have another go. ' + hint; S.ctl.retry();
+  } else {
+    S.missed.push(q.x); fb.className='fb bad'; fb.innerHTML = 'The answer is ' + colored(q.x.w) + '.'; S.ctl.reveal(); lock();
+    setTimeout(()=>{ if(canSpeak && q.kind==='listen') speak(q.x.w); }, 200);
+  }
+}
+function finish(){
+  const n=S.qs.length, pct=S.pts/n, stars = pct>=.9?3:pct>=.7?2:pct>=.4?1:0;
+  const b=store.get(); if((b[S.actId]||0)<stars){ b[S.actId]=stars; store.set(b); }
+  const msg = stars===3?'Brilliant spelling!':stars===2?'Great work!':stars===1?'Good start. Try again to beat it.':'Keep practising, you will get there.';
+  const miss = [...new Map(S.missed.map(x=>[x.w,x])).values()];
+  $('#app').innerHTML = `<div class="res"><p class="eyebrow">${ACTS.find(a=>a.id===S.actId).t}</p>
+    <div class="score">${S.pts}/${n}</div>
+    <div class="stars" aria-label="${stars} of 3 stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}">★</span>`).join('')}</div>
+    <h2>${msg}</h2><p class="clue">Points are for words you got right first time.</p>
+    ${miss.length?`<p class="eyebrow">Words to practise</p><div class="again">${miss.map(x=>`<span>${colored(x.w)}</span>`).join('')}</div>`:''}
+    <div class="row"><button class="btn primary" id="rep">Play again</button>${miss.length?'<button class="btn" id="prac">Practise these words</button>':''}<button class="btn" id="hm">Home</button></div></div>`;
+  const id=S.actId; $('#rep').onclick=()=>start(id); $('#hm').onclick=home;
+  if(miss.length) $('#prac').onclick=()=>start(id, miss);
+  scrollTo(0,0);
+}
+if(canSpeak){ try{ speechSynthesis.getVoices(); }catch(e){} }
+home();
+</script>
+</body></html>

@@ -505,7 +505,10 @@ function renderHome() {
   screen(h('section', { class: 'home' },
     h('h1', {}, tr(`¡Hola, ${state.session.username}!`, `Hi ${state.session.username}!`)),
     h('p', { class: 'muted lead' }, tr('¿Qué quieres repasar hoy?', 'What do you want to revise today?')),
-    h('div', { class: 'topic-grid' }, ...cards)));
+    h('div', { class: 'topic-grid' }, ...cards,
+      h('a', { class: 'card topic-card', href: '/prefix', style: 'text-decoration:none;color:inherit' },
+        h('div', { class: 'topic-icon' }, 'Aa'),
+        h('div', { class: 'topic-text' }, h('h2', {}, tr('Inglés: re- e inter-', 'English: re- and inter- spelling')), h('p', { class: 'muted' }, tr('Ortografía en inglés (3º de Primaria).', 'English spelling practice (3º Primaria).')))))));
 }
 function renderGroup(group) {
   setUserArea(); document.onkeydown = null;
