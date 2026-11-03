@@ -161,6 +161,8 @@ const byW = Object.fromEntries(WORDS.map(x=>[x.w,x]));
 const $ = (s,r=document)=>r.querySelector(s);
 const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
 const colored = w => `<span class="pre ${byW[w].pre}">${byW[w].pre}</span>${byW[w].root}`;
+const HEAR = `<button class="btn" data-hear="word">${'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>'}Hear the word</button>`;
+const HEAR_SENT = HEAR.replace('data-hear="word"','data-hear="sentence"').replace('Hear the word','Hear the sentence');
 const SPEAKER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
 
 /* storage (best stars per activity) */
@@ -168,7 +170,18 @@ const store = { get(){ try{ return JSON.parse(localStorage.getItem('prefix-works
   set(o){ try{ localStorage.setItem('prefix-workshop', JSON.stringify(o)); }catch(e){} } };
 
 /* speech */
-const canSpeak = 'speechSynthesis' in window;
+const canSpeak = true;   // recorded clips (with a browser-voice fallback)
+let clip = null;
+function playClip(name, fallbackText){   // recorded British voice first; browser voice if the file will not play
+  try{
+    if(clip){ clip.pause(); }
+    clip = new Audio(`/audio/${name}.mp3`);
+    clip.addEventListener('error', ()=>speak(fallbackText), {once:true});
+    const r = clip.play(); if(r && r.catch) r.catch(()=>speak(fallbackText));
+  }catch(e){ speak(fallbackText); }
+}
+const sayWord = w => playClip(w, w);
+const saySentence = w => playClip(w+'-sentence', byW[w].sent.replace('___', w));
 function speak(text){
   if(!canSpeak) return;
   try{
@@ -220,7 +233,7 @@ function learn(){
   <h2 class="sec"><span class="pre inter">inter-</span> means between</h2>
   <div class="words">${WORDS.filter(x=>x.pre==='inter').map(card).join('')}</div>`;
   $('#back').onclick = home;
-  document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>speak(b.dataset.s));
+  document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>sayWord(b.dataset.s));
   scrollTo(0,0);
 }
 
@@ -241,6 +254,7 @@ const BUILD = {
     h.innerHTML = `<p class="eyebrow">Build the word</p>
       <div class="build"><span class="chip ${x.pre}">${x.pre}</span><span>+</span><span class="chip">${x.root}</span><span>=</span></div>
       <p class="clue">It means <b>${x.mean}</b>.</p>
+      <div class="hear">${HEAR}</div>
       <input class="txt" id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the whole word">
       <button class="btn primary" id="chk">Check</button>`;
     const inp = $('#in',h); inp.focus({preventScroll:true});
@@ -253,6 +267,7 @@ const BUILD = {
     do { letters = shuffle(x.w.split('')); } while(letters.join('')===x.w);
     h.innerHTML = `<p class="eyebrow">Word scramble</p>
       <p class="clue">Unscramble the letters to make a word that means <b>${x.mean}</b>.</p>
+      <div class="hear">${HEAR}</div>
       <div class="slots" id="slots"></div><div class="pool" id="pool"></div>
       <button class="btn" id="clr">Clear</button>`;
     const slots=$('#slots',h), pool=$('#pool',h);
@@ -276,6 +291,7 @@ const BUILD = {
     const hide = new Set(shuffle([...Array(n).keys()]).slice(0,k));
     h.innerHTML = `<p class="eyebrow">Missing letters</p>
       <p class="clue">Fill in the missing letters. The word means <b>${x.mean}</b>.</p>
+      <div class="hear">${HEAR}</div>
       <div class="boxes" id="bx">${x.w.split('').map((c,i)=> hide.has(i)
          ? `<input class="lb" data-i="${i}" maxlength="1" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Missing letter ${i+1}">`
          : `<input class="lb fixed" value="${c}" readonly tabindex="-1" aria-label="Letter ${i+1}">`).join('')}</div>
@@ -296,24 +312,24 @@ const BUILD = {
       reveal(){ inputs.forEach(e=>{ e.value=x.w[+e.dataset.i]; e.classList.remove('no'); e.classList.add('ok'); e.readOnly=true; }); $('#chk',h).disabled=true; }};
   },
   listen(x, h, api){
-    const sentence = x.sent.replace('___', x.w);
-    h.innerHTML = `<p class="eyebrow">Listen and spell</p>
+        h.innerHTML = `<p class="eyebrow">Listen and spell</p>
       <p class="clue">${canSpeak?'Press the button, listen, then type the word.':'This browser cannot read words aloud, so use the meaning: <b>'+x.mean+'</b>.'}</p>
       <div class="hear"><button class="btn primary" id="h1">${SPEAKER}Hear the word</button><button class="btn" id="h2">${SPEAKER}In a sentence</button></div>
       <input class="txt" id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the word you heard">
       <button class="btn primary" id="chk">Check</button>`;
-    $('#h1',h).onclick = ()=>speak(x.w); $('#h2',h).onclick = ()=>speak(sentence);
+    $('#h1',h).onclick = ()=>sayWord(x.w); $('#h2',h).onclick = ()=>saySentence(x.w);
     if(!canSpeak){ $('.hear',h).hidden = true; }
     const inp=$('#in',h);
-    setTimeout(()=>speak(x.w),250);
+    setTimeout(()=>sayWord(x.w),250);
     const check = () => { const v=inp.value.trim().toLowerCase(); if(!v) return; if(v===x.w){ inp.classList.add('ok'); inp.disabled=true; $('#chk',h).disabled=true; api.attempt(true);} else { inp.classList.add('no'); api.attempt(false, `It starts with “${x.w.slice(0,3)}”.`);} };
     $('#chk',h).onclick=check; inp.onkeydown=e=>{ if(e.key==='Enter') check(); }; inp.oninput=()=>inp.classList.remove('no');
-    return {retry(){ inp.select(); speak(x.w); }, reveal(){ inp.value=x.w; inp.disabled=true; inp.classList.add('ok'); $('#chk',h).disabled=true; }};
+    return {retry(){ inp.select(); sayWord(x.w); }, reveal(){ inp.value=x.w; inp.disabled=true; inp.classList.add('ok'); $('#chk',h).disabled=true; }};
   },
   spell(x, h, api){
     h.innerHTML = `<p class="eyebrow">Spot the spelling</p>
       <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
       <p class="clue">Which spelling is right?</p>
+      <div class="hear">${HEAR}${HEAR_SENT}</div>
       <div class="opts">${shuffle([x.w,...x.bad]).map(o=>`<button class="opt" data-v="${o}">${o}</button>`).join('')}</div>`;
     const btns=[...h.querySelectorAll('.opt')];
     const done = () => { btns.forEach(b=>{ b.disabled=true; if(b.dataset.v===x.w) b.classList.add('ok'); }); };
@@ -342,6 +358,7 @@ function showQ(){
   $('#quit').onclick = home;
   $('#next').onclick = ()=>{ S.i++; S.i<S.qs.length ? showQ() : finish(); };
   S.ctl = BUILD[q.kind](q.x, $('#qc'), {attempt});
+  $('#qc').querySelectorAll('[data-hear]').forEach(b=>b.onclick=()=>(b.dataset.hear==='sentence'?saySentence:sayWord)(q.x.w));
   scrollTo(0,0);
 }
 function attempt(ok, hint=''){
@@ -356,7 +373,7 @@ function attempt(ok, hint=''){
     fb.className='fb bad'; fb.textContent = 'Not quite. Have another go. ' + hint; S.ctl.retry();
   } else {
     S.missed.push(q.x); fb.className='fb bad'; fb.innerHTML = 'The answer is ' + colored(q.x.w) + '.'; S.ctl.reveal(); lock();
-    setTimeout(()=>{ if(canSpeak && q.kind==='listen') speak(q.x.w); }, 200);
+    setTimeout(()=>{ if(q.kind==='listen') sayWord(q.x.w); }, 200);
   }
 }
 function finish(){
