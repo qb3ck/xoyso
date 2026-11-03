@@ -492,23 +492,47 @@ function heroMapSvg() {
 function sectionSummary(section) {
   return section.topics.reduce((acc, t) => { const x = topicSummary(t); return { mastered: acc.mastered + x.mastered, total: acc.total + x.total }; }, { mastered: 0, total: 0 });
 }
+// Navigation tree: year -> subject -> unit. Geography units live in SECTIONS; English units are separate pages.
+const YEARS = [
+  { id: '3prim', title: ['3º Primaria', '3rd Primary'], subjects: [
+    { id: 'english', title: ['Inglés', 'English'], blurb: ['Ortografía y vocabulario', 'Spelling and vocabulary'], icon: 'Aa',
+      units: [{ href: '/prefix', title: ['Prefijos re- e inter-', 'Prefixes re- and inter-'], blurb: ['19 palabras: juegos de ortografía.', '19 words: spelling games.'] }] }] },
+  { id: '1eso', title: ['1º ESO', '1st ESO'], subjects: [
+    { id: 'geo', title: ['Geografía', 'Geography'], blurb: ['Mapa físico y comunidades autónomas', 'Physical map and autonomous communities'], section: SECTIONS[0] }] },
+];
+for (const y of YEARS) for (const sub of y.subjects) { sub.year = y; if (sub.section) sub.section.year = y; }
+const card = (icon, title, blurb, extra = [], opts = {}) => h(opts.href ? 'a' : 'button', { class: 'card topic-card', href: opts.href, style: opts.href ? 'text-decoration:none;color:inherit' : null, onclick: opts.onclick },
+  h('div', { class: 'topic-icon', html: icon }),
+  h('div', { class: 'topic-text' }, h('h2', {}, tr(title)), h('p', { class: 'muted' }, tr(blurb)), ...extra));
+const meterBits = ({ mastered, total }) => [h('div', { class: 'meter' }, h('span', { style: `width:${(100 * mastered) / total}%` })),
+  h('p', { class: 'small' }, tr(`${mastered} de ${total} dominados`, `${mastered} of ${total} mastered`))];
+const textIcon = (t) => `<span style="font:700 1.5rem var(--font,inherit)">${t}</span>`;
 function renderHome() {
   setUserArea(); document.onkeydown = null;
-  const cards = SECTIONS.map((sec) => {
-    const { mastered, total } = sectionSummary(sec);
-    return h('button', { class: 'card topic-card', onclick: () => renderGroup(sec) },
-      h('div', { class: 'topic-icon', html: topicIcon('geo1eso') }),
-      h('div', { class: 'topic-text' }, h('h2', {}, tr(sec.title)), h('p', { class: 'muted' }, tr(sec.blurb)),
-        h('div', { class: 'meter' }, h('span', { style: `width:${(100 * mastered) / total}%` })),
-        h('p', { class: 'small' }, tr(`${mastered} de ${total} dominados`, `${mastered} of ${total} mastered`))));
-  });
+  const cards = YEARS.map((y) => card(textIcon(y.id === '1eso' ? '1º' : '3º'), y.title, [y.subjects.map((x) => x.title[0]).join(' · '), y.subjects.map((x) => x.title[1]).join(' · ')], [], { onclick: () => renderYear(y) }));
   screen(h('section', { class: 'home' },
     h('h1', {}, tr(`¡Hola, ${state.session.username}!`, `Hi ${state.session.username}!`)),
-    h('p', { class: 'muted lead' }, tr('¿Qué quieres repasar hoy?', 'What do you want to revise today?')),
-    h('div', { class: 'topic-grid' }, ...cards,
-      h('a', { class: 'card topic-card', href: '/prefix', style: 'text-decoration:none;color:inherit' },
-        h('div', { class: 'topic-icon' }, 'Aa'),
-        h('div', { class: 'topic-text' }, h('h2', {}, tr('Inglés: re- e inter-', 'English: re- and inter- spelling')), h('p', { class: 'muted' }, tr('Ortografía en inglés (3º de Primaria).', 'English spelling practice (3º Primaria).')))))));
+    h('p', { class: 'muted lead' }, tr('¿De qué curso quieres repasar?', 'Which year do you want to revise?')),
+    h('div', { class: 'topic-grid' }, ...cards)));
+}
+function renderYear(year) {
+  setUserArea(); document.onkeydown = null;
+  const cards = year.subjects.map((sub) => card(sub.section ? topicIcon('geo1eso') : textIcon(sub.icon), sub.title, sub.blurb, sub.section ? meterBits(sectionSummary(sub.section)) : [],
+    { onclick: () => (sub.section ? renderGroup(sub.section) : renderSubject(sub)) }));
+  screen(h('section', { class: 'home' },
+    h('button', { class: 'back', onclick: renderHome }, '← ', tr('Inicio', 'Home')),
+    h('h1', {}, tr(year.title)),
+    h('p', { class: 'muted lead' }, tr('Elige una asignatura.', 'Choose a subject.')),
+    h('div', { class: 'topic-grid' }, ...cards)));
+}
+function renderSubject(sub) {   // a subject whose units are separate pages
+  setUserArea(); document.onkeydown = null;
+  const cards = sub.units.map((u) => card(textIcon(sub.icon), u.title, u.blurb, [], { href: u.href }));
+  screen(h('section', { class: 'home' },
+    h('button', { class: 'back', onclick: () => renderYear(sub.year) }, '← ', tr(sub.year.title)),
+    h('h1', {}, tr(sub.title)),
+    h('p', { class: 'muted lead' }, tr('Elige una unidad.', 'Choose a unit.')),
+    h('div', { class: 'topic-grid' }, ...cards)));
 }
 function renderGroup(group) {
   setUserArea(); document.onkeydown = null;
@@ -521,9 +545,9 @@ function renderGroup(group) {
         h('p', { class: 'small' }, tr(`${mastered} de ${total} dominados`, `${mastered} of ${total} mastered`))));
   });
   screen(h('section', { class: 'home' },
-    h('button', { class: 'back', onclick: renderHome }, '← ', tr('Inicio', 'Home')),
+    h('button', { class: 'back', onclick: () => renderYear(group.year) }, '← ', tr(group.year.title)),
     h('h1', {}, tr(group.title)),
-    h('p', { class: 'muted lead' }, tr('Elige una parte para repasar.', 'Choose a part to revise.')),
+    h('p', { class: 'muted lead' }, tr('Elige una unidad.', 'Choose a unit.')),
     h('div', { class: 'topic-grid' }, ...cards)));
 }
 function renderSection(section) {

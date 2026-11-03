@@ -192,6 +192,7 @@ function home(){
   const stars = id => { const s = best[id]||0; return [1,2,3].map(i=>`<i class="${i<=s?'on':''}">★</i>`).join(''); };
   $('#app').innerHTML = `
   <header class="hero">
+    <a class="link" href="/" style="justify-self:start">← xoyso home</a>
     <h1>Prefix Workshop</h1>
     <p>A prefix goes at the start of a word and changes what it means. Practise 19 words that start with re- or inter-.</p>
     <div class="keys">
