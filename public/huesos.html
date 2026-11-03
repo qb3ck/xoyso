@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Los huesos</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700;800&display=swap">
+<style>
+:root{
+  --bg:#eef4f8; --card:#ffffff; --ink:#13233f; --muted:#56677f; --line:#d3dfeb;
+  --hi:#0a7c86; --hi-soft:#d8f1f3; --warm:#d9480f;
+  --good:#1b7f45; --good-soft:#dcf5e5; --bad:#c2362b; --bad-soft:#fde4e1;
+  --bone:#f3e9d2; --boneline:#a08e66; --boneink:#3a3123;
+  --display:'Fredoka','Trebuchet MS',system-ui,sans-serif; --body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1829; --card:#172540; --ink:#e8eefb; --muted:#9db0cf; --line:#2a3b59;
+  --hi:#4fd1d9; --hi-soft:#0f3a42; --warm:#ff9a5c; --good:#4cd98a; --good-soft:#12382a; --bad:#ff8a80; --bad-soft:#3d1a1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1829; --card:#172540; --ink:#e8eefb; --muted:#9db0cf; --line:#2a3b59;
+  --hi:#4fd1d9; --hi-soft:#0f3a42; --warm:#ff9a5c; --good:#4cd98a; --good-soft:#12382a; --bad:#ff8a80; --bad-soft:#3d1a1a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;margin:0;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#app{max-width:900px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance;line-height:1.1}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.link{background:none;border:0;padding:8px 4px;font-weight:800;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+a.link{display:inline-block}
+.hero{display:grid;gap:14px;margin-bottom:8px}
+.hero h1{font-size:clamp(2.2rem,7vw,3.4rem)} .hero p{margin:0;color:var(--muted);max-width:56ch}
+.sec{font-family:var(--display);font-size:1.25rem;margin:26px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.act{text-align:left;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px 18px;display:grid;gap:6px;min-width:0;transition:transform .12s,border-color .12s}
+.act:hover{transform:translateY(-2px);border-color:var(--ink)}
+.act .demo{font-family:var(--display);font-size:1.6rem;font-weight:600;min-height:2.2rem}
+.act h3{font-size:1.15rem} .act p{margin:0;color:var(--muted);font-size:.95rem}
+.act .stars{font-size:1.1rem;letter-spacing:.15em;min-height:1.4rem} .act .stars i{font-style:normal;color:var(--line)} .act .stars i.on{color:var(--warm)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.count{font-weight:800;color:var(--muted)}
+.track{height:10px;border-radius:99px;background:var(--line);margin:6px 0 16px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--hi);border-radius:99px;transition:width .25s}
+
+/* stage: skeleton + panel */
+.stage{display:grid;gap:16px;grid-template-columns:1fr;align-items:start}
+@media (min-width:760px){.stage{grid-template-columns:minmax(240px,330px) 1fr}}
+.skel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:10px;display:grid;place-items:center}
+.skel svg{width:100%;max-width:300px;height:auto;max-height:68vh;display:block}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:clamp(16px,4vw,26px);display:grid;gap:14px;justify-items:center;text-align:center;align-content:start}
+.eyebrow{margin:0;font-weight:800;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.big{font-family:var(--display);font-size:clamp(1.8rem,6vw,2.6rem);font-weight:600;overflow-wrap:anywhere;line-height:1.15}
+.clue{margin:0;color:var(--muted);max-width:44ch}
+.opts{display:grid;gap:10px;width:100%}
+.opt{min-height:54px;padding:10px 18px;border-radius:16px;border:2px solid var(--line);background:var(--bg);font-family:var(--display);font-size:1.3rem;font-weight:500}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.opt:disabled{cursor:default}
+.txt{width:min(100%,380px);font:600 1.5rem var(--display);text-align:center;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.txt.ok{border-color:var(--good);background:var(--good-soft)} .txt.no{border-color:var(--bad);background:var(--bad-soft)}
+.btn{min-height:50px;padding:10px 26px;border-radius:14px;border:2px solid var(--ink);background:var(--card);font-weight:800}
+.btn.primary{background:var(--ink);color:var(--bg)} .btn:disabled{opacity:.4;cursor:default}
+.fb{min-height:3.2rem;margin:14px 0 0;text-align:center;font-weight:800;font-size:1.1rem;padding:8px 14px;border-radius:14px}
+.fb.good{background:var(--good-soft);color:var(--good)} .fb.bad{background:var(--bad-soft);color:var(--bad)}
+.actions{display:flex;justify-content:center;margin-top:12px;min-height:54px}
+
+/* the skeleton drawing */
+.o{fill:var(--boneline);stroke:var(--boneline);stroke-linecap:round;stroke-linejoin:round}
+.f{fill:var(--bone);stroke:var(--bone);stroke-linecap:round;stroke-linejoin:round}
+.f.nofill{fill:none} .o.nofill{fill:none}
+.dec{fill:var(--boneink);opacity:.75}
+.soft .o{opacity:.55} .soft .f{opacity:.7}
+.bone{cursor:default} .skel.tap .bone{cursor:pointer}
+.hit{fill:none;stroke:transparent;stroke-linecap:round;pointer-events:stroke}
+.hitf{fill:transparent;stroke:none;pointer-events:all}
+.bone.hi .f{fill:var(--hi);stroke:var(--hi)} .bone.hi .f.nofill{fill:none}
+.bone.hi .o{fill:var(--hi);stroke:var(--hi)} .bone.hi .o.nofill{fill:none}
+.bone.ok .f,.bone.ok .o{fill:var(--good);stroke:var(--good)} .bone.no .f,.bone.no .o{fill:var(--bad);stroke:var(--bad)}
+.bone.ok .nofill,.bone.no .nofill,.bone.hi .nofill{fill:none}
+.skel.tap .bone:hover .f{fill:var(--hi-soft);stroke:var(--hi-soft)} .skel.tap .bone:hover .f.nofill{fill:none}
+
+/* drag and drop */
+.board{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:8px;overflow-x:auto}
+.board svg{display:block;width:100%;min-width:540px;max-width:760px;margin:0 auto;height:auto}
+.lead{stroke:var(--muted);stroke-width:2;opacity:.8} .lead-dot{fill:var(--muted)}
+.slot rect{fill:var(--bg);stroke:var(--line);stroke-width:2.5} .slot{cursor:pointer}
+.slot text{font:800 15px var(--body);fill:var(--ink);text-anchor:middle;pointer-events:none}
+.slot.over rect{stroke:var(--hi);fill:var(--hi-soft)}
+.slot.ok rect{stroke:var(--good);fill:var(--good-soft)} .slot.ok{cursor:default}
+.slot.pre text{opacity:.6}
+.slot.no rect{stroke:var(--bad);fill:var(--bad-soft)}
+.tray{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px}
+.dchip{touch-action:none;user-select:none;-webkit-user-select:none;padding:10px 18px;min-height:48px;border-radius:14px;border:2px solid var(--ink);background:var(--card);font:700 1.05rem var(--body);cursor:grab}
+.dchip.sel{background:var(--hi-soft);border-color:var(--hi);color:var(--hi)} .dchip.lift{opacity:.35} .dchip.bad{background:var(--bad-soft);border-color:var(--bad)}
+.dchip.ghost{position:fixed;z-index:50;pointer-events:none;opacity:.95;box-shadow:0 8px 20px rgba(0,0,0,.25);transform:rotate(-2deg)}
+
+/* learn card */
+.info{display:grid;gap:8px;justify-items:center;text-align:center;width:100%}
+.info h2{font-size:clamp(2rem,7vw,2.8rem)} .info .en{color:var(--muted);font-weight:800}
+.tip{background:var(--bg);border-radius:14px;padding:10px 14px;text-align:left;max-width:46ch}
+.tip p{margin:4px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{border:2px solid var(--line);background:var(--bg);border-radius:99px;padding:6px 14px;font-weight:800}
+.chip.on{border-color:var(--hi);background:var(--hi-soft);color:var(--hi)}
+.res{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,32px);display:grid;gap:14px;justify-items:center;text-align:center}
+.res .score{font-family:var(--display);font-size:clamp(3rem,14vw,5rem);font-weight:600;line-height:1}
+.res .stars{font-size:2.4rem;letter-spacing:.2em;color:var(--line)} .res .stars .on{color:var(--warm)}
+.again{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-family:var(--display);font-size:1.3rem;font-weight:600}
+.again span{padding:2px 12px;border-radius:12px;background:var(--bg);border:2px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+</style></head><body><div id="app"></div>
+<script>
+const BONES = [
+ {id:'craneo',n:'Cráneo',en:'Skull',art:'el cráneo',tip:'Es el casco de la cabeza: protege el cerebro.',silly:'Un casco que nunca te quitas, ni para dormir.'},
+ {id:'clavicula',n:'Clavícula',en:'Collarbone',art:'la clavícula',tip:'Va del cuello al hombro, justo debajo de la piel.',silly:'Es como el collar de huesos que te cuelga de los hombros.'},
+ {id:'columna',n:'Columna vertebral',en:'Spine',art:'la columna vertebral',alt:['columna'],tip:'Una fila de huesecillos (vértebras) que recorre la espalda.',silly:'Una torre de bloques de juguete que no se cae.'},
+ {id:'costillas',n:'Costillas',en:'Ribs',art:'las costillas',alt:['costilla'],tip:'Son una jaula curva que protege el corazón y los pulmones.',silly:'Una jaula donde viven el corazón y los pulmones.'},
+ {id:'humero',n:'Húmero',en:'Humerus',art:'el húmero',tip:'El hueso del brazo, entre el hombro y el codo.',silly:'Húmero empieza como hombro: los dos con H.'},
+ {id:'radio',n:'Radio',en:'Radius',art:'el radio',tip:'Hueso del antebrazo, del lado del dedo pulgar.',silly:'Radio, el que sube a la antena del pulgar.'},
+ {id:'cubito',n:'Cúbito',en:'Ulna',art:'el cúbito',tip:'Hueso del antebrazo, del lado del meñique. Forma la punta del codo.',silly:'Cúbito y codo se parecen: el cúbito hace la punta del codo.'},
+ {id:'pelvis',n:'Pelvis',en:'Pelvis',art:'la pelvis',tip:'Es la cadera: un hueso ancho, como un cuenco, que sostiene el cuerpo.',silly:'Un cuenco con forma de mariposa donde se sienta tu tripa.'},
+ {id:'femur',n:'Fémur',en:'Femur',art:'el fémur',tip:'El hueso más largo y más fuerte del cuerpo. Está en el muslo.',silly:'El gigante de los huesos: ¡fuerte como un muro!'},
+ {id:'rotula',n:'Rótula',en:'Kneecap',art:'la rótula',tip:'Un hueso redondo que protege la rodilla.',silly:'Rótula, rueda: una tapa redonda que rueda en tu rodilla.'},
+ {id:'tibia',n:'Tibia',en:'Tibia (shinbone)',art:'la tibia',tip:'El hueso grueso de la parte baja de la pierna. Es la espinilla.',silly:'La tibia es la que te duele cuando te dan una patada: ¡espinilleras!'},
+ {id:'perone',n:'Peroné',en:'Fibula',art:'el peroné',tip:'El hueso fino de la pierna, pegado a la tibia por fuera.',silly:'Peroné: «pero» más fino que la tibia.'},
+ {id:'esternon',n:'Esternón',en:'Breastbone (sternum)',art:'el esternón',tip:'Un hueso plano en medio del pecho. Las costillas se unen a él por delante.',silly:'Es la corbata de hueso que llevas en el pecho.'},
+ {id:'omoplato',n:'Omóplato',en:'Shoulder blade (scapula)',art:'el omóplato',alt:['omoplato'],tip:'Un hueso plano y triangular en la espalda, detrás del hombro.',silly:'Omóplato: las «alas» de la espalda, como un ángel sin plumas.'}
+];
+const byId = Object.fromEntries(BONES.map(b=>[b.id,b]));
+const ACTS = [
+ {id:'drag',t:'Arrastra los nombres',d:'Como la ficha de clase: pon cada nombre en su sitio.',demo:'⇄ Arrastra',n:14},
+ {id:'find',t:'Encuéntralo',d:'Te digo un hueso y lo tocas en el esqueleto.',demo:'¿Dónde está…?',n:8},
+ {id:'name',t:'¿Cómo se llama?',d:'Ves un hueso de color y eliges su nombre.',demo:'A · B · C',n:8},
+ {id:'type',t:'Escríbelo',d:'Ves un hueso y escribes su nombre.',demo:'f é m u r',n:8},
+ {id:'mixed',t:'Reto mixto',d:'Diez preguntas de todo tipo.',demo:'? ? ?',n:10}
+];
+const KINDS=['find','name','type'];
+const $=(s,r=document)=>r.querySelector(s);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const store={get(){try{return JSON.parse(localStorage.getItem('huesos')||'{}');}catch(e){return {};}},set(o){try{localStorage.setItem('huesos',JSON.stringify(o));}catch(e){}}};
+const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/^(el|la|los|las)\s+/,'').replace(/\s+/g,' ').trim();
+
+/* ---------- the skeleton drawing (front view, 300 x 640) ---------- */
+const mx = x => 300 - x;
+function line(x1,y1,x2,y2,w){ const e=(c,ww)=>`<line class="${c}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="${ww}"/>`; return {o:e('o',w+3.5)+`<circle class="o" cx="${x1}" cy="${y1}" r="${w*.8+1.8}" stroke-width="0"/><circle class="o" cx="${x2}" cy="${y2}" r="${w*.8+1.8}" stroke-width="0"/>`, f:e('f',w)+`<circle class="f" cx="${x1}" cy="${y1}" r="${w*.8}" stroke-width="0"/><circle class="f" cx="${x2}" cy="${y2}" r="${w*.8}" stroke-width="0"/>`, hit:`<line class="hit" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="${Math.max(w+8,18)}"/>`}; }
+function path(d,sw=3){ return {o:`<path class="o" d="${d}" stroke-width="${sw+1.5}"/>`, f:`<path class="f" d="${d}" stroke-width="0"/>`, hit:`<path class="hitf" d="${d}"/>`}; }
+function arc(d,w){ return {o:`<path class="o nofill" d="${d}" stroke-width="${w+3}"/>`, f:`<path class="f nofill" d="${d}" stroke-width="${w}"/>`, hit:`<path class="hit" d="${d}" stroke-width="${w+10}"/>`}; }
+function dot(cx,cy,r){ return {o:`<circle class="o" cx="${cx}" cy="${cy}" r="${r+2}" stroke-width="0"/>`, f:`<circle class="f" cx="${cx}" cy="${cy}" r="${r}" stroke-width="0"/>`, hit:`<circle class="hitf" cx="${cx}" cy="${cy}" r="${r+7}"/>`}; }
+function rect(x,y,w,h,r){ return {o:`<rect class="o" x="${x-1.5}" y="${y-1.5}" width="${w+3}" height="${h+3}" rx="${r+1}" stroke-width="0"/>`, f:`<rect class="f" x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" stroke-width="0"/>`, hit:`<rect class="hitf" x="${x-4}" y="${y-1}" width="${w+8}" height="${h+2}"/>`}; }
+const both = fn => [fn(false), fn(true)];                 // left side and its mirror image
+const mirrorPath = d => d.replace(/(-?\d+(?:\.\d+)?)[ ,](-?\d+(?:\.\d+)?)/g,(m,x,y)=>`${mx(+x)} ${y}`);
+const SHAPES = {
+  craneo: [path('M150 12 C122 12 112 36 114 56 C115 72 122 80 128 84 L130 102 Q150 112 170 102 L172 84 C178 80 185 72 186 56 C188 36 178 12 150 12 Z',3),
+           {o:'',f:'<ellipse class="dec" cx="136" cy="58" rx="8" ry="9"/><ellipse class="dec" cx="164" cy="58" rx="8" ry="9"/><path class="dec" d="M150 68 L145 82 L155 82 Z"/><rect class="dec" x="138" y="94" width="24" height="4" rx="2"/>',hit:''}],
+  clavicula: both(m=>{const a=m?mx:(x=>x); return line(a(148),124,a(96),128,5.5);}),
+  columna: Array.from({length:12},(_,i)=>rect(143,118+i*12.3,14,10,4)),
+  esternon: [path('M142 128 L158 128 L156 146 L154 186 L150 196 L146 186 L144 146 Z',2.5)],
+  omoplato: both(m=>{const a=m?mx:(x=>x); return path(`M${a(96)} 128 L${a(126)} 134 L${a(120)} 176 Q${a(106)} 182 ${a(98)} 164 Z`,2.5);}),
+  costillas: [...Array.from({length:7},(_,i)=>{ const y=134+i*12.5, off=[46,56,62,63,58,50,40][i];
+      return [arc(`M146 ${y} C${150-off-8} ${y-4} ${150-off-12} ${y+18} 147 ${y+22}`,4), arc(`M154 ${y} C${150+off+8} ${y-4} ${150+off+12} ${y+18} 153 ${y+22}`,4)]; }).flat()],
+  humero: both(m=>{const a=m?mx:(x=>x); return line(a(94),134,a(72),224,8);}),
+  radio: both(m=>{const a=m?mx:(x=>x); return line(a(66),230,a(46),318,5);}),
+  cubito: both(m=>{const a=m?mx:(x=>x); return line(a(76),230,a(60),318,5);}),
+  pelvis: [path('M147 264 C128 254 104 258 101 276 C100 296 116 314 134 318 L142 304 L147 304 Z',3), path('M153 264 C172 254 196 258 199 276 C200 296 184 314 166 318 L158 304 L153 304 Z',3), path('M142 268 L158 268 L155 310 L145 310 Z',3)],
+  femur: both(m=>{const a=m?mx:(x=>x); return [line(a(124),312,a(132),430,10), dot(a(130),310,10)];}).flat(),
+  rotula: both(m=>{const a=m?mx:(x=>x); return dot(a(133),443,9);}),
+  tibia: both(m=>{const a=m?mx:(x=>x); return line(a(137),456,a(139),568,8);}),
+  perone: both(m=>{const a=m?mx:(x=>x); return line(a(123),458,a(122),562,4);})
+};
+const FINGERS = [...both(m=>{const a=m?mx:(x=>x); return [line(a(52),322,a(30),358,3.4),line(a(54),324,a(40),366,3.4),line(a(56),324,a(51),370,3.4),line(a(58),322,a(62),366,3.4),line(a(60),320,a(74),346,3.4)];}).flat(),
+  ...both(m=>{const a=m?mx:(x=>x); return [line(a(124),590,a(114),614,3.4),line(a(130),592,a(126),618,3.4),line(a(136),592,a(138),618,3.4),line(a(142),590,a(148),614,3.4),line(a(146),586,a(156),606,3.4)];}).flat()];
+const DECOR = [ // un-labelled bones, drawn softly behind (wrist, ankle and foot bones)
+  path('M44 316 Q54 330 70 318 Q68 310 56 308 Z',2), path('M246 316 Q236 330 220 318 Q222 310 234 308 Z',2),
+  path('M126 568 Q140 580 150 570 L148 590 Q136 600 122 588 Z',2), path('M174 568 Q160 580 150 570 L152 590 Q164 600 178 588 Z',2)
+];
+function skeletonInner(){
+  const flat = a => a.flat(Infinity);
+  const group = (id) => { const sh = flat(SHAPES[id]);
+    return `<g class="bone" data-bone="${id}"><g>${sh.map(s=>s.o).join('')}</g><g>${sh.map(s=>s.f).join('')}</g><g>${sh.map(s=>s.hit).join('')}</g></g>`; };
+  const soft = `<g class="soft">${[...DECOR,...FINGERS].map(s=>s.o+s.f).join('')}</g>`;
+  const order = ['pelvis','femur','tibia','perone','rotula','costillas','omoplato','columna','esternon','clavicula','humero','radio','cubito','craneo'];
+  return soft + order.map(group).join('');
+}
+function skeleton(host, onTap){
+  host.innerHTML = `<svg viewBox="0 0 300 640" role="img" aria-label="Esqueleto humano">${skeletonInner()}</svg>`; host.classList.toggle('tap', !!onTap);
+  const set = (id, cls) => { const g = host.querySelector(`[data-bone="${id}"]`); if(g) g.classList.add(cls); };
+  const clear = () => host.querySelectorAll('.bone').forEach(g=>g.classList.remove('hi','ok','no'));
+  if(onTap) host.addEventListener('click', e=>{ const g=e.target.closest('[data-bone]'); if(g) onTap(g.dataset.bone); });
+  return {set, clear};
+}
+
+/* ---------- home ---------- */
+function home(){
+  const best = store.get();
+  const stars = id => [1,2,3].map(i=>`<i class="${i<=(best[id]||0)?'on':''}">★</i>`).join('');
+  $('#app').innerHTML = `<header class="hero"><a class="link" href="/" style="justify-self:start">← xoyso</a><h1>Los huesos</h1>
+    <p>14 huesos del esqueleto humano, los mismos de la ficha de clase. Aprende dónde están y cómo se escriben.</p></header>
+    <h2 class="sec">Aprende</h2><div class="grid"><button class="act" id="learn"><span class="demo">El esqueleto</span><h3>Conoce los huesos</h3><p>Toca un hueso para ver su nombre, un truco y una forma tonta de recordarlo.</p></button></div>
+    <h2 class="sec">Practica</h2>
+    <div class="grid">${ACTS.map(a=>`<button class="act" data-a="${a.id}"><span class="demo">${a.demo}</span><h3>${a.t}</h3><p>${a.d}</p><span class="stars" aria-label="${best[a.id]||0} de 3 estrellas">${stars(a.id)}</span></button>`).join('')}</div>`;
+  $('#learn').onclick = learn; document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>start(b.dataset.a)); scrollTo(0,0);
+}
+function learn(){
+  $('#app').innerHTML = `<div class="top"><button class="link" id="back">← Inicio</button></div>
+   <div class="stage"><div class="skel" id="sk"></div><div class="panel"><div class="info" id="info"></div><div class="chips" id="chips"></div></div></div>`;
+  $('#back').onclick = home;
+  const sk = skeleton($('#sk'), id=>pick(id));
+  const info = $('#info'), chips = $('#chips');
+  chips.innerHTML = BONES.map(b=>`<button class="chip" data-id="${b.id}">${b.n}</button>`).join('');
+  chips.querySelectorAll('.chip').forEach(c=>c.onclick=()=>pick(c.dataset.id));
+  function pick(id){
+    const b=byId[id]; sk.clear(); sk.set(id,'hi');
+    chips.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.id===id));
+    info.innerHTML = `<p class="eyebrow">Hueso</p><h2>${b.n}</h2><div class="en">${b.en}</div><div class="tip"><p><strong>Truco:</strong> ${b.tip}</p><p><strong>Para recordarlo:</strong> ${b.silly}</p></div>`;
+  }
+  info.innerHTML = `<p class="eyebrow">Toca un hueso</p><h2>El esqueleto</h2><p class="clue">Toca un hueso del dibujo, o un nombre de la lista, para ver cómo se llama.</p>`;
+  scrollTo(0,0);
+}
+
+/* ---------- drag and drop (like the class worksheet) ---------- */
+const SLOTS = { // side, box y, and the point on the skeleton the arrow touches (skeleton is drawn at x+170)
+  craneo:['L',30,120,52], clavicula:['L',92,108,127], humero:['L',160,82,175], radio:['L',250,50,272], femur:['L',360,126,372], perone:['L',500,123,510],
+  omoplato:['R',52,192,150], esternon:['R',104,150,160], costillas:['R',156,204,178], columna:['R',208,150,232], cubito:['R',268,232,274], pelvis:['R',328,190,292], rotula:['R',430,167,443], tibia:['R',508,163,512] };
+function boardSvg(prefilled){
+  const bw=150, bh=34, parts=Object.entries(SLOTS).map(([id,[side,y,ax,ay]])=>{
+    const x = side==='L' ? 4 : 486, ex = side==='L' ? x+bw : x, cy=y+bh/2;
+    const pre = prefilled.includes(id);
+    return `<line class="lead" x1="${ex}" y1="${cy}" x2="${170+ax}" y2="${ay}"/><circle class="lead-dot" cx="${170+ax}" cy="${ay}" r="3.5"/>
+      <g class="slot ${pre?'pre':''}" data-slot="${id}"><rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="9"/><text x="${x+bw/2}" y="${y+22}">${pre?byId[id].n:''}</text></g>`; }).join('');
+  return `<svg viewBox="0 0 640 640" role="img" aria-label="Esqueleto con casillas para los nombres"><g transform="translate(170,0)">${skeletonInner()}</g>${parts}</svg>`;
+}
+function dragGame(only){
+  const todo = only&&only.length ? only.map(b=>b.id) : BONES.map(b=>b.id), pre = BONES.map(b=>b.id).filter(id=>!todo.includes(id));
+  S = {actId:'drag', qs:todo.map(()=>0), i:0, pts:0, missed:[], tries:0, locked:false, ctl:null};
+  const wrong = new Set(); let left = todo.length, selected = null;
+  $('#app').innerHTML = `<div class="top"><button class="link" id="quit">← Parar</button><span class="count" id="cnt"></span></div>
+    <div class="track"><i id="bar" style="width:0"></i></div>
+    <div class="board" id="board">${boardSvg(pre)}</div>
+    <p class="clue" style="text-align:center;margin:8px auto">Arrastra cada nombre a su casilla. También puedes tocar el nombre y después la casilla.</p>
+    <div class="tray" id="tray">${shuffle(todo).map(id=>`<button class="dchip" data-id="${id}">${byId[id].n}</button>`).join('')}</div>
+    <div class="fb" id="fb" aria-live="polite"></div>`;
+  $('#quit').onclick=home;
+  const board=$('#board'), tray=$('#tray'), fb=$('#fb');
+  const count=()=>{ $('#cnt').textContent=`Colocados ${todo.length-left} de ${todo.length}`; $('#bar').style.width=((todo.length-left)/todo.length*100)+'%'; }; count();
+  board.querySelectorAll('.slot.pre').forEach(g=>g.classList.add('ok'));
+  const slotEl = id => board.querySelector(`[data-slot="${id}"]`);
+  const unselect=()=>{ selected=null; tray.querySelectorAll('.dchip').forEach(c=>c.classList.remove('sel')); };
+  function place(slotId, boneId){
+    const g=slotEl(slotId); if(!g || g.classList.contains('ok')) return;
+    const chip=tray.querySelector(`[data-id="${boneId}"]`); if(!chip) return;
+    if(slotId===boneId){
+      g.classList.remove('over','no'); g.classList.add('ok'); $('text',g).textContent=byId[boneId].n; chip.remove(); unselect();
+      if(wrong.has(boneId)) {} else S.pts++;
+      left--; count(); fb.className='fb good'; fb.textContent='¡Bien! '+byId[boneId].n+'.';
+      if(!left) setTimeout(finish,900);
+    } else {
+      if(!wrong.has(boneId)){ wrong.add(boneId); S.missed.push(byId[boneId]); }
+      g.classList.add('no'); chip.classList.add('bad'); setTimeout(()=>{ g.classList.remove('no'); chip.classList.remove('bad'); },600);
+      fb.className='fb bad'; fb.textContent='Ahí no. Mira hacia dónde apunta la flecha e inténtalo otra vez.';
+    }
+  }
+  board.addEventListener('click',e=>{ const g=e.target.closest('[data-slot]'); if(g&&selected) place(g.dataset.slot,selected); });
+  const slotAt=(x,y)=>{ for(const el of document.elementsFromPoint(x,y)){ const g=el.closest&&el.closest('[data-slot]'); if(g) return g.dataset.slot; } return null; };
+  tray.addEventListener('pointerdown',e=>{
+    const c=e.target.closest('.dchip'); if(!c) return; e.preventDefault();
+    const r=c.getBoundingClientRect(), ghost=c.cloneNode(true); ghost.classList.add('ghost'); ghost.style.width=r.width+'px'; document.body.append(ghost); c.classList.add('lift');
+    const sx=e.clientX, sy=e.clientY; let moved=false, over=null;
+    const pos=(x,y)=>{ ghost.style.left=(x-r.width/2)+'px'; ghost.style.top=(y-r.height/2)+'px'; }; pos(sx,sy);
+    const mv=ev=>{ if(Math.hypot(ev.clientX-sx,ev.clientY-sy)>6) moved=true; pos(ev.clientX,ev.clientY);
+      const id=slotAt(ev.clientX,ev.clientY); if(id!==over){ if(over) slotEl(over).classList.remove('over'); over=id; if(id&&!slotEl(id).classList.contains('ok')) slotEl(id).classList.add('over'); } };
+    const end=ev=>{ window.removeEventListener('pointermove',mv); window.removeEventListener('pointerup',end); window.removeEventListener('pointercancel',end);
+      ghost.remove(); c.classList.remove('lift'); if(over) slotEl(over).classList.remove('over');
+      if(ev.type==='pointerup'){ if(moved){ const id=slotAt(ev.clientX,ev.clientY); if(id) place(id,c.dataset.id); } else { const was=c.classList.contains('sel'); unselect(); if(!was){ selected=c.dataset.id; c.classList.add('sel'); } } } };
+    window.addEventListener('pointermove',mv); window.addEventListener('pointerup',end); window.addEventListener('pointercancel',end);
+  });
+  scrollTo(0,0);
+}
+
+/* ---------- questions ---------- */
+const BUILD = {
+  find(b, ui, api){
+    ui.panel.innerHTML = `<p class="eyebrow">Encuéntralo</p><div class="big">¿Dónde está ${b.art}?</div><p class="clue">Toca ese hueso en el esqueleto.</p>`;
+    const sk = skeleton(ui.sk, id=>{ if(S.locked) return; if(id===b.id){ sk.clear(); sk.set(id,'ok'); api.attempt(true);} else { sk.clear(); sk.set(id,'no'); api.attempt(false, `Ese es ${byId[id].art}.`);} });
+    return {retry(){}, reveal(){ sk.clear(); sk.set(b.id,'ok'); }};
+  },
+  name(b, ui, api){
+    const wrong = shuffle(BONES.filter(x=>x.id!==b.id)).slice(0,3);
+    ui.panel.innerHTML = `<p class="eyebrow">¿Cómo se llama?</p><div class="big">¿Qué hueso es el de color?</div>
+      <div class="opts">${shuffle([b,...wrong]).map(o=>`<button class="opt" data-id="${o.id}">${o.n}</button>`).join('')}</div>`;
+    const sk = skeleton(ui.sk, null); sk.set(b.id,'hi');
+    const btns=[...ui.panel.querySelectorAll('.opt')];
+    const done=()=>{ btns.forEach(x=>{x.disabled=true; if(x.dataset.id===b.id) x.classList.add('ok');}); sk.clear(); sk.set(b.id,'ok'); };
+    btns.forEach(x=>x.onclick=()=>{ if(x.dataset.id===b.id) api.attempt(true); else { x.disabled=true; x.classList.add('no'); api.attempt(false);} });
+    return {retry(){}, reveal:done, correct:done};
+  },
+  type(b, ui, api){
+    ui.panel.innerHTML = `<p class="eyebrow">Escríbelo</p><div class="big">¿Cómo se llama este hueso?</div><p class="clue">Está pintado de color en el esqueleto. Escribe su nombre.</p>
+      <input class="txt" id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Nombre del hueso">
+      <button class="btn primary" id="chk">Comprobar</button>`;
+    const sk = skeleton(ui.sk, null); sk.set(b.id,'hi');
+    const inp=$('#in',ui.panel); inp.focus({preventScroll:true});
+    const ok = v => [b.n,...(b.alt||[])].map(norm).includes(norm(v));
+    const check=()=>{ const v=inp.value.trim(); if(!v) return;
+      if(ok(v)){ inp.classList.add('ok'); inp.disabled=true; $('#chk',ui.panel).disabled=true; sk.clear(); sk.set(b.id,'ok');
+        const accent = v.toLowerCase()!==b.n.toLowerCase() && !(b.alt||[]).includes(v.toLowerCase()) ? ` Recuerda escribirlo así: ${b.n}.` : ''; api.attempt(true, accent); }
+      else { inp.classList.add('no'); api.attempt(false, `Empieza por «${b.n.slice(0,2)}».`); } };
+    $('#chk',ui.panel).onclick=check; inp.onkeydown=e=>{ if(e.key==='Enter') check(); }; inp.oninput=()=>inp.classList.remove('no');
+    return {retry(){ inp.select(); }, reveal(){ inp.value=b.n; inp.disabled=true; inp.classList.add('ok'); $('#chk',ui.panel).disabled=true; sk.clear(); sk.set(b.id,'ok'); }};
+  }
+};
+
+let S=null;
+function start(actId, only){
+  if(actId==='drag') return dragGame(only);
+  const act=ACTS.find(a=>a.id===actId);
+  let pool = only&&only.length ? shuffle(only) : shuffle(BONES);
+  while(pool.length<act.n) pool=pool.concat(shuffle(BONES));
+  const qs = pool.slice(0,act.n).map((b,i)=>({b, kind: actId==='mixed'?KINDS[i%3]:actId}));
+  if(actId==='mixed') shuffle(qs);
+  S={actId,qs,i:0,pts:0,missed:[],tries:0,locked:false,ctl:null}; showQ();
+}
+function showQ(){
+  const q=S.qs[S.i]; S.tries=0; S.locked=false;
+  $('#app').innerHTML = `<div class="top"><button class="link" id="quit">← Parar</button><span class="count">Pregunta ${S.i+1} de ${S.qs.length}</span></div>
+   <div class="track"><i style="width:${S.i/S.qs.length*100}%"></i></div>
+   <div class="stage"><div class="skel" id="sk"></div><div><div class="panel" id="pn"></div><div class="fb" id="fb" aria-live="polite"></div>
+   <div class="actions"><button class="btn primary" id="next" hidden>${S.i===S.qs.length-1?'Ver mi nota':'Siguiente'}</button></div></div></div>`;
+  $('#quit').onclick=home; $('#next').onclick=()=>{S.i++; S.i<S.qs.length?showQ():finish();};
+  S.ctl=BUILD[q.kind](q.b,{sk:$('#sk'),panel:$('#pn')},{attempt}); scrollTo(0,0);
+}
+function attempt(ok,note=''){
+  if(S.locked) return; const q=S.qs[S.i], fb=$('#fb'); S.tries++;
+  const lock=()=>{S.locked=true; const n=$('#next'); n.hidden=false; n.focus({preventScroll:true});};
+  if(ok){ if(S.tries===1) S.pts++; else S.missed.push(q.b); if(S.ctl.correct) S.ctl.correct();
+    fb.className='fb good'; fb.textContent=(S.tries===1?'¡Perfecto! ':'¡Lo tienes! ')+q.b.n+'.'+(note?' '+note:''); lock(); }
+  else if(S.tries<2){ fb.className='fb bad'; fb.textContent='Casi. Inténtalo otra vez. '+note; S.ctl.retry(); }
+  else { S.missed.push(q.b); fb.className='fb bad'; fb.textContent=`Es ${q.b.art}: ${q.b.n}.`; S.ctl.reveal(); lock(); }
+}
+function finish(){
+  const n=S.qs.length, pct=S.pts/n, stars=pct>=.9?3:pct>=.7?2:pct>=.4?1:0;
+  const b=store.get(); if((b[S.actId]||0)<stars){ b[S.actId]=stars; store.set(b); }
+  const msg=stars===3?'¡Genial! Te sabes el esqueleto.':stars===2?'¡Muy bien!':stars===1?'Buen comienzo. Prueba otra vez.':'Sigue practicando, lo conseguirás.';
+  const miss=[...new Map(S.missed.map(x=>[x.id,x])).values()];
+  $('#app').innerHTML=`<div class="res"><p class="eyebrow">${ACTS.find(a=>a.id===S.actId).t}</p><div class="score">${S.pts}/${n}</div>
+   <div class="stars" aria-label="${stars} de 3 estrellas">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}">★</span>`).join('')}</div><h2>${msg}</h2>
+   <p class="clue">Los puntos son por los huesos que aciertas a la primera.</p>
+   ${miss.length?`<p class="eyebrow">Para repasar</p><div class="again">${miss.map(x=>`<span>${x.n}</span>`).join('')}</div>`:''}
+   <div class="row"><button class="btn primary" id="rep">Otra vez</button>${miss.length?'<button class="btn" id="prac">Repasar estos</button>':''}<button class="btn" id="hm">Inicio</button></div></div>`;
+  const id=S.actId; $('#rep').onclick=()=>start(id); $('#hm').onclick=home; if(miss.length) $('#prac').onclick=()=>start(id,miss); scrollTo(0,0);
+}
+home();
+</script></body></html>
