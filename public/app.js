@@ -436,7 +436,7 @@ const tipEl = (it) => (it.tip ? h('div', { class: 'tip' },
 const both = (fn) => [((l) => { const o = lang; lang = l; const r = fn(); lang = o; return r; })('es'), ((l) => { const o = lang; lang = l; const r = fn(); lang = o; return r; })('en')];
 
 function renderLogin(mode = 'signin', message = null) {
-  setUserArea();
+  setUserArea(); setCrumbs();
   let pin = '';
   const signin = mode === 'signin';
   const nameInput = h('input', { id: 'username', autocomplete: 'username', autocapitalize: 'none', spellcheck: 'false', maxlength: 20,
@@ -500,7 +500,19 @@ const YEARS = [
   { id: '1eso', title: ['1º ESO', '1st ESO'], subjects: [
     { id: 'geo', title: ['Geografía', 'Geography'], blurb: ['Mapa físico y comunidades autónomas', 'Physical map and autonomous communities'], section: SECTIONS[0] }] },
 ];
-for (const y of YEARS) for (const sub of y.subjects) { sub.year = y; if (sub.section) sub.section.year = y; }
+for (const y of YEARS) for (const sub of y.subjects) { sub.year = y; if (sub.section) { sub.section.year = y; sub.section.subject = sub; } }
+// Header trail: xoyso > year > subject > unit > topic. Each earlier step is a link; the last is the current page.
+function setCrumbs(trail = []) {
+  const nav = $('#crumbs'); nav.replaceChildren();
+  const all = [{ plain: 'xoyso', fn: () => (state.session ? renderHome() : renderLogin()) }, ...trail];
+  all.forEach((c, i) => {
+    if (i) nav.append(h('span', { class: 'sep', 'aria-hidden': 'true' }, '›'));
+    const last = i === all.length - 1, label = c.plain || tr(c.t);
+    nav.append(!last && c.fn ? h('button', { class: 'crumb', onclick: c.fn }, label) : h('span', { class: 'crumb cur', 'aria-current': last ? 'page' : null }, label));
+  });
+}
+const yearCrumb = (y) => ({ t: y.title, fn: () => renderYear(y) });
+const subjectCrumb = (sub) => ({ t: sub.title, fn: sub.section ? () => renderGroup(sub.section) : () => renderSubject(sub) });
 const card = (icon, title, blurb, extra = [], opts = {}) => h(opts.href ? 'a' : 'button', { class: 'card topic-card', href: opts.href, style: opts.href ? 'text-decoration:none;color:inherit' : null, onclick: opts.onclick },
   h('div', { class: 'topic-icon', html: icon }),
   h('div', { class: 'topic-text' }, h('h2', {}, tr(title)), h('p', { class: 'muted' }, tr(blurb)), ...extra));
@@ -508,7 +520,7 @@ const meterBits = ({ mastered, total }) => [h('div', { class: 'meter' }, h('span
   h('p', { class: 'small' }, tr(`${mastered} de ${total} dominados`, `${mastered} of ${total} mastered`))];
 const textIcon = (t) => `<span style="font:700 1.5rem var(--font,inherit)">${t}</span>`;
 function renderHome() {
-  setUserArea(); document.onkeydown = null;
+  setUserArea(); document.onkeydown = null; setCrumbs();
   const cards = YEARS.map((y) => card(textIcon(y.id === '1eso' ? '1º' : '3º'), y.title, [y.subjects.map((x) => x.title[0]).join(' · '), y.subjects.map((x) => x.title[1]).join(' · ')], [], { onclick: () => renderYear(y) }));
   screen(h('section', { class: 'home' },
     h('h1', {}, tr(`¡Hola, ${state.session.username}!`, `Hi ${state.session.username}!`)),
@@ -516,7 +528,7 @@ function renderHome() {
     h('div', { class: 'topic-grid' }, ...cards)));
 }
 function renderYear(year) {
-  setUserArea(); document.onkeydown = null;
+  setUserArea(); document.onkeydown = null; setCrumbs([{ t: year.title }]);
   const cards = year.subjects.map((sub) => card(sub.section ? topicIcon('geo1eso') : textIcon(sub.icon), sub.title, sub.blurb, sub.section ? meterBits(sectionSummary(sub.section)) : [],
     { onclick: () => (sub.section ? renderGroup(sub.section) : renderSubject(sub)) }));
   screen(h('section', { class: 'home' },
@@ -526,7 +538,7 @@ function renderYear(year) {
     h('div', { class: 'topic-grid' }, ...cards)));
 }
 function renderSubject(sub) {   // a subject whose units are separate pages
-  setUserArea(); document.onkeydown = null;
+  setUserArea(); document.onkeydown = null; setCrumbs([yearCrumb(sub.year), { t: sub.title }]);
   const cards = sub.units.map((u) => card(textIcon(sub.icon), u.title, u.blurb, [], { href: u.href }));
   screen(h('section', { class: 'home' },
     h('button', { class: 'back', onclick: () => renderYear(sub.year) }, '← ', tr(sub.year.title)),
@@ -535,7 +547,7 @@ function renderSubject(sub) {   // a subject whose units are separate pages
     h('div', { class: 'topic-grid' }, ...cards)));
 }
 function renderGroup(group) {
-  setUserArea(); document.onkeydown = null;
+  setUserArea(); document.onkeydown = null; setCrumbs([yearCrumb(group.year), { t: group.subject.title }]);
   const cards = group.children.map((c) => {
     const { mastered, total } = sectionSummary(c);
     return h('button', { class: 'card topic-card', onclick: () => renderSection(c) },
@@ -551,7 +563,7 @@ function renderGroup(group) {
     h('div', { class: 'topic-grid' }, ...cards)));
 }
 function renderSection(section) {
-  setUserArea(); document.onkeydown = null;
+  setUserArea(); document.onkeydown = null; setCrumbs([yearCrumb(section.parent.year), subjectCrumb(section.parent.subject), { t: section.title }]);
   const cards = section.topics.map((t) => {
     const { mastered, total } = topicSummary(t);
     return h('button', { class: 'card topic-card', onclick: () => renderTopic(t) },
@@ -592,7 +604,7 @@ function topicIcon(id) {
 }
 
 function renderTopic(topic) {
-  setUserArea();
+  setUserArea(); { const sec = sectionOf(topic); setCrumbs([yearCrumb(sec.parent.year), subjectCrumb(sec.parent.subject), { t: sec.title, fn: () => renderSection(sec) }, { t: topic.title }]); }
   const { mastered, total } = topicSummary(topic);
   const [nEs, nEn] = topic.noun;
   const mode = (title, desc, icon, fn, extra = '') => h('button', { class: `card mode-card ${extra}`, onclick: fn },
