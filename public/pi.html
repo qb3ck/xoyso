@@ -68,6 +68,11 @@ select{font:inherit;padding:6px 10px;border-radius:10px;border:2px solid var(--l
 .track{height:10px;border-radius:99px;background:var(--line);overflow:hidden;width:100%} .track i{display:block;height:100%;background:var(--hi);border-radius:99px;transition:width .25s}
 .toggle{display:flex;align-items:center;gap:10px;font-weight:700}
 .toggle input{width:22px;height:22px}
+.pcs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.pc{font:700 .95rem var(--mono);letter-spacing:.04em;padding:6px 10px;border-radius:10px;border:2px solid var(--warm);background:var(--warm-soft);color:var(--warm);min-height:36px}
+.pc.solid{background:var(--good);border-color:var(--good);color:#fff} .pc.sel{outline:3px solid var(--ink);outline-offset:1px}
+.lens{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.len{min-width:42px;min-height:42px;border-radius:12px;border:2px solid var(--line);background:var(--card);font:800 1rem var(--mono)} .len.on{border-color:var(--hi);background:var(--hi-soft);color:var(--hi)}
 </style></head><body><div id="app"></div>
 <script>
 const DIG = '1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153643678925903600113305305488204665213841469519415116094330572703657595919530921861173819326117931051185480744623799627495673518857527248912279381830119491298336733624406566430860213949463952247371907021798609437027705392171762931767523846748184676694051320005681271452635608277857713427577896091736371787214684409012249534301465495853710507922796892589235420199561121290219608640344181598136297747713099605187072113499999983729780499510597317328160963185950244594553469083026425223082533446850352619311881710100031378387528865875332083814206171776691473035982534904287554687311595628638823537875937519577818577805321712268066130019278766111959092164201989';
@@ -76,38 +81,54 @@ const shuffle = a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Ma
 const store = {get(){try{return JSON.parse(localStorage.getItem('pi-progress')||'{}');}catch(e){return {};}}, set(o){try{localStorage.setItem('pi-progress',JSON.stringify(o));}catch(e){}}};
 
 /* ---------- state ---------- */
-let DB = store.get(); DB.size = DB.size || 6; DB.by = DB.by || {};
+/* The learner chooses the length of every piece (tramo). DB.segs = lengths of the pieces learned so far, in order.
+   DB.rec[start:len] = {s: correct-in-a-row, t: last time} for that exact piece. */
+let DB = store.get();
 const save = () => store.set(DB);
-const G = () => DB.size;
-const bucket = () => (DB.by[G()] = DB.by[G()] || {groups:{}, best:0});
-const nGroups = () => Math.floor(DIG.length / G());
-const grp = i => DIG.slice(i*G(), (i+1)*G());
-const rec = i => bucket().groups[i] || null;
-const SOLID = 3;
-const learned = () => { let n=0; while(n<nGroups() && rec(n) && rec(n).seen) n++; return n; };          // groups learned in a row from the start
-const solid = () => { let n=0; while(n<nGroups() && rec(n) && rec(n).seen && rec(n).s>=SOLID) n++; return n; };
-function bump(i, ok){ const b=bucket(); const r=b.groups[i]=b.groups[i]||{s:0,seen:0,t:0}; r.seen=1; r.t=Date.now(); r.s = ok ? r.s+1 : 0; save(); }
-const fmt = (s,size=3) => { const out=[]; for(let i=0;i<s.length;i+=size) out.push(s.slice(i,i+size)); return out.join('<span class="sp"></span>'); };
+(function migrate(){
+  if (DB.segs) return;
+  const size = DB.size || 6, old = DB.by && DB.by[size];
+  DB.segs = []; DB.rec = {}; DB.best = 0; DB.last = size;
+  if (old) { let n = 0; while (old.groups && old.groups[n] && old.groups[n].seen) n++;
+    for (let i = 0; i < n; i++) { DB.segs.push(size); DB.rec[i*size+':'+size] = old.groups[i]; }
+    DB.best = old.best || 0; }
+  delete DB.by; delete DB.size; save();
+})();
+const SOLID = 3, MAXLEN = 12;
+const start = k => DB.segs.slice(0,k).reduce((a,b)=>a+b,0);
+const digits = () => start(DB.segs.length);
+const piece = k => DIG.slice(start(k), start(k)+DB.segs[k]);
+const rk = k => start(k)+':'+DB.segs[k];
+const rec = k => DB.rec[rk(k)] || null;
+const solid = () => { let n=0; while(n<DB.segs.length && rec(n) && rec(n).s>=SOLID) n++; return n; };
+function bump(k, ok){ const key=rk(k); const r=DB.rec[key]=DB.rec[key]||{s:0,t:0}; r.t=Date.now(); r.s = ok ? r.s+1 : 0; save(); }
+const gap = '<span class="sp"></span>';
 const onlyDigits = s => s.replace(/[^0-9]/g,'');
 
 /* ---------- home ---------- */
+let selPiece = null;
 function home(){
-  const g=G(), L=learned(), S=solid(), best=bucket().best||0, nextG=Math.min(L, nGroups()-1);
-  const cells=[]; for(let i=0;i<Math.min(nGroups(), Math.max(24, L+14));i++){ const r=rec(i); cells.push(`<span class="cell ${r&&r.seen?(r.s>=SOLID?'solid':'learn'):''}" title="Grupo ${i+1}">${(i+1)%5===0?i+1:''}</span>`); }
+  const n=DB.segs.length, D=digits(), S=start(solid()), best=DB.best||0, nextLen=Math.min(DB.last||5, DIG.length-D);
+  const chips = DB.segs.map((l,k)=>{ const r=rec(k); return `<button class="pc ${r&&r.s>=SOLID?'solid':''} ${selPiece===k?'sel':''}" data-k="${k}" aria-label="Tramo ${k+1}: ${piece(k)}">${piece(k)}</button>`; }).join('');
   $('#app').innerHTML = `<header class="hero"><a class="link" href="/" style="justify-self:start">← xoyso</a><h1>Decimales de π</h1>
-    <p>π = 3,<strong>${fmt(grp(0))}</strong> ${fmt(grp(1))} ${fmt(grp(2))}… Aprende los decimales en grupos de ${g}, practica los enlaces entre grupos y ensaya la recitación completa.</p></header>
-   <div class="stats"><div class="stat hi"><b>${L*g}</b><span>decimales aprendidos</span></div><div class="stat"><b>${S*g}</b><span>decimales seguros (3 aciertos)</span></div><div class="stat"><b>${best}</b><span>mejor recitado seguido</span></div></div>
+    <p>π = 3,<strong>14159</strong> 265 3 58979… Tú eliges cuántos dígitos tiene cada tramo (1, 3, 5, 8…) y vas enlazándolos.</p></header>
+   <div class="stats"><div class="stat hi"><b>${D}</b><span>decimales aprendidos</span></div><div class="stat"><b>${S}</b><span>decimales seguros (3 aciertos)</span></div><div class="stat"><b>${best}</b><span>mejor recitado seguido</span></div></div>
    <div class="grid">
-     <button class="act main" id="learn"><span class="demo">+ ${grp(nextG)}</span><h3>Aprender ${L?'el siguiente grupo':'el primer grupo'}</h3><p>Lo ves, lo tapas y lo escribes de memoria. Solo avanzas cuando lo aciertas.</p></button>
-     <button class="act" id="links" ${L<2?'disabled':''}><span class="demo">${L>=2?grp(0)+' → ?':'· · ·'}</span><h3>Enlazar</h3><p>${L>=2?'Te enseño un grupo y escribes el siguiente. Así se une la cadena.':'Aprende al menos 2 grupos para desbloquearlo.'}</p></button>
-     <button class="act" id="recite" ${L<1?'disabled':''}><span class="demo">3,…</span><h3>Recitar</h3><p>Escribe todos los decimales que sepas desde el principio, como en el concurso.</p></button>
+     <button class="act main" id="learn" ${D>=DIG.length?'disabled':''}><span class="demo">+ ${DIG.slice(D,D+nextLen)}</span><h3>Aprender ${n?'el siguiente tramo':'el primer tramo'}</h3><p>Eliges la longitud, lo ves, lo tapas y lo escribes de memoria. Solo avanzas cuando lo aciertas.</p></button>
+     <button class="act" id="links" ${n<2?'disabled':''}><span class="demo">${n>=2?piece(0)+' → ?':'· · ·'}</span><h3>Enlazar</h3><p>${n>=2?'Te enseño un tramo y escribes el siguiente.':'Aprende al menos dos tramos para desbloquearlo.'}</p></button>
+     <button class="act" id="recite" ${n<1?'disabled':''}><span class="demo">3,…</span><h3>Recitar</h3><p>Escribe todos los decimales que sepas desde el principio, como en el concurso.</p></button>
    </div>
-   <h2 class="sec">Mi mapa</h2><div class="map">${cells.join('')}</div>
-   <div class="legend"><span><i></i>sin aprender</span><span><i class="l"></i>aprendiendo</span><span><i class="s"></i>seguro</span></div>
-   <h2 class="sec">Ajustes</h2>
-   <label class="opt">Decimales por grupo: <select id="size">${[4,5,6,7,8,10].map(n=>`<option ${n===g?'selected':''}>${n}</option>`).join('')}</select> <span>(el progreso se guarda por separado para cada tamaño)</span></label>`;
-  $('#learn').onclick=learn; $('#links').onclick=links; $('#recite').onclick=recite;
-  $('#size').onchange=e=>{ DB.size=+e.target.value; save(); home(); };
+   <h2 class="sec">Mis tramos</h2>
+   <div class="pcs">3,${chips || ' <span class="hint" style="color:var(--muted)">aún ninguno</span>'}</div>
+   <div class="legend"><span><i class="l"></i>aprendiendo</span><span><i class="s"></i>seguro</span></div>
+   <div id="edit"></div>`;
+  $('#learn').onclick=()=>learn(); $('#links').onclick=links; $('#recite').onclick=recite;
+  document.querySelectorAll('.pc').forEach(b=>b.onclick=()=>{ selPiece = selPiece===+b.dataset.k ? null : +b.dataset.k; home(); });
+  if(selPiece!==null){ const k=selPiece;
+    $('#edit').innerHTML=`<div class="card" style="margin-top:12px;display:grid;gap:8px"><span>Tramo ${k+1}: <strong style="font-family:var(--mono)">${piece(k)}</strong></span>
+      <button class="btn" id="cut">Olvidar este tramo${k<n-1?' y los siguientes':''} y volver a elegir</button></div>`;
+    $('#cut').onclick=()=>{ if(!confirm('¿Borrar del tramo '+(k+1)+' en adelante? Podrás volver a aprenderlos con otras longitudes.')) return; DB.segs=DB.segs.slice(0,k); selPiece=null; save(); home(); };
+  }
   scrollTo(0,0);
 }
 
@@ -116,77 +137,80 @@ function digitInput(host, len, onSubmit){
   host.innerHTML = `<input class="inp" id="in" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="${len}" aria-label="Escribe los dígitos"><button class="btn primary" id="chk">Comprobar</button>`;
   const inp=$('#in',host); inp.focus({preventScroll:true});
   inp.oninput=()=>{ inp.value=onlyDigits(inp.value).slice(0,len); inp.classList.remove('no'); };
-  const go=()=>{ if(inp.value.length<len){ inp.classList.add('no'); return {short:true,inp}; } return null; };
   const submit=()=>{ if(inp.value.length<len){ onSubmit(null,inp); return; } onSubmit(inp.value,inp); };
   $('#chk',host).onclick=submit; inp.onkeydown=e=>{ if(e.key==='Enter') submit(); };
   return inp;
 }
+const inputRow = id => `<div id="${id}" class="row" style="width:100%;flex-direction:column;align-items:center"></div>`;
 
-/* ---------- learn a new group ---------- */
+/* ---------- learn a new piece, of a length the learner picks ---------- */
 function learn(){
-  const g=learned(); if(g>=nGroups()){ home(); return; }
-  const prev = g>0 ? grp(g-1) : '', cur = grp(g);
-  let phase='show';
-  const shell = () => { $('#app').innerHTML=`<div class="top"><button class="link" id="back">← Inicio</button><span class="eyebrow">Grupo ${g+1} · decimales ${g*G()+1}–${(g+1)*G()}</span></div><div class="panel" id="pn"></div><div class="fb" id="fb"></div>`; $('#back').onclick=home; };
-  shell();
-  const pn=$('#pn'), fb=()=>$('#fb');
-  const say=(t,c)=>{ fb().className='fb '+c; fb().textContent=t; };
+  const k=DB.segs.length, D=digits(); if(D>=DIG.length){ home(); return; }
+  const prev = k>0 ? piece(k-1) : '';
+  const room = Math.min(MAXLEN, DIG.length-D);
+  let L = Math.min(DB.last||5, room), cur = DIG.slice(D, D+L);
+  $('#app').innerHTML=`<div class="top"><button class="link" id="back">← Inicio</button><span class="eyebrow">Tramo ${k+1} · desde el decimal ${D+1}</span></div><div class="panel" id="pn"></div><div class="fb" id="fb"></div>`;
+  $('#back').onclick=home;
+  const pn=$('#pn'), say=(t,c)=>{ $('#fb').className='fb '+c; $('#fb').textContent=t; };
+  const reset=()=>{ $('#fb').className='fb'; $('#fb').textContent=''; };
   function show(){
-    fb().className='fb'; fb().textContent='';
-    pn.innerHTML=`<div class="cue"><small>${g?'Viene después de':'Empieza así'}</small><div class="digits dim">${g?fmt(prev):'3,'}</div></div>
-      <div class="cue"><small>Grupo nuevo</small><div class="digits hl">${fmt(cur)}</div></div>
-      <p class="clue">Dilo en voz alta tres veces, con ritmo (${fmt(cur)}). Cuando creas que lo tienes, tápalo.</p>
+    reset(); cur = DIG.slice(D, D+L);
+    pn.innerHTML=`<div class="cue"><small>¿Cuántos dígitos quieres en este tramo?</small><div class="lens" id="lens">${[...Array(room).keys()].map(i=>`<button class="len ${i+1===L?'on':''}" data-n="${i+1}">${i+1}</button>`).join('')}</div></div>
+      <div class="cue"><small>${k?'Viene después de':'Empieza así'}</small><div class="digits dim">${k?prev:'3,'}</div></div>
+      <div class="cue"><small>Tramo nuevo</small><div class="digits hl">${cur}</div></div>
+      <p class="clue">Dilo en voz alta tres veces, con ritmo. Cuando creas que lo tienes, tápalo.</p>
       <button class="btn primary" id="cover">Lo tengo, taparlo</button>`;
+    document.querySelectorAll('.len').forEach(b=>b.onclick=()=>{ L=+b.dataset.n; show(); });
     $('#cover').onclick=typeNew;
   }
   function typeNew(){
-    pn.innerHTML=`<div class="cue"><small>${g?'Viene después de':'Empieza así'}</small><div class="digits dim">${g?fmt(prev):'3,'}</div></div><p class="clue">Escribe el grupo de ${G()} dígitos de memoria.</p><div id="ib" class="row" style="width:100%"></div>`;
-    digitInput($('#ib'), G(), (v,inp)=>{
-      if(v===null){ say('Faltan dígitos: son '+G()+'.','bad'); return; }
-      if(v===cur){ inp.classList.add('ok'); inp.disabled=true; say('¡Bien!','good'); setTimeout(()=>g?typeBoth():finish(),600); }
+    pn.innerHTML=`<div class="cue"><small>${k?'Viene después de':'Empieza así'}</small><div class="digits dim">${k?prev:'3,'}</div></div><p class="clue">Escribe el tramo de ${L} dígito${L>1?'s':''} de memoria.</p>${inputRow('ib')}`;
+    digitInput($('#ib'), L, (v,inp)=>{
+      if(v===null){ say('Faltan dígitos: son '+L+'.','bad'); return; }
+      if(v===cur){ inp.classList.add('ok'); inp.disabled=true; say('¡Bien!','good'); setTimeout(()=>k?typeBoth():finish(),600); }
       else { inp.classList.add('no'); inp.disabled=true; say('Casi. Era '+cur+'. Míralo otra vez.','bad'); setTimeout(show,1800); }
     });
   }
   function typeBoth(){
-    fb().className='fb'; fb().textContent='';
-    pn.innerHTML=`<p class="clue">Ahora los dos grupos seguidos, sin ver nada.</p><div class="cue"><small>Empieza por el grupo anterior</small><div class="digits dim">···</div></div><div id="ib" class="row" style="width:100%"></div>`;
-    digitInput($('#ib'), G()*2, (v,inp)=>{
-      if(v===null){ say('Faltan dígitos: son '+(G()*2)+'.','bad'); return; }
+    reset();
+    pn.innerHTML=`<p class="clue">Ahora los dos tramos seguidos, sin ver nada.</p><div class="cue"><small>Empieza por el tramo anterior</small><div class="digits dim">···</div></div>${inputRow('ib')}`;
+    digitInput($('#ib'), prev.length+L, (v,inp)=>{
+      if(v===null){ say('Faltan dígitos: son '+(prev.length+L)+'.','bad'); return; }
       if(v===prev+cur){ inp.classList.add('ok'); inp.disabled=true; say('¡Enlazados!','good'); setTimeout(finish,600); }
       else { inp.classList.add('no'); inp.disabled=true; say('Casi. Era '+prev+' '+cur+'. Vuelve a mirarlo.','bad'); setTimeout(show,2200); }
     });
   }
   function finish(){
-    bump(g,true);
-    pn.innerHTML=`<div class="big">¡Grupo ${g+1}!</div><div class="digits hl">${fmt(cur)}</div><p class="clue">Ya sabes ${(g+1)*G()} decimales. Mañana repásalo con Enlazar para que se quede.</p>
-      <div class="row"><button class="btn primary" id="more">Siguiente grupo</button><button class="btn" id="stop">Terminar</button></div>`;
-    $('#more').onclick=learn; $('#stop').onclick=home; fb().className='fb'; fb().textContent='';
+    DB.segs.push(L); DB.last=L; bump(k,true);
+    pn.innerHTML=`<div class="big">¡Tramo ${k+1}!</div><div class="digits hl">${cur}</div><p class="clue">Ya sabes ${digits()} decimales. Mañana repásalo con Enlazar para que se quede.</p>
+      <div class="row"><button class="btn primary" id="more">Siguiente tramo</button><button class="btn" id="stop">Terminar</button></div>`;
+    $('#more').onclick=learn; $('#stop').onclick=home; reset();
   }
   show();
 }
 
-/* ---------- links: given a group, type the next one ---------- */
+/* ---------- links: given a piece, type the next one ---------- */
 function links(){
-  const L=learned(); if(L<2){ home(); return; }
-  const N=10, now=Date.now(); let n=0, pts=0; const missed=new Set();
-  const weight=i=>{ const r=rec(i); const age=(now-(r.t||0))/864e5; return (r.s<SOLID?3:1)+Math.min(age,10); };
-  const pick=()=>{ const idx=[...Array(L-1).keys()].map(i=>i+1); const tot=idx.reduce((a,i)=>a+weight(i),0); let x=Math.random()*tot; for(const i of idx){ x-=weight(i); if(x<=0) return i; } return idx[0]; };
+  const n=DB.segs.length; if(n<2){ home(); return; }
+  const N=10, now=Date.now(); let q=0, pts=0; const missed=new Set();
+  const weight=j=>{ const r=rec(j)||{s:0,t:0}; const age=(now-(r.t||0))/864e5; return (r.s<SOLID?3:1)+Math.min(age,10); };
+  const pick=()=>{ const idx=[...Array(n-1).keys()].map(i=>i+1); const tot=idx.reduce((a,i)=>a+weight(i),0); let x=Math.random()*tot; for(const i of idx){ x-=weight(i); if(x<=0) return i; } return idx[0]; };
   function ask(){
-    const j=pick(), cue=grp(j-1), ans=grp(j);
-    $('#app').innerHTML=`<div class="top"><button class="link" id="back">← Parar</button><span class="eyebrow">Enlazar · ${n+1} de ${N}</span></div><div class="track"><i style="width:${n/N*100}%"></i></div>
-      <div class="panel"><div class="cue"><small>Decimales ${(j-1)*G()+1}–${j*G()}</small><div class="digits">${fmt(cue)}</div></div><p class="clue">¿Qué grupo viene después?</p><div id="ib" class="row" style="width:100%"></div></div><div class="fb" id="fb"></div>`;
+    const j=pick(), cue=piece(j-1), ans=piece(j), len=ans.length;
+    $('#app').innerHTML=`<div class="top"><button class="link" id="back">← Parar</button><span class="eyebrow">Enlazar · ${q+1} de ${N}</span></div><div class="track"><i style="width:${q/N*100}%"></i></div>
+      <div class="panel"><div class="cue"><small>Decimales ${start(j-1)+1}–${start(j)}</small><div class="digits">${cue}</div></div><p class="clue">¿Qué tramo viene después? (${len} dígito${len>1?'s':''})</p>${inputRow('ib')}<div class="fb" id="fb"></div></div>`;
     $('#back').onclick=home; let tried=0;
-    digitInput($('#ib'), G(), (v,inp)=>{
-      if(v===null){ $('#fb').className='fb bad'; $('#fb').textContent='Faltan dígitos: son '+G()+'.'; return; }
+    digitInput($('#ib'), len, (v,inp)=>{
+      if(v===null){ $('#fb').className='fb bad'; $('#fb').textContent='Faltan dígitos: son '+len+'.'; return; }
       tried++;
       if(v===ans){ inp.classList.add('ok'); inp.disabled=true; if(tried===1){ pts++; bump(j,true);} else { bump(j,false); missed.add(j); } $('#fb').className='fb good'; $('#fb').textContent='¡Sí! '+ans; setTimeout(next,tried===1?700:1400); }
-      else if(tried<2){ inp.classList.add('no'); $('#fb').className='fb bad'; $('#fb').textContent='Casi. Prueba otra vez.'; inp.select(); inp.classList.remove('no'); }
+      else if(tried<2){ $('#fb').className='fb bad'; $('#fb').textContent='Casi. Prueba otra vez.'; inp.select(); }
       else { inp.classList.add('no'); inp.disabled=true; bump(j,false); missed.add(j); $('#fb').className='fb bad'; $('#fb').textContent='Era '+ans+'.'; setTimeout(next,2200); }
     });
   }
-  function next(){ n++; n<N ? ask() : done(); }
+  function next(){ q++; q<N ? ask() : done(); }
   function done(){
-    $('#app').innerHTML=`<div class="panel"><p class="eyebrow">Enlazar</p><div class="big">${pts}/${N}</div><p class="clue">Acertados a la primera.${missed.size?' Para repasar: grupos '+[...missed].map(i=>i+1).sort((a,b)=>a-b).join(', ')+'.':' ¡Todos!'}</p>
+    $('#app').innerHTML=`<div class="panel"><p class="eyebrow">Enlazar</p><div class="big">${pts}/${N}</div><p class="clue">Acertados a la primera.${missed.size?' Para repasar: tramos '+[...missed].map(i=>i+1).sort((a,b)=>a-b).join(', ')+'.':''}</p>
       <div class="row"><button class="btn primary" id="again">Otra ronda</button><button class="btn" id="hm">Inicio</button></div></div>`;
     $('#again').onclick=links; $('#hm').onclick=home;
   }
@@ -196,6 +220,7 @@ function links(){
 /* ---------- recite from the start (competition practice) ---------- */
 function recite(){
   let help = true;
+  const bounds=new Set(); { let s=0; for(const l of DB.segs){ s+=l; bounds.add(s); } for(let i=s+5;i<=DIG.length;i+=5) bounds.add(i); }
   $('#app').innerHTML=`<div class="top"><button class="link" id="back">← Inicio</button><span class="eyebrow">Recitar</span></div>
    <div class="panel"><p class="clue">Escribe los decimales de π desde el principio, sin la parte «3,». Termina cuando no sepas más.</p>
     <label class="toggle"><input type="checkbox" id="helpbox" checked> Marcar los errores mientras escribo (quítalo para ensayar el concurso)</label>
@@ -207,18 +232,18 @@ function recite(){
   const typed=()=>onlyDigits(inp.value).slice(0,DIG.length);
   const firstWrong=t=>{ for(let i=0;i<t.length;i++) if(t[i]!==DIG[i]) return i; return -1; };
   const draw=()=>{ const t=typed(); const w=firstWrong(t); let h='';
-    for(let i=0;i<t.length;i++){ if(i&&i%G()===0) h+='<span class="sp"></span>'; const cls=!help?'n':(w>=0&&i>=w?(i===w?'x':'n'):'g'); h+=`<span class="${cls}">${t[i]}</span>`; }
+    for(let i=0;i<t.length;i++){ if(i&&bounds.has(i)) h+=gap; const cls=!help?'n':(w>=0&&i>=w?(i===w?'x':'n'):'g'); h+=`<span class="${cls}">${t[i]}</span>`; }
     live.innerHTML = h || '<span style="color:var(--muted)">3,</span>'; };
   inp.oninput=()=>{ inp.value=typed(); draw(); }; $('#helpbox').onchange=e=>{ help=e.target.checked; draw(); }; draw();
   $('#end').onclick=()=>{
     const t=typed(), w=firstWrong(t), run = w<0 ? t.length : w;
-    const b=bucket(); if(run>(b.best||0)) b.best=run;
-    // the group that holds the first mistake loses its streak; groups typed fully before it count as a pass
-    for(let i=0;i<Math.floor(run/G());i++) if(rec(i)&&rec(i).seen) bump(i,true);
-    if(w>=0){ const gi=Math.floor(w/G()); if(rec(gi)&&rec(gi).seen) bump(gi,false); }
+    if(run>(DB.best||0)) DB.best=run;
+    // pieces typed completely before the first mistake count as a pass; the piece holding the mistake loses its streak
+    DB.segs.forEach((l,k)=>{ if(start(k)+l<=run) bump(k,true); else if(w>=0 && start(k)<=w && w<start(k)+l) bump(k,false); });
     save();
-    const wrongInfo = w>=0 ? `<p class="clue">El primer error está en el decimal <strong>${w+1}</strong> (grupo ${Math.floor(w/G())+1}): escribiste <strong>${t[w]}</strong> y era <strong>${DIG[w]}</strong>.</p><div class="cue"><small>Así es ese grupo</small><div class="digits hl">${fmt(grp(Math.floor(w/G())))}</div></div>` : (t.length?'<p class="clue">¡Sin ningún error!</p>':'<p class="clue">No escribiste nada.</p>');
-    $('#app').innerHTML=`<div class="panel"><p class="eyebrow">Recitar</p><div class="big">${run}</div><p class="clue">decimales seguidos sin fallar ${run>=(b.best||0)&&run>0?'· ¡tu mejor marca!':'(mejor: '+b.best+')'}</p>${wrongInfo}
+    const pk = w>=0 ? DB.segs.findIndex((l,k)=>start(k)<=w && w<start(k)+l) : -1;
+    const wrongInfo = w>=0 ? `<p class="clue">El primer error está en el decimal <strong>${w+1}</strong>${pk>=0?` (tramo ${pk+1}: <strong>${piece(pk)}</strong>)`:''}: escribiste <strong>${t[w]}</strong> y era <strong>${DIG[w]}</strong>.</p>` : '';
+    $('#app').innerHTML=`<div class="panel"><p class="eyebrow">Recitar</p><div class="big">${run}</div><p class="clue">decimales seguidos sin fallar ${run>=(DB.best||0)&&run>0?'· ¡tu mejor marca!':'(mejor: '+DB.best+')'}</p>${wrongInfo}
       <div class="row"><button class="btn primary" id="again">Otra vez</button><button class="btn" id="hm">Inicio</button></div></div>`;
     $('#again').onclick=recite; $('#hm').onclick=home;
   };
