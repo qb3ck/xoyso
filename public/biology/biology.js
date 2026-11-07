@@ -19,7 +19,7 @@ const ACTS = {
   cloze: { name: 'Complete the notes', icon: '…', blurb: 'Fill the gaps with the right words.' },
   riddles: { name: 'Who am I?', icon: '?', blurb: 'Fewer clues means more points.' },
   order: { name: 'Put in order', icon: '1·2·3', blurb: 'Steps of reproduction in the right order.' },
-  vocab: { name: 'Vocabulary', icon: 'Aa', blurb: 'Terms, meanings and Spanish.' },
+  vocab: { name: 'Vocabulary', icon: 'Aa', blurb: 'Key terms and what they mean.' },
   exam: { name: 'Final exam', icon: '★', blurb: 'A mixed test. Your best score is saved.' },
 };
 
@@ -79,8 +79,9 @@ function quiz(act, qs) {
 const catName = (id) => U.categories.find((c) => c.id === id).name;
 const sortQ = (n) => sample(U.sort, n).map(([t, c]) => ({ prompt: `Which group? <br><span style="font-family:var(--body);font-weight:800">${esc(t)}</span>`, opts: U.categories.map((x) => x.name), answer: catName(c) }));
 const vocabQ = (n) => sample(U.vocab, n).map(([en, def, es], k) => {
+  const hasEs = es !== undefined; // Spanish column is optional per unit
   const others = (idx) => shuffle(U.vocab.filter((v) => v[0] !== en)).slice(0, 3).map((v) => v[idx]);
-  const mode = k % 3;
+  const mode = k % (hasEs ? 3 : 2);
   if (mode === 0) return { prompt: `Which term means: <em>${esc(def)}</em>?`, opts: shuffle([en, ...others(0)]), answer: en };
   if (mode === 1) return { prompt: `What does <b>${esc(en)}</b> mean?`, opts: shuffle([def, ...others(1)]), answer: def };
   return { prompt: `Spanish for <b>${esc(en)}</b>?`, opts: shuffle([es, ...others(2)]), answer: es };
