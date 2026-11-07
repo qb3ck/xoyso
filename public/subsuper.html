@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sub and Super Workshop</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Layout: one column workshop. Orange = re- (again), teal = inter- (between), used the same way on every screen. */
+:root{
+  --bg:#eef4f8; --card:#ffffff; --ink:#13233f; --muted:#56677f; --line:#d3dfeb;
+  --re:#d9480f; --re-soft:#ffe9dc;
+  --inter:#0a7c86; --inter-soft:#d8f1f3;
+  --good:#1b7f45; --good-soft:#dcf5e5;
+  --bad:#c2362b; --bad-soft:#fde4e1;
+  --display:'Fredoka','Trebuchet MS',system-ui,sans-serif;
+  --body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1829; --card:#172540; --ink:#e8eefb; --muted:#9db0cf; --line:#2a3b59;
+  --re:#ff9a5c; --re-soft:#3a2416; --inter:#4fd1d9; --inter-soft:#0f3a42;
+  --good:#4cd98a; --good-soft:#12382a; --bad:#ff8a80; --bad-soft:#3d1a1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1829; --card:#172540; --ink:#e8eefb; --muted:#9db0cf; --line:#2a3b59;
+  --re:#ff9a5c; --re-soft:#3a2416; --inter:#4fd1d9; --inter-soft:#0f3a42;
+  --good:#4cd98a; --good-soft:#12382a; --bad:#ff8a80; --bad-soft:#3d1a1a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;margin:0;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#app{max-width:880px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance;line-height:1.1}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--inter);outline-offset:2px}
+.pre.re,.chip.re{color:var(--re)} .pre.inter,.chip.inter{color:var(--inter)}
+.pre{font-weight:800}
+
+/* home */
+.hero{display:grid;gap:16px;margin-bottom:28px}
+.hero h1{font-size:clamp(2.2rem,7vw,3.4rem)}
+.hero p{margin:0;color:var(--muted);max-width:56ch}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.key{border-radius:18px;padding:16px 18px;border:2px solid;display:grid;gap:4px}
+.key.re{background:var(--re-soft);border-color:var(--re)} .key.inter{background:var(--inter-soft);border-color:var(--inter)}
+.key b{font-family:var(--display);font-size:2rem;font-weight:600}
+.key.re b{color:var(--re)} .key.inter b{color:var(--inter)}
+.key span{color:var(--ink)}
+.sec{font-family:var(--display);font-size:1.25rem;margin:26px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.act{text-align:left;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px 18px;display:grid;gap:6px;min-width:0;transition:transform .12s,border-color .12s}
+.act:hover{transform:translateY(-2px);border-color:var(--ink)}
+.act .demo{font-family:var(--display);font-size:1.7rem;font-weight:600;letter-spacing:.02em;min-height:2.2rem;overflow-wrap:anywhere}
+.act h3{font-size:1.15rem} .act p{margin:0;color:var(--muted);font-size:.95rem}
+.act .stars{font-size:1.1rem;letter-spacing:.15em;color:var(--re);min-height:1.4rem}
+.act .stars i{font-style:normal;color:var(--line)}
+.act .stars i.on{color:var(--re)}
+.act.wide{border-style:dashed}
+
+/* learn */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.link{background:none;border:0;padding:8px 4px;font-weight:800;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.words{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.wc{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;gap:4px;min-width:0}
+.wc .w{font-family:var(--display);font-size:1.6rem;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wc .sum{color:var(--muted);font-size:.9rem;font-weight:700}
+.wc p{margin:0}
+.say{flex:none;width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center}
+.say:hover{border-color:var(--ink)} .say svg{width:22px;height:22px;fill:var(--ink)}
+
+/* play */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.count{font-weight:800;color:var(--muted)}
+.track{height:10px;border-radius:99px;background:var(--line);margin:6px 0 18px;overflow:hidden}
+.track i{display:block;height:100%;background:var(--inter);border-radius:99px;transition:width .25s}
+.qcard{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:clamp(16px,4vw,28px);display:grid;gap:16px;justify-items:center;text-align:center}
+.eyebrow{margin:0;font-weight:800;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.big{font-family:var(--display);font-size:clamp(2.4rem,10vw,4rem);font-weight:600;overflow-wrap:anywhere;line-height:1.1}
+.gap{display:inline-block;min-width:1.4em;border-bottom:4px solid var(--ink);color:var(--muted);margin-right:.08em}
+.clue{margin:0;color:var(--muted);max-width:44ch}
+.clue b{color:var(--ink)}
+.sent{font-size:1.25rem;font-weight:700;max-width:34ch;margin:0}
+.blank{display:inline-block;min-width:4.5em;border-bottom:3px solid var(--ink)}
+.opts{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;width:100%}
+.opt{min-height:56px;padding:10px 22px;border-radius:16px;border:2px solid var(--line);background:var(--bg);font-family:var(--display);font-size:1.5rem;font-weight:500;min-width:130px}
+.opt.re{color:var(--re);border-color:var(--re);background:var(--re-soft)}
+.opt.inter{color:var(--inter);border-color:var(--inter);background:var(--inter-soft)}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.opt:disabled{cursor:default}
+.build{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;font-family:var(--display);font-size:clamp(1.8rem,7vw,2.6rem);font-weight:600}
+.chip{padding:2px 16px;border-radius:14px;background:var(--bg);border:2px solid var(--line)}
+.chip.re{border-color:var(--re);background:var(--re-soft)} .chip.inter{border-color:var(--inter);background:var(--inter-soft)}
+.txt{width:min(100%,420px);font:600 1.6rem var(--display);text-align:center;padding:10px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);letter-spacing:.03em}
+.txt.ok{border-color:var(--good);background:var(--good-soft)} .txt.no{border-color:var(--bad);background:var(--bad-soft)}
+.boxes{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.lb{width:clamp(22px,7.2vw,42px);height:clamp(36px,10vw,54px);padding:0;text-align:center;font:600 clamp(1.1rem,4.6vw,1.7rem) var(--display);border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.lb.fixed{background:var(--card);border-color:transparent;color:var(--ink)}
+.lb.ok{border-color:var(--good);background:var(--good-soft)} .lb.no{border-color:var(--bad);background:var(--bad-soft)}
+.slots,.pool{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.slot,.tile{width:clamp(26px,7.4vw,44px);height:clamp(38px,10vw,54px);border-radius:10px;font:600 clamp(1.1rem,4.6vw,1.7rem) var(--display);display:grid;place-items:center;padding:0}
+.slot{border:2px dashed var(--line);background:var(--bg);color:var(--ink)}
+.slot.full{border-style:solid;border-color:var(--ink)}
+.slot.ok{border-color:var(--good);background:var(--good-soft);border-style:solid} .slot.no{border-color:var(--bad);background:var(--bad-soft);border-style:solid}
+.tile{border:2px solid var(--inter);background:var(--inter-soft);color:var(--inter)}
+.tile:disabled{opacity:.25;cursor:default}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}.act,.track i{transition:none}}
+.btn{min-height:50px;padding:10px 26px;border-radius:14px;border:2px solid var(--ink);background:var(--card);font-weight:800}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn:disabled{opacity:.4;cursor:default}
+.hear{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.hear .btn{display:inline-flex;align-items:center;gap:8px}
+.hear svg{width:22px;height:22px;fill:currentColor}
+.fb{min-height:3.2rem;margin:14px 0 0;text-align:center;font-weight:800;font-size:1.1rem;padding:8px 14px;border-radius:14px}
+.fb.good{background:var(--good-soft);color:var(--good)} .fb.bad{background:var(--bad-soft);color:var(--bad)}
+.actions{display:flex;justify-content:center;margin-top:12px;min-height:54px}
+
+/* result */
+.res{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,32px);display:grid;gap:14px;justify-items:center;text-align:center}
+.res .score{font-family:var(--display);font-size:clamp(3rem,14vw,5rem);font-weight:600;line-height:1}
+.res .stars{font-size:2.4rem;letter-spacing:.2em;color:var(--line)} .res .stars .on{color:var(--re)}
+.again{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-family:var(--display);font-size:1.4rem;font-weight:600}
+.again span{padding:2px 12px;border-radius:12px;background:var(--bg);border:2px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+</style>
+</head><body>
+
+<div id="app"></div>
+
+<script>
+const WORDS = [
+ {w:"market",pre:"super",full:"supermarket",root:'',mean:"a place where people buy and sell things",sent:"We bought fresh fruit at the ___ on Saturday.",bad:["markit", "marcet"]},
+ {w:"star",pre:"super",full:"superstar",root:'',mean:"a bright light in the night sky, or a famous person",sent:"I made a wish on the first ___ of the night.",bad:["starr", "stor"]},
+ {w:"human",pre:"super",full:"superhuman",root:'',mean:"a person",sent:"Every ___ needs food, water and sleep.",bad:["humun", "humen"]},
+ {w:"store",pre:"super",full:"superstore",root:'',mean:"a shop",sent:"Mum went to the ___ to buy some milk.",bad:["stor", "stoar"]},
+ {w:"size",pre:"super",full:"supersize",root:'',mean:"how big or small something is",sent:"What ___ shoes do you wear?",bad:["sise", "syze"]},
+ {w:"man",pre:"super",full:"superman",root:'',mean:"a grown-up male person",sent:"The ___ walked his dog in the park.",bad:["mann", "mon"]},
+ {w:"woman",pre:"super",full:"superwoman",root:'',mean:"a grown-up female person",sent:"The ___ read a book on the train.",bad:["womman", "wuman"]},
+ {w:"vision",pre:"super",full:"supervision",root:'',mean:"the power to see; sight",sent:"Glasses help my ___ so I can see the board.",bad:["vishion", "vission"]},
+ {w:"marine",pre:"sub",full:"submarine",root:'',mean:"to do with the sea",sent:"A dolphin is a ___ animal because it lives in the sea.",bad:["mareen", "marin"]},
+ {w:"way",pre:"sub",full:"subway",root:'',mean:"a road or path you follow",sent:"Which ___ is the school, left or right?",bad:["wai", "whay"]},
+ {w:"tract",pre:"sub",full:"subtract",root:'',mean:"to pull; it is also a large area of land",sent:"The farmer owns a large ___ of land.",bad:["trackt", "trac"]},
+ {w:"scribe",pre:"sub",full:"subscribe",root:'',mean:"to write; it is also a person who copied books by hand",sent:"The ___ copied the book by hand.",bad:["scribb", "skribe"]},
+ {w:"title",pre:"sub",full:"subtitle",root:'',mean:"the name of a book, film or song",sent:"The ___ of my book is Magic Rain.",bad:["tital", "titel"]},
+ {w:"heading",pre:"sub",full:"subheading",root:'',mean:"words written at the top of a part of a text",sent:"Put a ___ at the top of the page.",bad:["hedding", "headding"]},
+ {w:"section",pre:"sub",full:"subsection",root:'',mean:"a part of something",sent:"I read the first ___ of the story.",bad:["secsion", "sektion"]},
+ {w:"merge",pre:"sub",full:"submerge",root:'',mean:"to join together and become one",sent:"The two rivers ___ and become one big river.",bad:["mirge", "murge"]}
+];
+const ACTS = [
+ {id:'anagram',t:'Word scramble',d:'Tap the letters in the right order.',demo:'k · r · a · m · e · t',n:8},
+ {id:'missing',t:'Missing letters',d:'Fill in the letters that are hidden.',demo:'m_rk_t',n:8},
+ {id:'listen',t:'Listen and spell',d:'Hear the word part, then type it.',demo:'“market”',n:8},
+ {id:'spell',t:'Spot the spelling',d:'Pick the one spelt correctly.',demo:'markit ✕ market ✓',n:8},
+ {id:'mixed',t:'Mixed challenge',d:'Twelve questions, every kind.',demo:'? ? ? ?',n:12}
+];
+const KINDS = ['anagram','missing','listen','spell'];
+const byW = Object.fromEntries(WORDS.map(x=>[x.w,x]));
+const $ = (s,r=document)=>r.querySelector(s);
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+const pc = p => p==='sub' ? 're' : 'inter';   // reuse the two colours
+const colored = w => w;
+const HEAR = `<button class="btn" data-hear="word">${'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>'}Hear the word</button>`;
+const HEAR_SENT = HEAR.replace('data-hear="word"','data-hear="sentence"').replace('Hear the word','Hear the sentence');
+const SPEAKER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 4V5L7 9H3zm13.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+
+/* storage (best stars per activity) */
+const store = { get(){ try{ return JSON.parse(localStorage.getItem('subsuper-workshop')||'{}'); }catch(e){ return {}; } },
+  set(o){ try{ localStorage.setItem('subsuper-workshop', JSON.stringify(o)); }catch(e){} } };
+
+/* speech */
+const canSpeak = true;   // recorded clips (with a browser-voice fallback)
+let clip = null;
+function playClip(name, fallbackText){   // recorded British voice first; browser voice if the file will not play
+  try{
+    if(clip){ clip.pause(); }
+    clip = new Audio(`/audio/${name}.mp3`);
+    clip.addEventListener('error', ()=>speak(fallbackText), {once:true});
+    const r = clip.play(); if(r && r.catch) r.catch(()=>speak(fallbackText));
+  }catch(e){ speak(fallbackText); }
+}
+const sayWord = w => playClip('ss-'+w, w);
+const saySentence = w => playClip('ss-'+w+'-sentence', byW[w].sent.replace('___', w));
+function speak(text){
+  if(!canSpeak) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang='en-GB'; u.rate=.8;
+    const v = speechSynthesis.getVoices().find(v=>/en[-_]GB/i.test(v.lang)); if(v) u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* per-word memory: right first time (ok), missed (bad), current streak of first-time-right (s).
+   Kept on the device, and when signed in at xoyso also saved to the account (the progress table, item ids 'spell:<word>').
+   Stored as {owner: username|null, d: {word: stats}, q: [answers waiting to be sent]}. */
+const WSKEY = 'subsuper-words';
+function wsLoad(){ try{ const o=JSON.parse(localStorage.getItem(WSKEY)||'{}'); if(o && o.d && 'owner' in o) return {owner:o.owner, d:o.d, q:o.q||[]}; return {owner:null, d:o||{}, q:[]}; }catch(e){ return {owner:null,d:{},q:[]}; } }
+function wsSave(W){ try{ localStorage.setItem(WSKEY, JSON.stringify(W)); }catch(e){} }
+const WS = { get(){ return wsLoad().d; }, set(d){ const W=wsLoad(); W.d=d; wsSave(W); } };
+const session = () => { try{ const o=JSON.parse(localStorage.getItem('geo.session')); return o && o.token ? o : null; }catch(e){ return null; } };
+let CFG = null;
+async function rpc(fn, args){
+  CFG = CFG || await import('/config.js');
+  const res = await fetch(`${CFG.SUPABASE_URL}/rest/v1/rpc/${fn}`, {method:'POST', headers:{apikey:CFG.SUPABASE_KEY,'Content-Type':'application/json'}, body:JSON.stringify(args)});
+  const text = await res.text(), data = text ? JSON.parse(text) : null;
+  if(!res.ok) throw Object.assign(new Error((data&&data.message)||'error'), {code:data&&data.message});
+  return data;
+}
+function noteWord(w, ok){
+  const W=wsLoad(), r=W.d[w]=W.d[w]||{ok:0,bad:0,s:0,t:0};
+  if(ok){ r.ok++; r.s++; } else { r.bad++; r.s=0; } r.t=Date.now();
+  const u=session(); if(u && W.owner===u.username) W.q.push({id:'subsuper:'+w, c:ok});   // owner null: the start-up sync will upload it
+  wsSave(W); syncFlush();
+}
+let flushing=false;
+async function syncFlush(){
+  const u=session(); if(!u || flushing) return false; flushing=true;
+  try{
+    for(;;){ let W=wsLoad(); if(W.owner!==u.username || !W.q.length) break;
+      await rpc('record_answer',{p_token:u.token,p_item_id:W.q[0].id,p_correct:W.q[0].c});
+      W=wsLoad(); W.q.shift(); wsSave(W); }
+    return true;
+  }catch(e){ return false; }      // offline or signed out: answers stay queued for next time
+  finally{ flushing=false; }
+}
+/* on opening the page: claim local history for the signed-in child (first time only), send anything waiting, then load their account's words */
+async function syncStart(){
+  const u=session(); if(!u) return;
+  try{
+    let W=wsLoad();
+    if(W.owner && W.owner!==u.username) W={owner:null,d:{},q:[]};   // a different child used this device: show only their own words
+    const remote=await rpc('get_progress',{p_token:u.token}), known=new Set(remote.items.filter(i=>i.item_id.startsWith('subsuper:')).map(i=>i.item_id.slice(9)));
+    if(W.owner===null){
+      for(const [w,r] of Object.entries(W.d)){ if(known.has(w) || !byW[w]) continue;
+        const ev=[...Array(Math.min(Math.max(0,r.ok-r.s),15)).fill(true), ...Array(Math.min(r.bad,15)).fill(false), ...Array(Math.min(r.s,15)).fill(true)];   // replays to the same bad count and streak
+        ev.forEach(c=>W.q.push({id:'subsuper:'+w,c})); }
+      W.owner=u.username;
+    }
+    wsSave(W);
+    if(!(await syncFlush())) return;
+    const fresh=await rpc('get_progress',{p_token:u.token}), d={};
+    for(const i of fresh.items){ if(i.item_id.startsWith('subsuper:') && byW[i.item_id.slice(9)]) d[i.item_id.slice(9)]={ok:i.correct,bad:i.wrong,s:i.streak,t:Date.parse(i.last_seen)||0}; }
+    W=wsLoad(); W.d=d; wsSave(W);
+    if(document.querySelector('[data-a]')) home();
+  }catch(e){ /* offline: keep working from this device */ }
+}
+/* how often a word should come up */
+function weight(w, d){ const r=d[w]; if(!r) return 3; const m=Math.min(r.bad,5); return Math.max(.35, (1+2*m) * Math.pow(.6, Math.min(r.s,4))); }
+function weightedPick(n, from=WORDS){
+  const d=WS.get(), pool=[...from], out=[];
+  while(out.length<n && pool.length){
+    const tot=pool.reduce((a,x)=>a+weight(x.w,d),0); let r=Math.random()*tot, k=0;
+    for(;k<pool.length-1;k++){ r-=weight(pool[k].w,d); if(r<=0) break; }
+    out.push(pool.splice(k,1)[0]);
+  }
+  return shuffle(out);
+}
+const pickWords = n => weightedPick(n);
+/* words she still gets wrong (missed at some point and not yet 3 right first time in a row since) */
+function tricky(){ const d=WS.get(); return WORDS.filter(x=>d[x.w] && d[x.w].bad>0 && d[x.w].s<3).sort((p,q)=>(d[q.w].bad-d[p.w].bad)||(d[p.w].s-d[q.w].s)); }
+
+/* ---------- home ---------- */
+function home(){
+  const best = store.get();
+  const stars = id => { const s = best[id]||0; return [1,2,3].map(i=>`<i class="${i<=s?'on':''}">★</i>`).join(''); };
+  $('#app').innerHTML = `
+  <header class="hero">
+    <a class="link" href="/" style="justify-self:start">← xoyso home</a>
+    <h1>Sub and Super Workshop</h1>
+    <p>Words with sub- or super- at the front are made of two parts. <strong>Step 1</strong> is to spell the second part of each word. Step 2, adding the prefixes, comes next.</p>
+    <div class="keys">
+      <div class="key re"><b>sub-</b><span>means <strong>under</strong> or <strong>below</strong></span><span><span class="pre re">sub</span>way, <span class="pre re">sub</span>marine</span></div>
+      <div class="key inter"><b>super-</b><span>means <strong>above</strong> or <strong>extra big</strong></span><span><span class="pre inter">super</span>star, <span class="pre inter">super</span>market</span></div>
+    </div>
+  </header>
+  <h2 class="sec">Step 1: the word parts</h2>
+  <div class="grid"><button class="act wide" id="learn"><span class="demo">16 parts</span><h3>Word book</h3><p>See every part, what it means and the word it belongs to, and hear it read out.</p></button></div>
+  <h2 class="sec">Practise</h2>
+  <div class="grid">${ACTS.map(a=>`<button class="act" data-a="${a.id}"><span class="demo">${a.demo}</span><h3>${a.t}</h3><p>${a.d}</p><span class="stars" aria-label="${best[a.id]||0} of 3 stars">${stars(a.id)}</span></button>`).join('')}</div>`;
+  const hard = tricky();
+  if(hard.length){
+    $('#app').insertAdjacentHTML('beforeend', `<h2 class="sec">My tricky words</h2><p class="clue">These come up more often in the practice games. Get a word right first time three times in a row and it drops off the list.</p>
+      <div class="again">${hard.map(x=>`<span>${colored(x.w)}</span>`).join('')}</div>
+      <div class="row" style="margin-top:12px"><button class="btn primary" id="focus">Practise my tricky words</button></div>`);
+    $('#focus').onclick = ()=>start('mixed', hard);
+  }
+  const me = session();
+  $('#app').insertAdjacentHTML('beforeend', `<p class="clue" style="margin-top:22px">${me ? `Signed in as <strong>${me.username.replace(/[<>&"]/g,'')}</strong>: your tricky words are saved to your account.` : 'Sign in on the <a href="/">xoyso home page</a> to save your tricky words to your account and see them on any device.'}</p>`);
+  $('#learn').onclick = learn;
+  document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>start(b.dataset.a));
+  scrollTo(0,0);
+}
+
+/* ---------- word book ---------- */
+function learn(){
+  const card = x => `<div class="wc"><div class="w"><span>${x.w}</span><button class="say" data-s="${x.w}" aria-label="Hear ${x.w}">${SPEAKER}</button></div><div class="sum"><span class="pre ${pc(x.pre)}">${x.pre}</span> + ${x.w} = ${x.full}</div><p>${x.mean}</p></div>`;
+  $('#app').innerHTML = `<div class="top"><button class="link" id="back">← Home</button></div>
+  <h1 style="margin-bottom:6px">Word book</h1>
+  <p style="color:var(--muted);margin:0 0 4px">Tap the speaker to hear a part.</p>
+  <h2 class="sec"><span class="pre inter">super-</span> words: the second part</h2>
+  <div class="words">${WORDS.filter(x=>x.pre==='super').map(card).join('')}</div>
+  <h2 class="sec"><span class="pre re">sub-</span> words: the second part</h2>
+  <div class="words">${WORDS.filter(x=>x.pre==='sub').map(card).join('')}</div>`;
+  $('#back').onclick = home;
+  document.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>sayWord(b.dataset.s));
+  scrollTo(0,0);
+}
+
+/* ---------- question builders: each returns {retry, reveal} ---------- */
+const BUILD = {
+  prefix(x, h, api){
+    h.innerHTML = `<p class="eyebrow">Pick the prefix</p>
+      <div class="big"><span class="gap" id="g">?</span>${x.root}</div>
+      <p class="clue">The word means <b>${x.mean}</b>.</p>
+      <div class="opts"><button class="opt re" data-v="re">re-</button><button class="opt inter" data-v="inter">inter-</button></div>`;
+    const done = () => { $('#g').outerHTML = `<span class="pre ${x.pre}">${x.pre}</span>`; h.querySelectorAll('.opt').forEach(b=>{b.disabled=true; if(b.dataset.v===x.pre) b.classList.add('ok');}); };
+    h.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if(b.dataset.v===x.pre){ api.attempt(true); } else { b.disabled=true; b.classList.add('no'); api.attempt(false); }
+    });
+    return {retry(){}, reveal:done, correct:done};
+  },
+  build(x, h, api){
+    h.innerHTML = `<p class="eyebrow">Build the word</p>
+      <div class="build"><span class="chip ${x.pre}">${x.pre}</span><span>+</span><span class="chip">${x.root}</span><span>=</span></div>
+      <p class="clue">It means <b>${x.mean}</b>.</p>
+      <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
+      <div class="hear">${HEAR}${HEAR_SENT}</div>
+      <input class="txt" id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the whole word">
+      <button class="btn primary" id="chk">Check</button>`;
+    const inp = $('#in',h); inp.focus({preventScroll:true});
+    const check = () => { const v = inp.value.trim().toLowerCase(); if(!v) return; if(v===x.w){ inp.classList.add('ok'); inp.disabled=true; $('#chk',h).disabled=true; api.attempt(true);} else { inp.classList.add('no'); api.attempt(false); } };
+    $('#chk',h).onclick = check; inp.onkeydown = e=>{ if(e.key==='Enter') check(); }; inp.oninput = ()=>inp.classList.remove('no');
+    return {retry(){ inp.select(); }, reveal(){ inp.value=x.w; inp.disabled=true; inp.classList.add('ok'); $('#chk',h).disabled=true; }};
+  },
+  anagram(x, h, api){
+    let letters, placed = [];
+    do { letters = shuffle(x.w.split('')); } while(letters.join('')===x.w);
+    h.innerHTML = `<p class="eyebrow">Word scramble</p>
+      <p class="clue">Unscramble the letters to make a word that means <b>${x.mean}</b>.</p>
+      <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
+      <div class="hear">${HEAR}${HEAR_SENT}</div>
+      <div class="slots" id="slots"></div><div class="pool" id="pool"></div>
+      <button class="btn" id="clr">Clear</button>`;
+    const slots=$('#slots',h), pool=$('#pool',h);
+    let locked=false;
+    const draw = (cls='') => {
+      slots.innerHTML = x.w.split('').map((_,i)=>`<button class="slot ${placed[i]!==undefined?'full':''} ${cls}" data-i="${i}" aria-label="Letter ${i+1}">${placed[i]!==undefined?letters[placed[i]]:''}</button>`).join('');
+      pool.innerHTML = letters.map((l,i)=>`<button class="tile" data-i="${i}" ${placed.includes(i)||locked?'disabled':''}>${l}</button>`).join('');
+      slots.querySelectorAll('.slot').forEach(s=>s.onclick=()=>{ if(locked) return; const i=+s.dataset.i; if(placed[i]!==undefined){ placed.splice(i,1); draw(); } });
+      pool.querySelectorAll('.tile').forEach(t=>t.onclick=()=>{ if(locked) return; placed.push(+t.dataset.i); draw(); if(placed.length===x.w.length) check(); });
+    };
+    const check = () => { const guess = placed.map(i=>letters[i]).join('');
+      if(guess===x.w){ locked=true; draw('ok'); api.attempt(true); }
+      else { slots.classList.add('shake'); setTimeout(()=>slots.classList.remove('shake'),400); draw('no'); api.attempt(false); } };
+    $('#clr',h).onclick = ()=>{ if(!locked){ placed=[]; draw(); } };
+    draw();
+    return {retry(){ setTimeout(()=>{ placed=[]; draw(); },700); },
+      reveal(){ locked=true; letters=x.w.split(''); placed=letters.map((_,i)=>i); draw('ok'); }};
+  },
+  missing(x, h, api){
+    const n=x.w.length, k=Math.min(n-2, Math.max(2, Math.round(n*.4)));
+    const hide = new Set(shuffle([...Array(n).keys()]).slice(0,k));
+    h.innerHTML = `<p class="eyebrow">Missing letters</p>
+      <p class="clue">Fill in the missing letters. The word means <b>${x.mean}</b>.</p>
+      <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
+      <div class="hear">${HEAR}${HEAR_SENT}</div>
+      <div class="boxes" id="bx">${x.w.split('').map((c,i)=> hide.has(i)
+         ? `<input class="lb" data-i="${i}" maxlength="1" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Missing letter ${i+1}">`
+         : `<input class="lb fixed" value="${c}" readonly tabindex="-1" aria-label="Letter ${i+1}">`).join('')}</div>
+      <button class="btn primary" id="chk">Check</button>`;
+    const inputs = [...h.querySelectorAll('.lb:not(.fixed)')];
+    inputs[0].focus({preventScroll:true});
+    inputs.forEach((el,j)=>{
+      el.oninput = ()=>{ el.value = el.value.replace(/[^a-z]/gi,'').toLowerCase().slice(-1); el.classList.remove('no'); if(el.value && inputs[j+1]) inputs[j+1].focus(); };
+      el.onkeydown = e=>{ if(e.key==='Backspace' && !el.value && inputs[j-1]){ inputs[j-1].focus(); inputs[j-1].value=''; }
+        else if(e.key==='ArrowLeft'&&inputs[j-1]) inputs[j-1].focus(); else if(e.key==='ArrowRight'&&inputs[j+1]) inputs[j+1].focus(); else if(e.key==='Enter') check(); };
+    });
+    const build = () => [...h.querySelectorAll('.lb')].map(e=>e.value||'_').join('');
+    const check = () => { if(inputs.some(e=>!e.value)){ inputs.find(e=>!e.value).focus(); return; }
+      if(build()===x.w){ inputs.forEach(e=>{e.classList.add('ok'); e.readOnly=true;}); $('#chk',h).disabled=true; api.attempt(true); }
+      else { inputs.forEach((e,j)=>{ if(e.value!==x.w[+e.dataset.i]) e.classList.add('no'); }); api.attempt(false); } };
+    $('#chk',h).onclick = check;
+    return {retry(){ const bad = inputs.filter(e=>e.classList.contains('no')); bad.forEach(e=>e.value=''); (bad[0]||inputs[0]).focus(); },
+      reveal(){ inputs.forEach(e=>{ e.value=x.w[+e.dataset.i]; e.classList.remove('no'); e.classList.add('ok'); e.readOnly=true; }); $('#chk',h).disabled=true; }};
+  },
+  listen(x, h, api){
+        h.innerHTML = `<p class="eyebrow">Listen and spell</p>
+      <p class="clue">${canSpeak?'Press the button, listen, then type the word.':'This browser cannot read words aloud, so use the meaning: <b>'+x.mean+'</b>.'}</p>
+      <div class="hear"><button class="btn primary" id="h1">${SPEAKER}Hear the word</button><button class="btn" id="h2">${SPEAKER}In a sentence</button></div>
+      <input class="txt" id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the word you heard">
+      <button class="btn primary" id="chk">Check</button>`;
+    $('#h1',h).onclick = ()=>sayWord(x.w); $('#h2',h).onclick = ()=>saySentence(x.w);
+    if(!canSpeak){ $('.hear',h).hidden = true; }
+    const inp=$('#in',h);
+    setTimeout(()=>sayWord(x.w),250);
+    const check = () => { const v=inp.value.trim().toLowerCase(); if(!v) return; if(v===x.w){ inp.classList.add('ok'); inp.disabled=true; $('#chk',h).disabled=true; api.attempt(true);} else { inp.classList.add('no'); api.attempt(false, `It starts with “${x.w.slice(0,3)}”.`);} };
+    $('#chk',h).onclick=check; inp.onkeydown=e=>{ if(e.key==='Enter') check(); }; inp.oninput=()=>inp.classList.remove('no');
+    return {retry(){ inp.select(); sayWord(x.w); }, reveal(){ inp.value=x.w; inp.disabled=true; inp.classList.add('ok'); $('#chk',h).disabled=true; }};
+  },
+  spell(x, h, api){
+    h.innerHTML = `<p class="eyebrow">Spot the spelling</p>
+      <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
+      <p class="clue">Which spelling is right?</p>
+      <div class="hear">${HEAR}${HEAR_SENT}</div>
+      <div class="opts">${shuffle([x.w,...x.bad]).map(o=>`<button class="opt" data-v="${o}">${o}</button>`).join('')}</div>`;
+    const btns=[...h.querySelectorAll('.opt')];
+    const done = () => { btns.forEach(b=>{ b.disabled=true; if(b.dataset.v===x.w) b.classList.add('ok'); }); };
+    btns.forEach(b=>b.onclick=()=>{ if(b.dataset.v===x.w){ api.attempt(true); } else { b.disabled=true; b.classList.add('no'); api.attempt(false); } });
+    return {retry(){}, reveal:done, correct:done};
+  }
+};
+
+/* ---------- session ---------- */
+let S=null;
+function start(actId, onlyWords){
+  const act = ACTS.find(a=>a.id===actId);
+  const words = onlyWords && onlyWords.length ? weightedPick(act.n, onlyWords) : pickWords(act.n);
+  while(words.length < act.n) words.push(...weightedPick(act.n-words.length, WORDS.filter(x=>!words.includes(x))));
+  const qs = words.map((x,i)=>({x, kind: actId==='mixed' ? KINDS[i%KINDS.length] : actId}));
+  if(actId==='mixed') shuffle(qs);
+  S = {actId, qs, i:0, pts:0, missed:[], tries:0, locked:false, ctl:null};
+  showQ();
+}
+function showQ(){
+  const q=S.qs[S.i]; S.tries=0; S.locked=false;
+  $('#app').innerHTML = `<div class="bar"><button class="link" id="quit">← Stop</button><span class="count">Question ${S.i+1} of ${S.qs.length}</span></div>
+    <div class="track"><i style="width:${S.i/S.qs.length*100}%"></i></div>
+    <section class="qcard" id="qc"></section><div class="fb" id="fb" aria-live="polite"></div>
+    <div class="actions"><button class="btn primary" id="next" hidden>${S.i===S.qs.length-1?'See my score':'Next'}</button></div>`;
+  $('#quit').onclick = home;
+  $('#next').onclick = ()=>{ S.i++; S.i<S.qs.length ? showQ() : finish(); };
+  S.ctl = BUILD[q.kind](q.x, $('#qc'), {attempt});
+  $('#qc').querySelectorAll('[data-hear]').forEach(b=>b.onclick=()=>(b.dataset.hear==='sentence'?saySentence:sayWord)(q.x.w));
+  scrollTo(0,0);
+}
+function attempt(ok, hint=''){
+  if(S.locked) return;
+  const q=S.qs[S.i], fb=$('#fb'); S.tries++;
+  if(S.tries===1) noteWord(q.x.w, ok);   // remember first-try result for this word
+  const lock = () => { S.locked=true; $('#next').hidden=false; $('#next').focus({preventScroll:true}); };
+  if(ok){
+    if(S.tries===1) S.pts++; else S.missed.push(q.x);
+    if(S.ctl.correct) S.ctl.correct();
+    fb.className='fb good'; fb.innerHTML = (S.tries===1?'Perfect! ':'You got it! ') + colored(q.x.w); lock();
+  } else if(S.tries<2){
+    fb.className='fb bad'; fb.textContent = 'Not quite. Have another go. ' + hint; S.ctl.retry();
+  } else {
+    S.missed.push(q.x); fb.className='fb bad'; fb.innerHTML = 'The answer is ' + colored(q.x.w) + '.'; S.ctl.reveal(); lock();
+    setTimeout(()=>{ if(q.kind==='listen') sayWord(q.x.w); }, 200);
+  }
+}
+function finish(){
+  const n=S.qs.length, pct=S.pts/n, stars = pct>=.9?3:pct>=.7?2:pct>=.4?1:0;
+  const b=store.get(); if((b[S.actId]||0)<stars){ b[S.actId]=stars; store.set(b); }
+  const msg = stars===3?'Brilliant spelling!':stars===2?'Great work!':stars===1?'Good start. Try again to beat it.':'Keep practising, you will get there.';
+  const miss = [...new Map(S.missed.map(x=>[x.w,x])).values()];
+  $('#app').innerHTML = `<div class="res"><p class="eyebrow">${ACTS.find(a=>a.id===S.actId).t}</p>
+    <div class="score">${S.pts}/${n}</div>
+    <div class="stars" aria-label="${stars} of 3 stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}">★</span>`).join('')}</div>
+    <h2>${msg}</h2><p class="clue">Points are for words you got right first time.</p>
+    ${miss.length?`<p class="eyebrow">Words to practise</p><div class="again">${miss.map(x=>`<span>${colored(x.w)}</span>`).join('')}</div>`:''}
+    <div class="row"><button class="btn primary" id="rep">Play again</button>${miss.length?'<button class="btn" id="prac">Practise these words</button>':''}<button class="btn" id="hm">Home</button></div></div>`;
+  const id=S.actId; $('#rep').onclick=()=>start(id); $('#hm').onclick=home;
+  if(miss.length) $('#prac').onclick=()=>start(id, miss);
+  scrollTo(0,0);
+}
+if(canSpeak){ try{ speechSynthesis.getVoices(); }catch(e){} }
+home();
+syncStart();
+</script>
+</body></html>

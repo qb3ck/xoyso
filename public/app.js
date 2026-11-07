@@ -544,7 +544,8 @@ function sectionSummary(section) {
 const YEARS = [
   { id: '3prim', title: ['3º Primaria', '3rd Primary'], subjects: [
     { id: 'english', title: ['Inglés', 'English'], blurb: ['Ortografía y vocabulario', 'Spelling and vocabulary'], icon: 'Aa',
-      units: [{ href: '/prefix', title: ['Prefijos re- e inter-', 'Prefixes re- and inter-'], blurb: ['19 palabras: juegos de ortografía.', '19 words: spelling games.'] }] },
+      units: [{ href: '/prefix', title: ['Prefijos re- e inter-', 'Prefixes re- and inter-'], blurb: ['19 palabras: juegos de ortografía.', '19 words: spelling games.'] },
+        { href: '/subsuper', title: ['Sub- y super-', 'Sub- and super-'], blurb: ['Paso 1: la segunda parte de cada palabra.', 'Step 1: the second part of each word.'] }] },
     { id: 'pe', title: ['Educación Física', 'Physical Education'], blurb: ['El cuerpo humano', 'The human body'], icon: 'EF',
       units: [{ href: '/huesos', title: ['Los huesos', 'The bones'], blurb: ['14 huesos del esqueleto: arrastrar, encontrar y escribir.', '14 skeleton bones: drag, find and spell.'] }] }] },
   { id: '1eso', title: ['1º ESO', '1st ESO'], subjects: [
