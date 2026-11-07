@@ -153,7 +153,7 @@ function attachPad(inp, onEnter){
       inp.dispatchEvent(new Event('input',{bubbles:true})); };
     inp.insertAdjacentElement('afterend',pad); last=pad;
   }
-  const t=document.createElement('button'); t.type='button'; t.className='link padtoggle'; t.textContent=on?'Usar el teclado del iPad':'Usar el teclado en pantalla';
+  const t=document.createElement('button'); t.type='button'; t.className='link padtoggle'; t.textContent=on?'Usar el teclado del dispositivo':'Usar el teclado en pantalla';
   t.onclick=()=>{ setKb(!on); attachPad(inp,onEnter); if(on) inp.focus(); else inp.blur(); };
   last.insertAdjacentElement('afterend',t);
 }
