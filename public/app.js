@@ -59,6 +59,7 @@ const ERRORS = {
   wrong_login: ['El nombre y el PIN no coinciden. Inténtalo otra vez.', 'That name and PIN don’t match. Try again.'],
   username_taken: ['Ese nombre ya existe. Elige otro o entra con él.', 'That name is already taken. Pick another, or sign in.'],
   bad_username: ['El nombre puede tener letras, números y _ (de 2 a 20).', 'Names can use letters, numbers and _ (2–20 characters).'],
+  bad_code: ['Ese código no es correcto. Pídeselo a tu familia.', 'That code isn’t right. Ask your family for it.'],
   wrong_pin: ['Ese no es tu PIN actual.', 'That isn’t your current PIN.'],
   bad_pin: ['El PIN tiene que tener de 4 a 6 cifras.', 'The PIN needs to be 4 to 6 digits.'],
   locked: ['Demasiados intentos. Espera 5 minutos.', 'Too many tries. Wait 5 minutes and try again.'],
@@ -442,6 +443,7 @@ function renderLogin(mode = 'signin', message = null) {
   const signin = mode === 'signin';
   const nameInput = h('input', { id: 'username', autocomplete: 'username', autocapitalize: 'none', spellcheck: 'false', maxlength: 20,
     placeholder: L('p. ej. sam', 'e.g. sam'), 'data-ph-es': 'p. ej. sam', 'data-ph-en': 'e.g. sam' });
+  const codeInput = h('input', { id: 'signupcode', inputmode: 'numeric', autocomplete: 'off', maxlength: 12, placeholder: '•••••' });
   const dots = h('div', { class: 'pin-dots', 'aria-label': 'PIN' });
   const err = h('p', { class: 'form-error', role: 'alert' }, message ? tr(message) : '');
   const btnText = signin ? ['Entrar', 'Sign in'] : ['Crear jugador', 'Create player'];
@@ -453,7 +455,7 @@ function renderLogin(mode = 'signin', message = null) {
     h('span'), h('button', { type: 'button', onclick: () => press('0') }, '0'),
     h('button', { type: 'button', 'aria-label': L('Borrar', 'Delete'), onclick: () => press('del') }, '⌫'));
   document.onkeydown = (e) => {
-    if (document.activeElement === nameInput) return;
+    if (document.activeElement === nameInput || document.activeElement === codeInput) return;
     if (/^[0-9]$/.test(e.key)) press(e.key); else if (e.key === 'Backspace') press('del');
   };
   drawDots();
@@ -462,10 +464,11 @@ function renderLogin(mode = 'signin', message = null) {
     e.preventDefault(); err.replaceChildren();
     const username = nameInput.value.trim().toLowerCase();
     if (!username) { fail(['Primero escribe tu nombre.', 'Type your name first.']); nameInput.focus(); return; }
+    if (!signin && !codeInput.value.trim()) { fail(['Escribe el código de registro.', 'Enter the sign-up code.']); codeInput.focus(); return; }
     if (pin.length < 4) { fail(['Escribe un PIN de al menos 4 cifras.', 'Enter a PIN of at least 4 digits.']); return; }
     submit.disabled = true; submit.replaceChildren(tr('Un momento…', 'Just a moment…'));
     try {
-      const res = await api(signin ? 'login_player' : 'register_player', { p_username: username, p_pin: pin });
+      const res = await api(signin ? 'login_player' : 'register_player', signin ? { p_username: username, p_pin: pin } : { p_username: username, p_pin: pin, p_code: codeInput.value.trim() });
       state.session = { token: res.token, username: res.username }; store.set('geo.session', state.session);
       document.onkeydown = null;
       await loadProgress(); flushPending(); renderHome();
@@ -479,6 +482,7 @@ function renderLogin(mode = 'signin', message = null) {
       ? ['Entra para seguir donde lo dejaste.', 'Sign in to carry on where you left off.']
       : ['Elige un nombre y un PIN que recuerdes. Tu progreso se guarda con este nombre.', 'Choose a name and a PIN you’ll remember. Your progress is saved under this name.'])),
     h('label', { for: 'username' }, tr('Tu nombre', 'Your name')), nameInput,
+    ...(signin ? [] : [h('label', { for: 'signupcode' }, tr('Código de registro', 'Sign-up code')), codeInput]),
     h('label', {}, tr(signin ? ['PIN', 'PIN'] : ['Elige un PIN (de 4 a 6 cifras)', 'Choose a PIN (4–6 digits)'])), dots, pad, err, submit,
     h('button', { type: 'button', class: 'link-btn', onclick: () => renderLogin(signin ? 'signup' : 'signin') },
       tr(signin ? ['¿Primera vez? Crea un jugador', 'First time? Create a player'] : ['¿Ya tienes jugador? Entra', 'Already have a player? Sign in'])));
