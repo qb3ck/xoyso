@@ -192,11 +192,61 @@ function speak(text){
   }catch(e){}
 }
 
-/* per-word memory: right first time (ok), missed (bad), current streak of first-time-right (s) */
-const WS = { get(){ try{ return JSON.parse(localStorage.getItem('prefix-words')||'{}'); }catch(e){ return {}; } },
-  set(o){ try{ localStorage.setItem('prefix-words', JSON.stringify(o)); }catch(e){} } };
-function noteWord(w, ok){ const d=WS.get(), r=d[w]=d[w]||{ok:0,bad:0,s:0,t:0}; if(ok){ r.ok++; r.s++; } else { r.bad++; r.s=0; } r.t=Date.now(); WS.set(d); }
-/* how often a word should come up: new words a lot, missed words most, and fading once she gets them right again */
+/* per-word memory: right first time (ok), missed (bad), current streak of first-time-right (s).
+   Kept on the device, and when signed in at xoyso also saved to the account (the progress table, item ids 'spell:<word>').
+   Stored as {owner: username|null, d: {word: stats}, q: [answers waiting to be sent]}. */
+const WSKEY = 'prefix-words';
+function wsLoad(){ try{ const o=JSON.parse(localStorage.getItem(WSKEY)||'{}'); if(o && o.d && 'owner' in o) return {owner:o.owner, d:o.d, q:o.q||[]}; return {owner:null, d:o||{}, q:[]}; }catch(e){ return {owner:null,d:{},q:[]}; } }
+function wsSave(W){ try{ localStorage.setItem(WSKEY, JSON.stringify(W)); }catch(e){} }
+const WS = { get(){ return wsLoad().d; }, set(d){ const W=wsLoad(); W.d=d; wsSave(W); } };
+const session = () => { try{ const o=JSON.parse(localStorage.getItem('geo.session')); return o && o.token ? o : null; }catch(e){ return null; } };
+let CFG = null;
+async function rpc(fn, args){
+  CFG = CFG || await import('/config.js');
+  const res = await fetch(`${CFG.SUPABASE_URL}/rest/v1/rpc/${fn}`, {method:'POST', headers:{apikey:CFG.SUPABASE_KEY,'Content-Type':'application/json'}, body:JSON.stringify(args)});
+  const text = await res.text(), data = text ? JSON.parse(text) : null;
+  if(!res.ok) throw Object.assign(new Error((data&&data.message)||'error'), {code:data&&data.message});
+  return data;
+}
+function noteWord(w, ok){
+  const W=wsLoad(), r=W.d[w]=W.d[w]||{ok:0,bad:0,s:0,t:0};
+  if(ok){ r.ok++; r.s++; } else { r.bad++; r.s=0; } r.t=Date.now();
+  const u=session(); if(u && W.owner===u.username) W.q.push({id:'spell:'+w, c:ok});   // owner null: the start-up sync will upload it
+  wsSave(W); syncFlush();
+}
+let flushing=false;
+async function syncFlush(){
+  const u=session(); if(!u || flushing) return false; flushing=true;
+  try{
+    for(;;){ let W=wsLoad(); if(W.owner!==u.username || !W.q.length) break;
+      await rpc('record_answer',{p_token:u.token,p_item_id:W.q[0].id,p_correct:W.q[0].c});
+      W=wsLoad(); W.q.shift(); wsSave(W); }
+    return true;
+  }catch(e){ return false; }      // offline or signed out: answers stay queued for next time
+  finally{ flushing=false; }
+}
+/* on opening the page: claim local history for the signed-in child (first time only), send anything waiting, then load their account's words */
+async function syncStart(){
+  const u=session(); if(!u) return;
+  try{
+    let W=wsLoad();
+    if(W.owner && W.owner!==u.username) W={owner:null,d:{},q:[]};   // a different child used this device: show only their own words
+    const remote=await rpc('get_progress',{p_token:u.token}), known=new Set(remote.items.filter(i=>i.item_id.startsWith('spell:')).map(i=>i.item_id.slice(6)));
+    if(W.owner===null){
+      for(const [w,r] of Object.entries(W.d)){ if(known.has(w) || !byW[w]) continue;
+        const ev=[...Array(Math.min(Math.max(0,r.ok-r.s),15)).fill(true), ...Array(Math.min(r.bad,15)).fill(false), ...Array(Math.min(r.s,15)).fill(true)];   // replays to the same bad count and streak
+        ev.forEach(c=>W.q.push({id:'spell:'+w,c})); }
+      W.owner=u.username;
+    }
+    wsSave(W);
+    if(!(await syncFlush())) return;
+    const fresh=await rpc('get_progress',{p_token:u.token}), d={};
+    for(const i of fresh.items){ if(i.item_id.startsWith('spell:') && byW[i.item_id.slice(6)]) d[i.item_id.slice(6)]={ok:i.correct,bad:i.wrong,s:i.streak,t:Date.parse(i.last_seen)||0}; }
+    W=wsLoad(); W.d=d; wsSave(W);
+    if(document.querySelector('[data-a]')) home();
+  }catch(e){ /* offline: keep working from this device */ }
+}
+/* how often a word should come up */
 function weight(w, d){ const r=d[w]; if(!r) return 3; const m=Math.min(r.bad,5); return Math.max(.35, (1+2*m) * Math.pow(.6, Math.min(r.s,4))); }
 function weightedPick(n, from=WORDS){
   const d=WS.get(), pool=[...from], out=[];
@@ -236,6 +286,8 @@ function home(){
       <div class="row" style="margin-top:12px"><button class="btn primary" id="focus">Practise my tricky words</button></div>`);
     $('#focus').onclick = ()=>start('mixed', hard);
   }
+  const me = session();
+  $('#app').insertAdjacentHTML('beforeend', `<p class="clue" style="margin-top:22px">${me ? `Signed in as <strong>${me.username.replace(/[<>&"]/g,'')}</strong>: your tricky words are saved to your account.` : 'Sign in on the <a href="/">xoyso home page</a> to save your tricky words to your account and see them on any device.'}</p>`);
   $('#learn').onclick = learn;
   document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>start(b.dataset.a));
   scrollTo(0,0);
@@ -416,5 +468,6 @@ function finish(){
 }
 if(canSpeak){ try{ speechSynthesis.getVoices(); }catch(e){} }
 home();
+syncStart();
 </script>
 </body></html>
