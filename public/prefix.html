@@ -192,12 +192,24 @@ function speak(text){
   }catch(e){}
 }
 
-/* picks 8 (or n) words, making sure inter- words show up */
-function pickWords(n, from=WORDS){
-  const inter = shuffle(from.filter(x=>x.pre==='inter')), re = shuffle(from.filter(x=>x.pre==='re'));
-  const take = Math.min(inter.length, Math.max(2, Math.round(n*.25)));
-  return shuffle([...inter.slice(0,take), ...re.slice(0,n-take)].concat(n>from.length?[]:[])).slice(0,n);
+/* per-word memory: right first time (ok), missed (bad), current streak of first-time-right (s) */
+const WS = { get(){ try{ return JSON.parse(localStorage.getItem('prefix-words')||'{}'); }catch(e){ return {}; } },
+  set(o){ try{ localStorage.setItem('prefix-words', JSON.stringify(o)); }catch(e){} } };
+function noteWord(w, ok){ const d=WS.get(), r=d[w]=d[w]||{ok:0,bad:0,s:0,t:0}; if(ok){ r.ok++; r.s++; } else { r.bad++; r.s=0; } r.t=Date.now(); WS.set(d); }
+/* how often a word should come up: new words a lot, missed words most, and fading once she gets them right again */
+function weight(w, d){ const r=d[w]; if(!r) return 3; const m=Math.min(r.bad,5); return Math.max(.35, (1+2*m) * Math.pow(.6, Math.min(r.s,4))); }
+function weightedPick(n, from=WORDS){
+  const d=WS.get(), pool=[...from], out=[];
+  while(out.length<n && pool.length){
+    const tot=pool.reduce((a,x)=>a+weight(x.w,d),0); let r=Math.random()*tot, k=0;
+    for(;k<pool.length-1;k++){ r-=weight(pool[k].w,d); if(r<=0) break; }
+    out.push(pool.splice(k,1)[0]);
+  }
+  return shuffle(out);
 }
+const pickWords = n => weightedPick(n);
+/* words she still gets wrong (missed at some point and not yet 3 right first time in a row since) */
+function tricky(){ const d=WS.get(); return WORDS.filter(x=>d[x.w] && d[x.w].bad>0 && d[x.w].s<3).sort((p,q)=>(d[q.w].bad-d[p.w].bad)||(d[p.w].s-d[q.w].s)); }
 
 /* ---------- home ---------- */
 function home(){
@@ -217,6 +229,13 @@ function home(){
   <div class="grid"><button class="act wide" id="learn"><span class="demo">19 words</span><h3>Word book</h3><p>See every word with its meaning, and hear it read out.</p></button></div>
   <h2 class="sec">Practise</h2>
   <div class="grid">${ACTS.map(a=>`<button class="act" data-a="${a.id}"><span class="demo">${a.demo}</span><h3>${a.t}</h3><p>${a.d}</p><span class="stars" aria-label="${best[a.id]||0} of 3 stars">${stars(a.id)}</span></button>`).join('')}</div>`;
+  const hard = tricky();
+  if(hard.length){
+    $('#app').insertAdjacentHTML('beforeend', `<h2 class="sec">My tricky words</h2><p class="clue">These come up more often in the practice games. Get a word right first time three times in a row and it drops off the list.</p>
+      <div class="again">${hard.map(x=>`<span>${colored(x.w)}</span>`).join('')}</div>
+      <div class="row" style="margin-top:12px"><button class="btn primary" id="focus">Practise my tricky words</button></div>`);
+    $('#focus').onclick = ()=>start('mixed', hard);
+  }
   $('#learn').onclick = learn;
   document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>start(b.dataset.a));
   scrollTo(0,0);
@@ -345,8 +364,8 @@ const BUILD = {
 let S=null;
 function start(actId, onlyWords){
   const act = ACTS.find(a=>a.id===actId);
-  const words = onlyWords && onlyWords.length ? shuffle(onlyWords).slice(0,act.n) : pickWords(act.n);
-  while(words.length < act.n) words.push(...shuffle(WORDS).filter(x=>!words.includes(x)).slice(0, act.n-words.length));
+  const words = onlyWords && onlyWords.length ? weightedPick(act.n, onlyWords) : pickWords(act.n);
+  while(words.length < act.n) words.push(...weightedPick(act.n-words.length, WORDS.filter(x=>!words.includes(x))));
   const qs = words.map((x,i)=>({x, kind: actId==='mixed' ? KINDS[i%KINDS.length] : actId}));
   if(actId==='mixed') shuffle(qs);
   S = {actId, qs, i:0, pts:0, missed:[], tries:0, locked:false, ctl:null};
@@ -367,6 +386,7 @@ function showQ(){
 function attempt(ok, hint=''){
   if(S.locked) return;
   const q=S.qs[S.i], fb=$('#fb'); S.tries++;
+  if(S.tries===1) noteWord(q.x.w, ok);   // remember first-try result for this word
   const lock = () => { S.locked=true; $('#next').hidden=false; $('#next').focus({preventScroll:true}); };
   if(ok){
     if(S.tries===1) S.pts++; else S.missed.push(q.x);
