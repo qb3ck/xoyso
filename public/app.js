@@ -548,7 +548,9 @@ const YEARS = [
     { id: 'pe', title: ['Educación Física', 'Physical Education'], blurb: ['El cuerpo humano', 'The human body'], icon: 'EF',
       units: [{ href: '/huesos', title: ['Los huesos', 'The bones'], blurb: ['14 huesos del esqueleto: arrastrar, encontrar y escribir.', '14 skeleton bones: drag, find and spell.'] }] }] },
   { id: '1eso', title: ['1º ESO', '1st ESO'], subjects: [
-    { id: 'geo', title: ['Geografía', 'Geography'], blurb: ['Mapa físico y comunidades autónomas', 'Physical map and autonomous communities'], section: SECTIONS[0] }] },
+    { id: 'geo', title: ['Geografía', 'Geography'], blurb: ['Mapa físico y comunidades autónomas', 'Physical map and autonomous communities'], section: SECTIONS[0] },
+    { id: 'math', title: ['Matemáticas', 'Maths'], blurb: ['Concurso de decimales de π', 'The π digits competition'], icon: 'π',
+      units: [{ href: '/pi', title: ['Decimales de π', 'Digits of π'], blurb: ['Aprende, enlaza y recita los decimales en grupos.', 'Learn, link and recite the digits in groups.'] }] }] },
 ];
 for (const y of YEARS) for (const sub of y.subjects) { sub.year = y; if (sub.section) { sub.section.year = y; sub.section.subject = sub; } }
 // Header trail: xoyso > year > subject > unit > topic. Each earlier step is a link; the last is the current page.

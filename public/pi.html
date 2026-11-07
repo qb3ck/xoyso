@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Decimales de π</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700;800&family=JetBrains+Mono:wght@600;700&display=swap">
+<style>
+:root{
+  --bg:#eef4f8; --card:#ffffff; --ink:#13233f; --muted:#56677f; --line:#d3dfeb;
+  --hi:#0a7c86; --hi-soft:#d8f1f3; --warm:#d9480f; --warm-soft:#ffe9dc;
+  --good:#1b7f45; --good-soft:#dcf5e5; --bad:#c2362b; --bad-soft:#fde4e1;
+  --display:'Fredoka','Trebuchet MS',system-ui,sans-serif; --body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1829; --card:#172540; --ink:#e8eefb; --muted:#9db0cf; --line:#2a3b59;
+  --hi:#4fd1d9; --hi-soft:#0f3a42; --warm:#ff9a5c; --warm-soft:#3a2416; --good:#4cd98a; --good-soft:#12382a; --bad:#ff8a80; --bad-soft:#3d1a1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1829; --card:#172540; --ink:#e8eefb; --muted:#9db0cf; --line:#2a3b59;
+  --hi:#4fd1d9; --hi-soft:#0f3a42; --warm:#ff9a5c; --warm-soft:#3a2416; --good:#4cd98a; --good-soft:#12382a; --bad:#ff8a80; --bad-soft:#3d1a1a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;margin:0;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#app{max-width:820px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance;line-height:1.1}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.link{background:none;border:0;padding:8px 4px;font-weight:800;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+a.link{display:inline-block}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.hero{display:grid;gap:12px;margin-bottom:12px}
+.hero h1{font-size:clamp(2.4rem,8vw,3.6rem)} .hero p{margin:0;color:var(--muted);max-width:58ch}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:14px 0}
+.stat{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 16px;display:grid;gap:2px}
+.stat b{font-family:var(--display);font-size:2.1rem;font-weight:600;line-height:1} .stat span{color:var(--muted);font-weight:700;font-size:.92rem}
+.stat.hi{border-color:var(--hi);background:var(--hi-soft)} .stat.hi b{color:var(--hi)}
+.sec{font-family:var(--display);font-size:1.25rem;margin:24px 0 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.act{text-align:left;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px 18px;display:grid;gap:6px;min-width:0;transition:transform .12s,border-color .12s}
+.act:hover:not(:disabled){transform:translateY(-2px);border-color:var(--ink)} .act:disabled{opacity:.5;cursor:default}
+.act.main{border-color:var(--hi);background:var(--hi-soft)}
+.act .demo{font-family:var(--mono);font-size:1.4rem;font-weight:700;letter-spacing:.06em}
+.act h3{font-size:1.15rem} .act p{margin:0;color:var(--muted);font-size:.95rem}
+.map{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.cell{width:22px;height:22px;border-radius:6px;background:var(--line);font:700 .62rem var(--mono);color:var(--muted);display:grid;place-items:center}
+.cell.learn{background:var(--warm-soft);box-shadow:inset 0 0 0 2px var(--warm);color:var(--warm)} .cell.solid{background:var(--good);color:#fff}
+.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-weight:700;font-size:.9rem;margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-1px;margin-right:5px;background:var(--line)} .legend i.l{background:var(--warm)} .legend i.s{background:var(--good)}
+.opt{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--muted);font-weight:700}
+select{font:inherit;padding:6px 10px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+
+.panel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:clamp(16px,4vw,28px);display:grid;gap:16px;justify-items:center;text-align:center}
+.eyebrow{margin:0;font-weight:800;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.clue{margin:0;color:var(--muted);max-width:50ch}
+.digits{font-family:var(--mono);font-weight:700;font-size:clamp(2rem,9vw,3.6rem);letter-spacing:.04em;line-height:1.2;overflow-wrap:anywhere}
+.digits .sp{display:inline-block;width:.55em}
+.digits.dim{color:var(--muted);opacity:.55;font-size:clamp(1.3rem,6vw,2.1rem)}
+.digits.hl{color:var(--hi)}
+.cue{display:grid;gap:4px;justify-items:center}
+.cue small{color:var(--muted);font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:.72rem}
+.inp{width:min(100%,520px);font:700 clamp(1.5rem,6vw,2.2rem) var(--mono);letter-spacing:.14em;text-align:center;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.inp.ok{border-color:var(--good);background:var(--good-soft)} .inp.no{border-color:var(--bad);background:var(--bad-soft)}
+.btn{min-height:50px;padding:10px 26px;border-radius:14px;border:2px solid var(--ink);background:var(--card);font-weight:800}
+.btn.primary{background:var(--ink);color:var(--bg)} .btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.fb{min-height:3rem;text-align:center;font-weight:800;font-size:1.05rem;padding:8px 14px;border-radius:14px}
+.fb.good{background:var(--good-soft);color:var(--good)} .fb.bad{background:var(--bad-soft);color:var(--bad)}
+.live{font-family:var(--mono);font-weight:700;font-size:clamp(1.2rem,5vw,1.7rem);letter-spacing:.06em;min-height:3.2rem;overflow-wrap:anywhere;text-align:center;width:100%}
+.live .g{color:var(--good)} .live .x{color:var(--bad);background:var(--bad-soft);border-radius:6px;padding:0 2px} .live .n{color:var(--ink)} .live .sp{display:inline-block;width:.5em}
+.big{font-family:var(--display);font-size:clamp(2.6rem,12vw,4.5rem);font-weight:600;line-height:1}
+.track{height:10px;border-radius:99px;background:var(--line);overflow:hidden;width:100%} .track i{display:block;height:100%;background:var(--hi);border-radius:99px;transition:width .25s}
+.toggle{display:flex;align-items:center;gap:10px;font-weight:700}
+.toggle input{width:22px;height:22px}
+</style></head><body><div id="app"></div>
+<script>
+const DIG = '1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153643678925903600113305305488204665213841469519415116094330572703657595919530921861173819326117931051185480744623799627495673518857527248912279381830119491298336733624406566430860213949463952247371907021798609437027705392171762931767523846748184676694051320005681271452635608277857713427577896091736371787214684409012249534301465495853710507922796892589235420199561121290219608640344181598136297747713099605187072113499999983729780499510597317328160963185950244594553469083026425223082533446850352619311881710100031378387528865875332083814206171776691473035982534904287554687311595628638823537875937519577818577805321712268066130019278766111959092164201989';
+const $ = (s,r=document)=>r.querySelector(s);
+const shuffle = a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const store = {get(){try{return JSON.parse(localStorage.getItem('pi-progress')||'{}');}catch(e){return {};}}, set(o){try{localStorage.setItem('pi-progress',JSON.stringify(o));}catch(e){}}};
+
+/* ---------- state ---------- */
+let DB = store.get(); DB.size = DB.size || 6; DB.by = DB.by || {};
+const save = () => store.set(DB);
+const G = () => DB.size;
+const bucket = () => (DB.by[G()] = DB.by[G()] || {groups:{}, best:0});
+const nGroups = () => Math.floor(DIG.length / G());
+const grp = i => DIG.slice(i*G(), (i+1)*G());
+const rec = i => bucket().groups[i] || null;
+const SOLID = 3;
+const learned = () => { let n=0; while(n<nGroups() && rec(n) && rec(n).seen) n++; return n; };          // groups learned in a row from the start
+const solid = () => { let n=0; while(n<nGroups() && rec(n) && rec(n).seen && rec(n).s>=SOLID) n++; return n; };
+function bump(i, ok){ const b=bucket(); const r=b.groups[i]=b.groups[i]||{s:0,seen:0,t:0}; r.seen=1; r.t=Date.now(); r.s = ok ? r.s+1 : 0; save(); }
+const fmt = (s,size=3) => { const out=[]; for(let i=0;i<s.length;i+=size) out.push(s.slice(i,i+size)); return out.join('<span class="sp"></span>'); };
+const onlyDigits = s => s.replace(/[^0-9]/g,'');
+
+/* ---------- home ---------- */
+function home(){
+  const g=G(), L=learned(), S=solid(), best=bucket().best||0, nextG=Math.min(L, nGroups()-1);
+  const cells=[]; for(let i=0;i<Math.min(nGroups(), Math.max(24, L+14));i++){ const r=rec(i); cells.push(`<span class="cell ${r&&r.seen?(r.s>=SOLID?'solid':'learn'):''}" title="Grupo ${i+1}">${(i+1)%5===0?i+1:''}</span>`); }
+  $('#app').innerHTML = `<header class="hero"><a class="link" href="/" style="justify-self:start">← xoyso</a><h1>Decimales de π</h1>
+    <p>π = 3,<strong>${fmt(grp(0))}</strong> ${fmt(grp(1))} ${fmt(grp(2))}… Aprende los decimales en grupos de ${g}, practica los enlaces entre grupos y ensaya la recitación completa.</p></header>
+   <div class="stats"><div class="stat hi"><b>${L*g}</b><span>decimales aprendidos</span></div><div class="stat"><b>${S*g}</b><span>decimales seguros (3 aciertos)</span></div><div class="stat"><b>${best}</b><span>mejor recitado seguido</span></div></div>
+   <div class="grid">
+     <button class="act main" id="learn"><span class="demo">+ ${grp(nextG)}</span><h3>Aprender ${L?'el siguiente grupo':'el primer grupo'}</h3><p>Lo ves, lo tapas y lo escribes de memoria. Solo avanzas cuando lo aciertas.</p></button>
+     <button class="act" id="links" ${L<2?'disabled':''}><span class="demo">${L>=2?grp(0)+' → ?':'· · ·'}</span><h3>Enlazar</h3><p>${L>=2?'Te enseño un grupo y escribes el siguiente. Así se une la cadena.':'Aprende al menos 2 grupos para desbloquearlo.'}</p></button>
+     <button class="act" id="recite" ${L<1?'disabled':''}><span class="demo">3,…</span><h3>Recitar</h3><p>Escribe todos los decimales que sepas desde el principio, como en el concurso.</p></button>
+   </div>
+   <h2 class="sec">Mi mapa</h2><div class="map">${cells.join('')}</div>
+   <div class="legend"><span><i></i>sin aprender</span><span><i class="l"></i>aprendiendo</span><span><i class="s"></i>seguro</span></div>
+   <h2 class="sec">Ajustes</h2>
+   <label class="opt">Decimales por grupo: <select id="size">${[4,5,6,7,8,10].map(n=>`<option ${n===g?'selected':''}>${n}</option>`).join('')}</select> <span>(el progreso se guarda por separado para cada tamaño)</span></label>`;
+  $('#learn').onclick=learn; $('#links').onclick=links; $('#recite').onclick=recite;
+  $('#size').onchange=e=>{ DB.size=+e.target.value; save(); home(); };
+  scrollTo(0,0);
+}
+
+/* ---------- shared input helper ---------- */
+function digitInput(host, len, onSubmit){
+  host.innerHTML = `<input class="inp" id="in" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" maxlength="${len}" aria-label="Escribe los dígitos"><button class="btn primary" id="chk">Comprobar</button>`;
+  const inp=$('#in',host); inp.focus({preventScroll:true});
+  inp.oninput=()=>{ inp.value=onlyDigits(inp.value).slice(0,len); inp.classList.remove('no'); };
+  const go=()=>{ if(inp.value.length<len){ inp.classList.add('no'); return {short:true,inp}; } return null; };
+  const submit=()=>{ if(inp.value.length<len){ onSubmit(null,inp); return; } onSubmit(inp.value,inp); };
+  $('#chk',host).onclick=submit; inp.onkeydown=e=>{ if(e.key==='Enter') submit(); };
+  return inp;
+}
+
+/* ---------- learn a new group ---------- */
+function learn(){
+  const g=learned(); if(g>=nGroups()){ home(); return; }
+  const prev = g>0 ? grp(g-1) : '', cur = grp(g);
+  let phase='show';
+  const shell = () => { $('#app').innerHTML=`<div class="top"><button class="link" id="back">← Inicio</button><span class="eyebrow">Grupo ${g+1} · decimales ${g*G()+1}–${(g+1)*G()}</span></div><div class="panel" id="pn"></div><div class="fb" id="fb"></div>`; $('#back').onclick=home; };
+  shell();
+  const pn=$('#pn'), fb=()=>$('#fb');
+  const say=(t,c)=>{ fb().className='fb '+c; fb().textContent=t; };
+  function show(){
+    fb().className='fb'; fb().textContent='';
+    pn.innerHTML=`<div class="cue"><small>${g?'Viene después de':'Empieza así'}</small><div class="digits dim">${g?fmt(prev):'3,'}</div></div>
+      <div class="cue"><small>Grupo nuevo</small><div class="digits hl">${fmt(cur)}</div></div>
+      <p class="clue">Dilo en voz alta tres veces, con ritmo (${fmt(cur)}). Cuando creas que lo tienes, tápalo.</p>
+      <button class="btn primary" id="cover">Lo tengo, taparlo</button>`;
+    $('#cover').onclick=typeNew;
+  }
+  function typeNew(){
+    pn.innerHTML=`<div class="cue"><small>${g?'Viene después de':'Empieza así'}</small><div class="digits dim">${g?fmt(prev):'3,'}</div></div><p class="clue">Escribe el grupo de ${G()} dígitos de memoria.</p><div id="ib" class="row" style="width:100%"></div>`;
+    digitInput($('#ib'), G(), (v,inp)=>{
+      if(v===null){ say('Faltan dígitos: son '+G()+'.','bad'); return; }
+      if(v===cur){ inp.classList.add('ok'); inp.disabled=true; say('¡Bien!','good'); setTimeout(()=>g?typeBoth():finish(),600); }
+      else { inp.classList.add('no'); inp.disabled=true; say('Casi. Era '+cur+'. Míralo otra vez.','bad'); setTimeout(show,1800); }
+    });
+  }
+  function typeBoth(){
+    fb().className='fb'; fb().textContent='';
+    pn.innerHTML=`<p class="clue">Ahora los dos grupos seguidos, sin ver nada.</p><div class="cue"><small>Empieza por el grupo anterior</small><div class="digits dim">···</div></div><div id="ib" class="row" style="width:100%"></div>`;
+    digitInput($('#ib'), G()*2, (v,inp)=>{
+      if(v===null){ say('Faltan dígitos: son '+(G()*2)+'.','bad'); return; }
+      if(v===prev+cur){ inp.classList.add('ok'); inp.disabled=true; say('¡Enlazados!','good'); setTimeout(finish,600); }
+      else { inp.classList.add('no'); inp.disabled=true; say('Casi. Era '+prev+' '+cur+'. Vuelve a mirarlo.','bad'); setTimeout(show,2200); }
+    });
+  }
+  function finish(){
+    bump(g,true);
+    pn.innerHTML=`<div class="big">¡Grupo ${g+1}!</div><div class="digits hl">${fmt(cur)}</div><p class="clue">Ya sabes ${(g+1)*G()} decimales. Mañana repásalo con Enlazar para que se quede.</p>
+      <div class="row"><button class="btn primary" id="more">Siguiente grupo</button><button class="btn" id="stop">Terminar</button></div>`;
+    $('#more').onclick=learn; $('#stop').onclick=home; fb().className='fb'; fb().textContent='';
+  }
+  show();
+}
+
+/* ---------- links: given a group, type the next one ---------- */
+function links(){
+  const L=learned(); if(L<2){ home(); return; }
+  const N=10, now=Date.now(); let n=0, pts=0; const missed=new Set();
+  const weight=i=>{ const r=rec(i); const age=(now-(r.t||0))/864e5; return (r.s<SOLID?3:1)+Math.min(age,10); };
+  const pick=()=>{ const idx=[...Array(L-1).keys()].map(i=>i+1); const tot=idx.reduce((a,i)=>a+weight(i),0); let x=Math.random()*tot; for(const i of idx){ x-=weight(i); if(x<=0) return i; } return idx[0]; };
+  function ask(){
+    const j=pick(), cue=grp(j-1), ans=grp(j);
+    $('#app').innerHTML=`<div class="top"><button class="link" id="back">← Parar</button><span class="eyebrow">Enlazar · ${n+1} de ${N}</span></div><div class="track"><i style="width:${n/N*100}%"></i></div>
+      <div class="panel"><div class="cue"><small>Decimales ${(j-1)*G()+1}–${j*G()}</small><div class="digits">${fmt(cue)}</div></div><p class="clue">¿Qué grupo viene después?</p><div id="ib" class="row" style="width:100%"></div></div><div class="fb" id="fb"></div>`;
+    $('#back').onclick=home; let tried=0;
+    digitInput($('#ib'), G(), (v,inp)=>{
+      if(v===null){ $('#fb').className='fb bad'; $('#fb').textContent='Faltan dígitos: son '+G()+'.'; return; }
+      tried++;
+      if(v===ans){ inp.classList.add('ok'); inp.disabled=true; if(tried===1){ pts++; bump(j,true);} else { bump(j,false); missed.add(j); } $('#fb').className='fb good'; $('#fb').textContent='¡Sí! '+ans; setTimeout(next,tried===1?700:1400); }
+      else if(tried<2){ inp.classList.add('no'); $('#fb').className='fb bad'; $('#fb').textContent='Casi. Prueba otra vez.'; inp.select(); inp.classList.remove('no'); }
+      else { inp.classList.add('no'); inp.disabled=true; bump(j,false); missed.add(j); $('#fb').className='fb bad'; $('#fb').textContent='Era '+ans+'.'; setTimeout(next,2200); }
+    });
+  }
+  function next(){ n++; n<N ? ask() : done(); }
+  function done(){
+    $('#app').innerHTML=`<div class="panel"><p class="eyebrow">Enlazar</p><div class="big">${pts}/${N}</div><p class="clue">Acertados a la primera.${missed.size?' Para repasar: grupos '+[...missed].map(i=>i+1).sort((a,b)=>a-b).join(', ')+'.':' ¡Todos!'}</p>
+      <div class="row"><button class="btn primary" id="again">Otra ronda</button><button class="btn" id="hm">Inicio</button></div></div>`;
+    $('#again').onclick=links; $('#hm').onclick=home;
+  }
+  ask();
+}
+
+/* ---------- recite from the start (competition practice) ---------- */
+function recite(){
+  let help = true;
+  $('#app').innerHTML=`<div class="top"><button class="link" id="back">← Inicio</button><span class="eyebrow">Recitar</span></div>
+   <div class="panel"><p class="clue">Escribe los decimales de π desde el principio, sin la parte «3,». Termina cuando no sepas más.</p>
+    <label class="toggle"><input type="checkbox" id="helpbox" checked> Marcar los errores mientras escribo (quítalo para ensayar el concurso)</label>
+    <div class="live" id="live" aria-live="polite"></div>
+    <input class="inp" id="in" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Decimales de pi">
+    <div class="row"><button class="btn primary" id="end">Terminar</button></div></div><div class="fb" id="fb"></div>`;
+  $('#back').onclick=home;
+  const inp=$('#in'), live=$('#live'); inp.focus({preventScroll:true});
+  const typed=()=>onlyDigits(inp.value).slice(0,DIG.length);
+  const firstWrong=t=>{ for(let i=0;i<t.length;i++) if(t[i]!==DIG[i]) return i; return -1; };
+  const draw=()=>{ const t=typed(); const w=firstWrong(t); let h='';
+    for(let i=0;i<t.length;i++){ if(i&&i%G()===0) h+='<span class="sp"></span>'; const cls=!help?'n':(w>=0&&i>=w?(i===w?'x':'n'):'g'); h+=`<span class="${cls}">${t[i]}</span>`; }
+    live.innerHTML = h || '<span style="color:var(--muted)">3,</span>'; };
+  inp.oninput=()=>{ inp.value=typed(); draw(); }; $('#helpbox').onchange=e=>{ help=e.target.checked; draw(); }; draw();
+  $('#end').onclick=()=>{
+    const t=typed(), w=firstWrong(t), run = w<0 ? t.length : w;
+    const b=bucket(); if(run>(b.best||0)) b.best=run;
+    // the group that holds the first mistake loses its streak; groups typed fully before it count as a pass
+    for(let i=0;i<Math.floor(run/G());i++) if(rec(i)&&rec(i).seen) bump(i,true);
+    if(w>=0){ const gi=Math.floor(w/G()); if(rec(gi)&&rec(gi).seen) bump(gi,false); }
+    save();
+    const wrongInfo = w>=0 ? `<p class="clue">El primer error está en el decimal <strong>${w+1}</strong> (grupo ${Math.floor(w/G())+1}): escribiste <strong>${t[w]}</strong> y era <strong>${DIG[w]}</strong>.</p><div class="cue"><small>Así es ese grupo</small><div class="digits hl">${fmt(grp(Math.floor(w/G())))}</div></div>` : (t.length?'<p class="clue">¡Sin ningún error!</p>':'<p class="clue">No escribiste nada.</p>');
+    $('#app').innerHTML=`<div class="panel"><p class="eyebrow">Recitar</p><div class="big">${run}</div><p class="clue">decimales seguidos sin fallar ${run>=(b.best||0)&&run>0?'· ¡tu mejor marca!':'(mejor: '+b.best+')'}</p>${wrongInfo}
+      <div class="row"><button class="btn primary" id="again">Otra vez</button><button class="btn" id="hm">Inicio</button></div></div>`;
+    $('#again').onclick=recite; $('#hm').onclick=home;
+  };
+}
+home();
+</script></body></html>
