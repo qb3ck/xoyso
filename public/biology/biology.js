@@ -26,6 +26,24 @@ const ACTS = {
 };
 
 const app = $('#app');
+const how = (tag, text) => `<div class="how"><b>${tag}</b><span>${text}</span></div>`;
+/* what to do in each activity: shown as a numbered "How it works" screen the first time, and as a highlighted box during it */
+const HOW = {
+  learn: ['Read the key points for the question.', 'Cover them and write or say your answer from memory.', 'Tick the points you included. Questions with gaps come round again until you have them.'],
+  sort: ['Read the statement.', 'Tap the group it describes.', 'If you are wrong, the right group is shown. Remember it for next time.'],
+  features: ['Look at each feature in the list.', 'Tick every group that has it. More than one group can have a feature.', 'Press Check. Green is right, red is wrong.'],
+  label: ['Look at the picture and its numbers.', 'Tap a word, then tap the number it belongs to.', 'Press Check. The right names are shown for any mistakes.'],
+  cloze: ['Read the sentence with its gaps.', 'Tap a word, then tap the gap it fits.', 'Press Check. The right words are shown for any mistakes.'],
+  riddles: ['Read the first clue.', 'Guess as early as you can. Fewer clues means more points.', 'Tap Another clue only if you need one.'],
+  order: ['Read the steps. They are in a mixed-up order.', 'Tap them in the order they happen.', 'Press Check. Tap a chosen step to take it back.'],
+  vocab: ['Read the question.', 'Tap the right answer.', 'If you are wrong, the right answer is shown. Remember it.'],
+  explain: ['Read the question.', 'Write or say your answer, in 2 or 3 sentences.', 'Show the key points and tick the ones you included. Be honest.'],
+  exam: ['Answer 20 questions from every activity.', 'Tap the best answer each time.', 'Your best score is saved. Check the review list at the end.'],
+};
+const HOWQ = { feeding: 'Tap how it gets its food.', importance: 'Tap Helpful or Harmful.', tf: 'Tap True or False. Then read the reason that appears.' };
+const seen = (k) => { try { return !!JSON.parse(localStorage.getItem('bio-seen') || '{}')[k]; } catch (e) { return false; } };
+const markSeen = (k) => { try { const o = JSON.parse(localStorage.getItem('bio-seen') || '{}'); o[k] = 1; localStorage.setItem('bio-seen', JSON.stringify(o)); } catch (e) { /* storage unavailable */ } };
+const stepsHtml = (arr) => `<ol class="steps">${arr.map((t, i) => `<li><i>${i + 1}</i><span>${['READ', 'DO', 'CHECK'][i] ? '' : ''}${esc(t)}</span></li>`).join('')}</ol>`;
 const topBar = (left, right = '') => `<div class="top">${left}<span class="eyebrow">${right}</span></div>`;
 const link = (href, text) => `<a class="link" href="${href}">${text}</a>`;
 
@@ -58,7 +76,7 @@ function quiz(act, qs) {
   const ask = () => {
     const q = qs[i]; let done = false;
     app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `${ACTS[act].name} · ${i + 1} of ${qs.length}`)}<div class="track"><i style="width:${(i / qs.length) * 100}%"></i></div>
-     <div class="panel"><p class="prompt">${q.prompt}</p><div class="opts">${q.opts.map((o, k) => `<button class="o" data-k="${k}">${esc(o)}</button>`).join('')}</div><div class="fb" id="fb"></div></div>`;
+     <div class="panel">${how('Do this', HOWQ[act.replace('q-', '')] || (HOW[act] ? HOW[act][1] : 'Tap the right answer.'))}<p class="prompt">${q.prompt}</p><div class="opts">${q.opts.map((o, k) => `<button class="o" data-k="${k}">${esc(o)}</button>`).join('')}</div><div class="fb" id="fb"></div></div>`;
     $('#stop').onclick = unitHome;
     app.querySelectorAll('.o').forEach((b) => {
       b.onclick = () => {
@@ -103,7 +121,7 @@ const RUN = {
 
   features() {
     const cats = U.categories, rows = U.features;
-    app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', 'Features table')}<div class="panel"><p class="clue">Tick every group that has each feature. A feature can belong to more than one group.</p>
+    app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', 'Features table')}<div class="panel">${how('Do this', 'Tick every group that has each feature. A feature can belong to more than one group.')}
      <table class="grid2"><thead><tr><th></th>${cats.map((c) => `<th>${esc(c.name)}</th>`).join('')}</tr></thead><tbody>
      ${rows.map(([f], r) => `<tr><td>${esc(f)}</td>${cats.map((c, k) => `<td data-r="${r}" data-k="${k}"><input type="checkbox" aria-label="${esc(f)}: ${esc(c.name)}"></td>`).join('')}</tr>`).join('')}</tbody></table>
      <div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
@@ -124,7 +142,7 @@ const RUN = {
       const bank = shuffle(d.labels.map((l) => l.a)); const placed = d.labels.map(() => null); let selChip = null;
       app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Label the drawing · ${i + 1} of ${ds.length}`)}<div class="panel"><h2 class="sec" style="margin:0">${esc(d.title)}</h2>
        <div class="pic pinbox" id="pic">${d.svg}</div>
-       <p class="hint">Tap a word, then tap the number it belongs to. Tap a filled number to take its word back.</p>
+       ${how('Do this', 'Tap a word, then tap the number it belongs to. Tap a filled number to take its word back.')}
        <div class="chips" id="bank"></div><div class="slots" id="slots"></div><div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
       $('#stop').onclick = unitHome;
       const vb = $('#pic svg').viewBox.baseVal;
@@ -150,12 +168,14 @@ const RUN = {
 
   cloze() {
     const items = shuffle(U.cloze).slice(0, 5); let i = 0, right = 0, total = 0;
-    const next = () => { if (i >= items.length) { finishCard('cloze', `${right}/${total}`, Math.round((right / total) * 100), '', RUN.cloze); return; } draw(items[i][0]); };
-    const draw = (text) => {
-      const answers = []; const parts = text.split(/\{([^}]+)\}/); // odd indexes are gaps
-      const bank = shuffle(parts.filter((_, k) => k % 2).map((x) => x)); const filled = []; let sel = null;
-      parts.forEach((p, k) => { if (k % 2) answers.push(p); });
-      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Complete the notes · ${i + 1} of ${items.length}`)}<div class="panel"><p class="cloze" id="txt"></p><div class="chips" id="bank"></div><div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
+    const next = () => { if (i >= items.length) { finishCard('cloze', `${right}/${total}`, Math.round((right / total) * 100), '', RUN.cloze); return; } draw(items[i][0], items[i][1] || []); };
+    const draw = (text, extra) => {
+      // gaps look like {word} or {word~tag}; gaps with the same tag are interchangeable (e.g. "A and B"), so either order is right
+      const answers = [], tags = []; const parts = text.split(/\{([^}]+)\}/); // odd indexes are gaps
+      parts.forEach((p, k) => { if (k % 2) { const [a, t] = p.split('~'); answers.push(a); tags.push(t || null); parts[k] = a; } });
+      const bank = shuffle([...parts.filter((_, k) => k % 2), ...(extra.length ? extra : sample(U.cloze.flatMap((c) => c[0].match(/\{[^}~]+/g) || []).map((x) => x.slice(1)).filter((x) => !answers.includes(x)), 3))]); const filled = []; let sel = null;
+      const accepts = (k, w) => w === answers[k] || (tags[k] && answers.some((a, j) => tags[j] === tags[k] && a === w));
+      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Complete the notes · ${i + 1} of ${items.length}`)}<div class="panel">${how('Do this', 'Tap a word, then tap the gap it fits. Tap a filled gap to take the word back.')}<p class="cloze" id="txt"></p><div class="chips" id="bank"></div><div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
       $('#stop').onclick = unitHome;
       const render = () => {
         let g = -1; $('#txt').innerHTML = parts.map((p, k) => { if (!(k % 2)) return esc(p); g++; return `<span class="gap ${sel === 'g' + g ? 'act' : ''}" data-g="${g}">${filled[g] ? esc(filled[g]) : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'}</span>`; }).join('');
@@ -166,7 +186,7 @@ const RUN = {
       render();
       $('#chk').onclick = () => {
         if (answers.some((_, k) => !filled[k])) { $('#fb').className = 'fb bad'; $('#fb').textContent = 'Fill every gap first.'; return; }
-        let r = 0; $('#txt').querySelectorAll('.gap').forEach((e) => { const k = +e.dataset.g; const ok = filled[k] === answers[k]; if (ok) r++; e.classList.add(ok ? 'ok' : 'no'); e.onclick = null; if (!ok) e.innerHTML += ` → ${esc(answers[k])}`; });
+        let r = 0; $('#txt').querySelectorAll('.gap').forEach((e) => { const k = +e.dataset.g; const ok = accepts(k, filled[k]); if (ok) r++; e.classList.add(ok ? 'ok' : 'no'); e.onclick = null; if (!ok) e.innerHTML += ` → ${esc(answers[k])}`; });
         right += r; total += answers.length; i++;
         $('#fb').className = 'fb ' + (r === answers.length ? 'good' : 'bad'); $('#fb').textContent = r === answers.length ? 'All right!' : 'Not quite: the right words are shown.';
         $('#chk').textContent = i >= items.length ? 'Finish' : 'Next'; $('#chk').onclick = next;
@@ -181,7 +201,7 @@ const RUN = {
     const ask = () => {
       const r = rs[i]; let shown = 1, done = false;
       app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Who am I? · ${i + 1} of ${rs.length}`)}<div class="track"><i style="width:${(i / rs.length) * 100}%"></i></div>
-       <div class="panel"><ul class="clues" id="cl"></ul><button class="btn" id="more">Another clue (worth less)</button><div class="opts" id="op">${shuffle(opts).map((o) => `<button class="o" data-o="${esc(o)}">${esc(o)}</button>`).join('')}</div><div class="fb" id="fb"></div></div>`;
+       <div class="panel">${how('Do this', 'Guess as early as you can: fewer clues means more points. Tap Another clue only if you need one.')}<ul class="clues" id="cl"></ul><button class="btn" id="more">Another clue (worth less)</button><div class="opts" id="op">${shuffle(opts).map((o) => `<button class="o" data-o="${esc(o)}">${esc(o)}</button>`).join('')}</div><div class="fb" id="fb"></div></div>`;
       $('#stop').onclick = unitHome;
       const clues = () => { $('#cl').innerHTML = r.clues.slice(0, shown).map((c) => `<li>${esc(c)}</li>`).join(''); $('#more').disabled = shown >= r.clues.length; };
       clues(); $('#more').onclick = () => { shown++; clues(); };
@@ -198,7 +218,7 @@ const RUN = {
     const sets = [['Page 60: Summarising', U.explain.filter((x) => x.src === 'p60')], ['Questions from the other pages', U.explain.filter((x) => x.src !== 'p60')]].filter((x) => x[1].length);
     const chooser = () => {
       app.innerHTML = `${topBar('<button class="link" id="stop">← Back</button>', 'Learn the answers')}<div class="panel"><p class="prompt">Learn the answers</p>
-       <p class="clue">For each question: read the key points, cover them, write your answer from memory, then check. Questions with gaps come round again until you have them.</p>
+       ${how('How it works', 'Every question has 3 steps. Do all 3.')}${stepsHtml(HOW.learn)}
        <div class="opts">${sets.map((x, k) => `<button class="o" data-k="${k}">${esc(x[0])} (${x[1].length} questions)</button>`).join('')}${sets.length > 1 ? `<button class="o" data-k="all">Everything (${U.explain.length} questions)</button>` : ''}</div></div>`;
       $('#stop').onclick = unitHome;
       app.querySelectorAll('.o').forEach((b) => { b.onclick = () => run(b.dataset.k === 'all' ? [...U.explain] : [...sets[+b.dataset.k][1]], true); });
@@ -207,14 +227,14 @@ const RUN = {
       let i = 0, got = 0, total = 0; const gaps = [];
       const item = () => {
         const it = list[i], n = it.points.length, head = `${topBar('<button class="link" id="stop">← Stop</button>', `Learn · ${i + 1} of ${list.length}`)}<div class="track"><i style="width:${(i / list.length) * 100}%"></i></div>`;
-        app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">Step 1 of 3: read and understand the key points.</p><ol class="clues">${it.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ol><button class="btn primary" id="cov">Cover it. I'll write it from memory</button></div>`;
+        app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how('Step 1 of 3 · Read', 'Read the key points and make sure you understand them.')}<ol class="clues">${it.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ol><button class="btn primary" id="cov">Cover it. I'll write it from memory</button></div>`;
         $('#stop').onclick = unitHome;
         $('#cov').onclick = () => {
-          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">Step 2 of 3: write or say your answer from memory, with no peeking.</p><textarea class="ta" id="ans" rows="5" placeholder="Your answer"></textarea><button class="btn primary" id="chk">Check my answer</button></div>`;
+          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how('Step 2 of 3 · Write', 'The points are hidden. Write or say your answer from memory.')}<textarea class="ta" id="ans" rows="5" placeholder="Your answer"></textarea><button class="btn primary" id="chk">Check my answer</button></div>`;
           $('#stop').onclick = unitHome; $('#ans').focus({ preventScroll: true });
           $('#chk').onclick = () => {
             const mine = $('#ans').value.trim();
-            app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">Step 3 of 3: tick the key points your answer included.</p>${mine ? `<div class="card" style="text-align:left;width:100%"><b>Your answer</b><p style="margin:4px 0 0;white-space:pre-wrap">${esc(mine)}</p></div>` : ''}
+            app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how('Step 3 of 3 · Check', 'Tick the key points your answer included. Be honest.')}${mine ? `<div class="card" style="text-align:left;width:100%"><b>Your answer</b><p style="margin:4px 0 0;white-space:pre-wrap">${esc(mine)}</p></div>` : ''}
              <div class="slots">${it.points.map((p, k) => `<label class="slot" style="cursor:pointer"><input type="checkbox" style="width:22px;height:22px;flex:none"><span>${esc(p)}</span></label>`).join('')}</div><div class="row"><button class="btn primary" id="nx">${i + 1 >= list.length ? 'Finish' : 'Next question'}</button></div></div>`;
             $('#stop').onclick = unitHome;
             $('#nx').onclick = () => { const t = app.querySelectorAll('.slot input:checked').length; got += t; total += n; if (t < n) gaps.push(it); i++; i < list.length ? item() : end(); };
@@ -239,12 +259,12 @@ const RUN = {
     const ask = () => {
       const it = items[i];
       app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Explain it · ${i + 1} of ${items.length}`)}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">From the book, ${it.src === 'p60' ? 'page 60 (Summarising)' : 'page ' + it.src.slice(1)}.</p>
-       <p class="hint">Write or say your answer first, in 2 or 3 sentences. Then check it against the key points.</p>
+       ${how('Step 1 of 2', 'Write or say your answer first, in 2 or 3 sentences. No peeking.')}
        <textarea class="ta" id="ans" rows="4" placeholder="Your answer (optional, it is not saved)"></textarea><button class="btn primary" id="show">Show the key points</button><div id="kp" style="width:100%"></div></div>`;
       $('#stop').onclick = unitHome;
       $('#show').onclick = () => {
         $('#show').hidden = true;
-        $('#kp').innerHTML = `<p class="hint">Tick each point your answer included. Be honest: this is how you find what to revise.</p><div class="slots">${it.points.map((p, k) => `<label class="slot" style="cursor:pointer"><input type="checkbox" data-k="${k}" style="width:22px;height:22px;flex:none"><span>${esc(p)}</span></label>`).join('')}</div><div class="row" style="margin-top:12px"><button class="btn primary" id="nx">${i + 1 >= items.length ? 'Finish' : 'Next question'}</button></div>`;
+        $('#kp').innerHTML = `${how('Step 2 of 2', 'Tick each point your answer included. Be honest: this is how you find what to revise.')}<div class="slots">${it.points.map((p, k) => `<label class="slot" style="cursor:pointer"><input type="checkbox" data-k="${k}" style="width:22px;height:22px;flex:none"><span>${esc(p)}</span></label>`).join('')}</div><div class="row" style="margin-top:12px"><button class="btn primary" id="nx">${i + 1 >= items.length ? 'Finish' : 'Next question'}</button></div>`;
         $('#nx').onclick = () => { got += app.querySelectorAll('#kp input:checked').length; total += it.points.length; i++; i < items.length ? ask() : finishCard('explain', `${got}/${total}`, Math.round((got / total) * 100), '<p class="hint">This score is marked by you. Revise the points you missed, then try again.</p>', RUN.explain); };
         $('#kp').scrollIntoView({ block: 'nearest' });
       };
@@ -257,7 +277,7 @@ const RUN = {
     const next = () => { if (i >= items.length) { finishCard('order', `${right}/${total}`, Math.round((right / total) * 100), '', RUN.order); return; } draw(items[i]); };
     const draw = (it) => {
       const pool = shuffle(it.steps); const chosen = [];
-      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Put in order · ${i + 1} of ${items.length}`)}<div class="panel"><h2 class="sec" style="margin:0">${esc(it.title)}</h2><p class="hint">Tap the steps in the order they happen. Tap a chosen step to take it back.</p><div class="opts" id="pool"></div><div class="slots" id="got"></div><div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
+      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Put in order · ${i + 1} of ${items.length}`)}<div class="panel"><h2 class="sec" style="margin:0">${esc(it.title)}</h2>${how('Do this', 'Tap the steps in the order they happen. Tap a chosen step to take it back.')}<div class="opts" id="pool"></div><div class="slots" id="got"></div><div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
       $('#stop').onclick = unitHome;
       const render = () => {
         $('#pool').innerHTML = pool.filter((s) => !chosen.includes(s)).map((s) => `<button class="step" data-s="${esc(s)}">${esc(s)}</button>`).join('');
@@ -278,11 +298,25 @@ const RUN = {
   },
 };
 
+/* ---------- first-time "How it works" screen for every activity ---------- */
+function wrapIntros() {
+  Object.keys(RUN).forEach((k) => {
+    if (RUN[k].wrapped) return; const raw = RUN[k];
+    RUN[k] = (...a) => {
+      const steps = HOW[k] || HOW[k.replace('q-', '')] || (ACTS[k] ? [ACTS[k].blurb, HOWQ[k.replace('q-', '')] || 'Tap the right answer.', 'Read what appears after each answer.'] : null);
+      if (a.length || seen(k) || !steps) return raw(...a);
+      app.innerHTML = `<div class="panel"><p class="eyebrow">How it works</p><h1 style="margin:0">${esc((ACTS[k] || {}).name || '')}</h1>${how('Read this first', 'It takes 10 seconds and makes the activity much more useful.')}${stepsHtml(steps)}
+        <div class="row"><button class="btn primary" id="go">Got it. Start</button><button class="btn" id="bk">Back</button></div></div>`;
+      $('#go').onclick = () => { markSeen(k); raw(); }; $('#bk').onclick = unitHome; scrollTo(0, 0);
+    };
+    RUN[k].wrapped = true;
+  });
+}
 /* ---------- boot ---------- */
 (async () => {
   try {
     UNITS = await (await fetch('/biology/units.json')).json();
     const id = new URLSearchParams(location.search).get('u'); const meta = UNITS.find((u) => u.id === id);
-    if (meta) { U = await (await fetch('/biology/' + meta.file)).json(); U.id = meta.id; (U.quizzes || []).forEach((z) => { ACTS['q-' + z.id] = { name: z.name, icon: z.icon, blurb: z.blurb }; RUN['q-' + z.id] = () => quiz('q-' + z.id, quizQ(z, Math.min(10, z.items.length))); }); unitHome(); } else listHome();
+    if (meta) { U = await (await fetch('/biology/' + meta.file)).json(); U.id = meta.id; (U.quizzes || []).forEach((z) => { ACTS['q-' + z.id] = { name: z.name, icon: z.icon, blurb: z.blurb }; RUN['q-' + z.id] = () => quiz('q-' + z.id, quizQ(z, Math.min(10, z.items.length))); }); wrapIntros(); unitHome(); } else listHome();
   } catch (e) { app.innerHTML = '<p class="fb bad">Could not load the unit. Check your connection and refresh.</p>'; }
 })();

@@ -1,0 +1,8 @@
+/* Instructions that are hard to skim past. Used on every standalone page. */
+.how{--c:var(--hi,var(--inter,#0a7c86));--cs:var(--hi-soft,var(--inter-soft,#d8f1f3));display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:left;width:100%;max-width:560px;margin:6px auto;padding:12px 16px;border-radius:14px;background:var(--cs);border:2px solid var(--c);border-left-width:9px;color:var(--ink,#16202a);font-weight:800;font-size:1.08rem;line-height:1.35}
+.how b{flex:none;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;background:var(--c);color:#fff;border-radius:99px;padding:4px 10px;margin-top:1px;white-space:nowrap}
+.how span{min-width:0}
+.steps{--c:var(--hi,var(--inter,#0a7c86));list-style:none;margin:0;padding:0;display:grid;gap:10px;width:100%;text-align:left}
+.steps li{display:flex;gap:12px;align-items:flex-start;background:var(--card,#fff);border:2px solid var(--line,#d6e0e8);border-radius:16px;padding:12px 14px;font-weight:700;font-size:1.05rem;line-height:1.35}
+.steps li i{flex:none;width:36px;height:36px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font:800 1.05rem var(--body,system-ui);font-style:normal}
+.steps li b{display:block;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--c);margin-bottom:2px}

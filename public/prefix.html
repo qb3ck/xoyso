@@ -121,6 +121,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--inter);outline-
 .again span{padding:2px 12px;border-radius:12px;background:var(--bg);border:2px solid var(--line)}
 .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 </style>
+<link rel="stylesheet" href="/how.css">
 </head><body>
 
 <div id="app"></div>
@@ -313,7 +314,7 @@ const BUILD = {
   prefix(x, h, api){
     h.innerHTML = `<p class="eyebrow">Pick the prefix</p>
       <div class="big"><span class="gap" id="g">?</span>${x.root}</div>
-      <p class="clue">The word means <b>${x.mean}</b>.</p>
+      <div class="how"><b>Do this</b><span>Tap the prefix that completes the word.</span></div><p class="clue">The word means <b>${x.mean}</b>.</p>
       <div class="opts"><button class="opt re" data-v="re">re-</button><button class="opt inter" data-v="inter">inter-</button></div>`;
     const done = () => { $('#g').outerHTML = `<span class="pre ${x.pre}">${x.pre}</span>`; h.querySelectorAll('.opt').forEach(b=>{b.disabled=true; if(b.dataset.v===x.pre) b.classList.add('ok');}); };
     h.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
@@ -324,7 +325,7 @@ const BUILD = {
   build(x, h, api){
     h.innerHTML = `<p class="eyebrow">Build the word</p>
       <div class="build"><span class="chip ${x.pre}">${x.pre}</span><span>+</span><span class="chip">${x.root}</span><span>=</span></div>
-      <p class="clue">It means <b>${x.mean}</b>.</p>
+      <div class="how"><b>Do this</b><span>Type the whole word: the prefix and the root together.</span></div><p class="clue">It means <b>${x.mean}</b>.</p>
       <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
       <div class="hear">${HEAR}${HEAR_SENT}</div>
       <input class="txt" id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the whole word">
@@ -338,7 +339,7 @@ const BUILD = {
     let letters, placed = [];
     do { letters = shuffle(x.w.split('')); } while(letters.join('')===x.w);
     h.innerHTML = `<p class="eyebrow">Word scramble</p>
-      <p class="clue">Unscramble the letters to make a word that means <b>${x.mean}</b>.</p>
+      <div class="how"><b>Do this</b><span>Tap the letters in the right order to make a word that means <b>${x.mean}</b>.</span></div>
       <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
       <div class="hear">${HEAR}${HEAR_SENT}</div>
       <div class="slots" id="slots"></div><div class="pool" id="pool"></div>
@@ -363,7 +364,7 @@ const BUILD = {
     const n=x.w.length, k=Math.min(n-2, Math.max(2, Math.round(n*.4)));
     const hide = new Set(shuffle([...Array(n).keys()]).slice(0,k));
     h.innerHTML = `<p class="eyebrow">Missing letters</p>
-      <p class="clue">Fill in the missing letters. The word means <b>${x.mean}</b>.</p>
+      <div class="how"><b>Do this</b><span>Type the missing letters.</span></div><p class="clue">The word means <b>${x.mean}</b>.</p>
       <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
       <div class="hear">${HEAR}${HEAR_SENT}</div>
       <div class="boxes" id="bx">${x.w.split('').map((c,i)=> hide.has(i)
@@ -387,7 +388,7 @@ const BUILD = {
   },
   listen(x, h, api){
         h.innerHTML = `<p class="eyebrow">Listen and spell</p>
-      <p class="clue">${canSpeak?'Press the button, listen, then type the word.':'This browser cannot read words aloud, so use the meaning: <b>'+x.mean+'</b>.'}</p>
+      <div class="how"><b>Do this</b><span>${canSpeak?'Press the button, listen, then type the word you hear.':'This browser cannot read words aloud, so use the meaning: <b>'+x.mean+'</b>.'}</span></div>
       <div class="hear"><button class="btn primary" id="h1">${SPEAKER}Hear the word</button><button class="btn" id="h2">${SPEAKER}In a sentence</button></div>
       <input class="txt" id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Type the word you heard">
       <button class="btn primary" id="chk">Check</button>`;
@@ -402,7 +403,7 @@ const BUILD = {
   spell(x, h, api){
     h.innerHTML = `<p class="eyebrow">Spot the spelling</p>
       <p class="sent">${x.sent.replace('___','<span class="blank"></span>')}</p>
-      <p class="clue">Which spelling is right?</p>
+      <div class="how"><b>Do this</b><span>Tap the word that is spelt correctly.</span></div>
       <div class="hear">${HEAR}${HEAR_SENT}</div>
       <div class="opts">${shuffle([x.w,...x.bad]).map(o=>`<button class="opt" data-v="${o}">${o}</button>`).join('')}</div>`;
     const btns=[...h.querySelectorAll('.opt')];

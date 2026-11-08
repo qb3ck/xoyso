@@ -106,7 +106,8 @@ a.link{display:inline-block}
 .again{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-family:var(--display);font-size:1.3rem;font-weight:600}
 .again span{padding:2px 12px;border-radius:12px;background:var(--bg);border:2px solid var(--line)}
 .row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-</style></head><body><div id="app"></div>
+</style><link rel="stylesheet" href="/how.css">
+</head><body><div id="app"></div>
 <script>
 const BONES = [
  {id:'craneo',n:'Cráneo',en:'Skull',art:'el cráneo',tip:'Es el casco de la cabeza: protege el cerebro.',silly:'Un casco que nunca te quitas, ni para dormir.'},
@@ -211,7 +212,7 @@ function learn(){
     chips.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.id===id));
     info.innerHTML = `<p class="eyebrow">Hueso</p><h2>${b.n}</h2><div class="en">${b.en}</div><div class="tip"><p><strong>Truco:</strong> ${b.tip}</p><p><strong>Para recordarlo:</strong> ${b.silly}</p></div>`;
   }
-  info.innerHTML = `<p class="eyebrow">Toca un hueso</p><h2>El esqueleto</h2><p class="clue">Toca un hueso del dibujo, o un nombre de la lista, para ver cómo se llama.</p>`;
+  info.innerHTML = `<p class="eyebrow">Toca un hueso</p><h2>El esqueleto</h2><div class="how"><b>Haz esto</b><span>Toca un hueso del dibujo, o un nombre de la lista, para ver cómo se llama.</span></div>`;
   scrollTo(0,0);
 }
 
@@ -234,7 +235,7 @@ function dragGame(only){
   $('#app').innerHTML = `<div class="top"><button class="link" id="quit">← Parar</button><span class="count" id="cnt"></span></div>
     <div class="track"><i id="bar" style="width:0"></i></div>
     <div class="board" id="board">${boardSvg(pre)}</div>
-    <p class="clue" style="text-align:center;margin:8px auto">Arrastra cada nombre a su casilla. También puedes tocar el nombre y después la casilla.</p>
+    <div class="how"><b>Haz esto</b><span>Arrastra cada nombre a su casilla. También puedes tocar el nombre y después la casilla.</span></div>
     <div class="tray" id="tray">${shuffle(todo).map(id=>`<button class="dchip" data-id="${id}">${byId[id].n}</button>`).join('')}</div>
     <div class="fb" id="fb" aria-live="polite"></div>`;
   $('#quit').onclick=home;
@@ -277,7 +278,7 @@ function dragGame(only){
 /* ---------- questions ---------- */
 const BUILD = {
   find(b, ui, api){
-    ui.panel.innerHTML = `<p class="eyebrow">Encuéntralo</p><div class="big">¿Dónde está ${b.art}?</div><p class="clue">Toca ese hueso en el esqueleto.</p>`;
+    ui.panel.innerHTML = `<p class="eyebrow">Encuéntralo</p><div class="big">¿Dónde está ${b.art}?</div><div class="how"><b>Haz esto</b><span>Toca ese hueso en el esqueleto.</span></div>`;
     const sk = skeleton(ui.sk, id=>{ if(S.locked) return; if(id===b.id){ sk.clear(); sk.set(id,'ok'); api.attempt(true);} else { sk.clear(); sk.set(id,'no'); api.attempt(false, `Ese es ${byId[id].art}.`);} });
     return {retry(){}, reveal(){ sk.clear(); sk.set(b.id,'ok'); }};
   },
@@ -292,7 +293,7 @@ const BUILD = {
     return {retry(){}, reveal:done, correct:done};
   },
   type(b, ui, api){
-    ui.panel.innerHTML = `<p class="eyebrow">Escríbelo</p><div class="big">¿Cómo se llama este hueso?</div><p class="clue">Está pintado de color en el esqueleto. Escribe su nombre.</p>
+    ui.panel.innerHTML = `<p class="eyebrow">Escríbelo</p><div class="big">¿Cómo se llama este hueso?</div><div class="how"><b>Haz esto</b><span>Mira el hueso pintado de color y escribe su nombre.</span></div>
       <input class="txt" id="in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Nombre del hueso">
       <button class="btn primary" id="chk">Comprobar</button>`;
     const sk = skeleton(ui.sk, null); sk.set(b.id,'hi');
