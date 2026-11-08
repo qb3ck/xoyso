@@ -98,6 +98,7 @@ const pendingKey = 'geo.pending';
 async function loadProgress() {
   const data = await api('get_progress', { p_token: state.session.token });
   state.progress = new Map(data.items.map((r) => [r.item_id, r]));
+  if (state.session && (data.year || null) !== (state.session.year || null)) { state.session.year = data.year || null; store.set('geo.session', state.session); }
 }
 function localRecord(itemId, correct) {
   const r = state.progress.get(itemId) || { item_id: itemId, correct: 0, wrong: 0, streak: 0 };
@@ -446,6 +447,9 @@ function renderLogin(mode = 'signin', message = null) {
   const codeInput = h('input', { id: 'signupcode', inputmode: 'numeric', autocomplete: 'off', maxlength: 12, placeholder: '•••••' });
   const dots = h('div', { class: 'pin-dots', 'aria-label': 'PIN' });
   const err = h('p', { class: 'form-error', role: 'alert' }, message ? tr(message) : '');
+  let year = null;
+  const yearBtns = [['3primaria', ['3º Primaria', '3rd Primary']], ['1eso', ['1º ESO', '1st ESO']]].map(([id, t]) => h('button', { type: 'button', class: 'btn option', 'aria-pressed': 'false', onclick: (e) => { year = id; yearBtns.forEach((b) => b.setAttribute('aria-pressed', String(b === e.currentTarget))); err.replaceChildren(); } }, tr(t)));
+  const yearRow = h('div', { class: 'row', role: 'group' }, ...yearBtns);
   const btnText = signin ? ['Entrar', 'Sign in'] : ['Crear jugador', 'Create player'];
   const submit = h('button', { class: 'btn primary wide', type: 'submit' }, tr(btnText));
   const drawDots = () => { dots.replaceChildren(...Array.from({ length: Math.max(4, pin.length) }, (_, i) => h('span', { class: i < pin.length ? 'on' : '' }))); };
@@ -465,11 +469,12 @@ function renderLogin(mode = 'signin', message = null) {
     const username = nameInput.value.trim().toLowerCase();
     if (!username) { fail(['Primero escribe tu nombre.', 'Type your name first.']); nameInput.focus(); return; }
     if (!signin && !codeInput.value.trim()) { fail(['Escribe el código de registro.', 'Enter the sign-up code.']); codeInput.focus(); return; }
+    if (!signin && !year) { fail(['Elige tu curso.', 'Choose your year.']); return; }
     if (pin.length < 4) { fail(['Escribe un PIN de al menos 4 cifras.', 'Enter a PIN of at least 4 digits.']); return; }
     submit.disabled = true; submit.replaceChildren(tr('Un momento…', 'Just a moment…'));
     try {
-      const res = await api(signin ? 'login_player' : 'register_player', signin ? { p_username: username, p_pin: pin } : { p_username: username, p_pin: pin, p_code: codeInput.value.trim() });
-      state.session = { token: res.token, username: res.username }; store.set('geo.session', state.session);
+      const res = await api(signin ? 'login_player' : 'register_player', signin ? { p_username: username, p_pin: pin } : { p_username: username, p_pin: pin, p_code: codeInput.value.trim(), p_year: year });
+      state.session = { token: res.token, username: res.username, year: res.year || null }; store.set('geo.session', state.session);
       document.onkeydown = null;
       await loadProgress(); flushPending(); renderHome();
     } catch (ex) {
@@ -482,7 +487,7 @@ function renderLogin(mode = 'signin', message = null) {
       ? ['Entra para seguir donde lo dejaste.', 'Sign in to carry on where you left off.']
       : ['Elige un nombre y un PIN que recuerdes. Tu progreso se guarda con este nombre.', 'Choose a name and a PIN you’ll remember. Your progress is saved under this name.'])),
     h('label', { for: 'username' }, tr('Tu nombre', 'Your name')), nameInput,
-    ...(signin ? [] : [h('label', { for: 'signupcode' }, tr('Código de registro', 'Sign-up code')), codeInput]),
+    ...(signin ? [] : [h('label', { for: 'signupcode' }, tr('Código de registro', 'Sign-up code')), codeInput, h('label', {}, tr('¿En qué curso estás?', 'Which year are you in?')), yearRow]),
     h('label', {}, tr(signin ? ['PIN', 'PIN'] : ['Elige un PIN (de 4 a 6 cifras)', 'Choose a PIN (4–6 digits)'])), dots, pad, err, submit,
     h('button', { type: 'button', class: 'link-btn', onclick: () => renderLogin(signin ? 'signup' : 'signin') },
       tr(signin ? ['¿Primera vez? Crea un jugador', 'First time? Create a player'] : ['¿Ya tienes jugador? Entra', 'Already have a player? Sign in'])));
@@ -574,13 +579,25 @@ const card = (icon, title, blurb, extra = [], opts = {}) => h(opts.href ? 'a' : 
 const meterBits = ({ mastered, total }) => [h('div', { class: 'meter' }, h('span', { style: `width:${(100 * mastered) / total}%` })),
   h('p', { class: 'small' }, tr(`${mastered} de ${total} dominados`, `${mastered} of ${total} mastered`))];
 const textIcon = (t) => `<span style="font:700 1.5rem var(--font,inherit)">${t}</span>`;
+const YEAR_OF = { '3primaria': '3prim', '1eso': '1eso' };
+async function chooseYear(db) {
+  const prev = state.session.year; state.session.year = db; store.set('geo.session', state.session); renderHome();
+  try { await api('set_year', { p_token: state.session.token, p_year: db }); } catch { state.session.year = prev; store.set('geo.session', state.session); toast(L('No se pudo guardar el curso. Inténtalo otra vez.', 'Could not save the year. Try again.'), 3000); renderHome(); }
+}
 function renderHome() {
   setUserArea(); document.onkeydown = null; setCrumbs();
-  const cards = YEARS.map((y) => card(textIcon(y.id === '1eso' ? '1º' : '3º'), y.title, [y.subjects.map((x) => x.title[0]).join(' · '), y.subjects.map((x) => x.title[1]).join(' · ')], [], { onclick: () => renderYear(y) }));
+  const mine = YEAR_OF[state.session.year];
+  const ordered = [...YEARS].sort((a, b) => (b.id === mine) - (a.id === mine));
+  const cards = ordered.map((y) => card(textIcon(y.id === '1eso' ? '1º' : '3º'), y.title, [(y.id === mine ? '★ Tu curso · ' : '') + y.subjects.map((x) => x.title[0]).join(' · '), (y.id === mine ? '★ Your year · ' : '') + y.subjects.map((x) => x.title[1]).join(' · ')], [], { onclick: () => renderYear(y), ...(y.id === mine ? { class: 'mine' } : {}) }));
+  const pickYear = h('div', { class: 'card' }, h('h2', {}, tr(mine ? 'Cambiar de curso' : '¿En qué curso estás?', mine ? 'Change your year' : 'Which year are you in?')),
+    h('p', { class: 'muted' }, tr('Te mostraremos primero tu curso. Los demás cursos siguen disponibles.', 'We will show your year first. The other years are still available.')),
+    h('div', { class: 'row' }, ...[['3primaria', ['3º Primaria', '3rd Primary']], ['1eso', ['1º ESO', '1st ESO']]].map(([id, t]) => h('button', { class: `btn option ${state.session.year === id ? 'primary' : ''}`, onclick: () => chooseYear(id) }, tr(t)))));
   screen(h('section', { class: 'home' },
     h('h1', {}, tr(`¡Hola, ${state.session.username}!`, `Hi ${state.session.username}!`)),
-    h('p', { class: 'muted lead' }, tr('¿De qué curso quieres repasar?', 'Which year do you want to revise?')),
-    h('div', { class: 'topic-grid' }, ...cards)));
+    ...(mine ? [] : [pickYear]),
+    h('p', { class: 'muted lead' }, tr(mine ? 'Empieza por tu curso o elige otro.' : '¿De qué curso quieres repasar?', mine ? 'Start with your year, or pick another.' : 'Which year do you want to revise?')),
+    h('div', { class: 'topic-grid' }, ...cards),
+    ...(mine ? [h('details', { class: 'muted' }, h('summary', {}, tr('Cambiar mi curso', 'Change my year')), pickYear)] : [])));
 }
 function renderYear(year) {
   setUserArea(); document.onkeydown = null; setCrumbs([{ t: year.title }]);
