@@ -15,7 +15,8 @@ const load = () => { try { const o = JSON.parse(localStorage.getItem(KEY) || '{}
 let DB = load();
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) { /* storage unavailable */ } };
 
-let DATA = null, group = null, sel = null, shown = false, viewMonth = null;
+let DATA = null, group = null, sel = null, shown = false, viewMonth = null, prac = null;
+function newPractice(g, prev) { let r = null; for (let i = 0; i < 12; i++) { r = G[g](); if (!prev || r.q !== prev.q) break; } return { ...r, g, shown: false, n: (prev ? prev.n : 0) + 1 }; }
 const today = () => ymd(new Date());
 const qFor = (g, date) => { const i = dayDiff(date, DATA.start); const list = DATA.groups[g]; return i >= 0 && i < list.length ? list[i] : null; };
 const mark = (g, date) => DB.d[`${g}:${date}`] || null;
@@ -76,10 +77,15 @@ function render() {
    <header class="hero"><h1>Maths question of the day</h1><p>Reto de mates del día. One new question every day. Work it out on paper, then check the answer and the working. Missed a day? Go back and do it from the calendar.</p></header>
    <div class="tabs" role="group" aria-label="Year">${GROUPS.map(([g, n2]) => `<button class="tab" data-g="${g}" aria-pressed="${g === group}">${n2}</button>`).join('')}</div>
    <div class="stats"><div class="stat hi"><b>${done}/${open.length}</b><span>questions done</span></div><div class="stat"><b>${right}</b><span>got right</span></div><div class="stat"><b>${missed}</b><span>still to do</span></div></div>
-   ${q ? `<div class="panel qbox"><div class="qhead"><p class="eyebrow">${sel === t ? 'Today · ' : ''}${longDate(sel)}</p>${stars(q.d)}</div>
+   ${prac ? `<div class="panel qbox"><div class="qhead"><p class="eyebrow">Practice ${prac.n} · same style as ${longDate(sel)}</p></div>
+     <p class="qtext">${esc(prac.q)}</p>
+     ${prac.shown ? `<div><p class="eyebrow">Answer</p><p class="answer">${esc(prac.a)}</p></div><div><p class="eyebrow">Working</p><ol class="work">${prac.work.map((w) => `<li>${esc(w)}</li>`).join('')}</ol></div><div class="mark"><button class="btn primary" id="pnext">Another one like this</button><button class="btn" id="pback">Back to the question of the day</button></div>`
+     : `<div class="how"><b>Do this</b><span>Work it out on paper first. Then check. Practice questions are not marked or saved.</span></div><button class="btn primary" id="pshow">Show the answer and working</button><button class="link" id="pback">Back to the question of the day</button>`}</div>`
+   : q ? `<div class="panel qbox"><div class="qhead"><p class="eyebrow">${sel === t ? 'Today · ' : ''}${longDate(sel)}</p>${stars(q.d)}</div>
      <p class="qtext">${esc(q.q)}</p>
      ${shown ? `<div><p class="eyebrow">Answer</p><p class="answer">${esc(q.a)}</p></div><div><p class="eyebrow">Working</p><ol class="work">${q.work.map((w) => `<li>${esc(w)}</li>`).join('')}</ol></div>
-       <div><p class="eyebrow">${m ? 'Marked: ' + (m === 'r' ? 'right' : 'wrong') + '. Tap to change.' : 'How did you do? Be honest.'}</p><div class="mark"><button class="btn ${m === 'r' ? 'on r' : ''}" data-m="r">✓ I got it right</button><button class="btn ${m === 'w' ? 'on w' : ''}" data-m="w">✗ I got it wrong</button></div></div>`
+       <div><p class="eyebrow">${m ? 'Marked: ' + (m === 'r' ? 'right' : 'wrong') + '. Tap to change.' : 'How did you do? Be honest.'}</p><div class="mark"><button class="btn ${m === 'r' ? 'on r' : ''}" data-m="r">✓ I got it right</button><button class="btn ${m === 'w' ? 'on w' : ''}" data-m="w">✗ I got it wrong</button></div></div>
+       <div><p class="eyebrow">Want more?</p><button class="btn" id="prac">Practise more questions like this</button></div>`
      : `<div class="how"><b>Do this</b><span>Work it out on paper first. Only then tap the button to see the answer and the working.</span></div><button class="btn primary" id="show">Show the answer and working</button>`}
     </div>` : `<div class="panel"><p class="clue">The first question appears on ${longDate(DATA.start)}.</p></div>`}
    <h2 class="sec">Calendar</h2>
@@ -87,9 +93,13 @@ function render() {
    <div class="cal">${['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((x) => `<span class="dow">${x}</span>`).join('')}${cells}</div>
    <div class="leg"><span><i class="r"></i>Right</span><span><i class="w"></i>Wrong</span><span><i class="m"></i>Not done yet</span><span>Greyed days are not open yet</span></div>
    <p class="hint" style="margin-top:14px">${session() ? 'Your marks are saved to your account.' : 'Sign in on the main xoyso page to save your marks to your account.'}</p>`;
-  app.querySelectorAll('.tab').forEach((b) => { b.onclick = () => { group = b.dataset.g; DB.g = group; save(); sel = null; shown = false; viewMonth = null; render(); }; });
-  app.querySelectorAll('.day[data-d]').forEach((b) => { b.onclick = () => { sel = b.dataset.d; shown = false; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }; });
+  app.querySelectorAll('.tab').forEach((b) => { b.onclick = () => { group = b.dataset.g; DB.g = group; save(); sel = null; shown = false; prac = null; viewMonth = null; render(); }; });
+  app.querySelectorAll('.day[data-d]').forEach((b) => { b.onclick = () => { sel = b.dataset.d; shown = false; prac = null; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }; });
   if ($('#show')) $('#show').onclick = () => { shown = true; render(); };
+  if ($('#prac')) $('#prac').onclick = () => { prac = newPractice(qFor(group, sel).g); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  if ($('#pshow')) $('#pshow').onclick = () => { prac.shown = true; render(); };
+  if ($('#pnext')) $('#pnext').onclick = () => { prac = newPractice(qFor(group, sel).g, prac); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  if ($('#pback')) $('#pback').onclick = () => { prac = null; render(); };
   app.querySelectorAll('[data-m]').forEach((b) => { b.onclick = () => setMark(group, sel, b.dataset.m); });
   if ($('#pm')) $('#pm').onclick = () => { const d = new Date(vy, vm - 2, 1); viewMonth = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; render(); };
   if ($('#nm')) $('#nm').onclick = () => { const d = new Date(vy, vm, 1); viewMonth = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; render(); };
