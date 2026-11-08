@@ -255,9 +255,10 @@ const RUN = {
     if (t) RUN.focus.t = t; t = RUN.focus.t; const T = (U.topics || []).find((x) => x.id === t);
     const pool = [];
     (U.quizzes || []).forEach((z) => z.items.filter((it) => it.k === t).forEach((it) => pool.push({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: t, pg: it.pg })));
-    U.sort.filter(([, c]) => c === t).forEach(([x, c]) => pool.push({ prompt: `Which group? <br><span style="font-family:var(--body);font-weight:800">${esc(x)}</span>`, opts: U.categories.map((y) => y.name), answer: catName(c), k: t }));
+    const GIVE = /mycelium|hyphae|yeast|lichen|mushroom|truffle/i;
+    U.sort.filter(([x, c]) => c === t && !(t === 'f' && GIVE.test(x))).forEach(([x, c]) => pool.push({ prompt: `Which group? <br><span style="font-family:var(--body);font-weight:800">${esc(x)}</span>`, opts: U.categories.map((y) => y.name), answer: catName(c), k: t }));
     if (t === 'v') pool.push(...vocabQ(U.vocab.length));
-    U.riddles.filter((r) => r.k === t).forEach((r) => pool.push(riddleQ(U.riddles.length).find((q) => q.answer === cap(r.a)) || riddleQ(1)[0]));
+    U.riddles.filter((r) => r.k === t && t !== 'f').forEach((r) => pool.push(riddleQ(U.riddles.length).find((q) => q.answer === cap(r.a)) || riddleQ(1)[0]));
     ACTS.focus.name = 'Practise ' + (T ? T.name : 'topic');
     quiz('focus', sample(pool, Math.min(10, pool.length)));
   },
