@@ -61,6 +61,12 @@ const ACTS = {
   features: { name: 'Features table', icon: '▦', blurb: 'Mark each box with a tick or a cross.' },
   label: { name: 'Label the drawing', icon: '✎', blurb: 'Name the shapes and parts.' },
   cloze: { name: 'Complete the notes', icon: '…', blurb: 'Fill the gaps with the right words.' },
+  pdfexam: { name: 'Exam paper', icon: '📝', blurb: '20 mixed questions from the two PDFs. Your best score is saved.' },
+  xfeatures: { name: 'Exam: features table', icon: '▦', blurb: 'Tick or cross each box, using only the PDFs.' },
+  xcloze: { name: 'Exam: complete the notes', icon: '…', blurb: 'The summary notes with gaps to fill.' },
+  xlabel: { name: 'Exam: label the diagrams', icon: '✎', blurb: 'The diagrams from the summary notes.' },
+  xspell: { name: 'Exam: spell the labels', icon: 'Abc', blurb: 'Type the names on the PDF diagrams. Spelling counts.' },
+  xlearn: { name: 'Exam: written answers', icon: '⟳', blurb: 'Exam-style questions. Write on paper, then check.' },
   spell: { name: 'Spell the labels', icon: 'Abc', blurb: 'Type the names on the drawings. Spelling counts.' },
   riddles: { name: 'Who am I?', icon: '?', blurb: 'Fewer clues means more points.' },
   order: { name: 'Put in order', icon: '1·2·3', blurb: 'Steps of reproduction in the right order.' },
@@ -86,7 +92,9 @@ const HOW = {
   explain: ['Read the question.', 'Write your answer on paper, in 2 or 3 sentences.', 'Show the key points and tick the ones you included. Be honest.'],
   exam: ['Answer 20 questions from every activity.', 'Tap the best answer each time.', 'Your best score is saved. Check the review list at the end.'],
 };
-const HOWQ = { feeding: 'Tap how it gets its food.', importance: 'Tap Helpful or Harmful.', tf: 'Tap True or False. Then read the reason that appears.' };
+HOW.xfeatures = HOW.features; HOW.xcloze = HOW.cloze; HOW.xlabel = HOW.label; HOW.xspell = HOW.spell; HOW.xlearn = HOW.learn;
+HOW.pdfexam = ['Answer 20 questions taken from the concept map and the summary notes.', 'Tap the best answer each time.', 'Your best score is saved. Check the review list at the end.'];
+const HOWQ = { feeding: 'Tap how it gets its food.', importance: 'Tap Helpful or Harmful.', tf: 'Tap True or False. Then read the reason that appears.', pdftf: 'Tap True or False. Then read the reason that appears.', pdf: 'Tap the best answer. Then read the reason that appears.' };
 const seen = (k) => { try { return !!JSON.parse(localStorage.getItem('bio-seen') || '{}')[k]; } catch (e) { return false; } };
 const markSeen = (k) => { try { const o = JSON.parse(localStorage.getItem('bio-seen') || '{}'); o[k] = 1; localStorage.setItem('bio-seen', JSON.stringify(o)); } catch (e) { /* storage unavailable */ } };
 const stepsHtml = (arr) => `<ol class="steps">${arr.map((t, i) => `<li><i>${i + 1}</i><span>${['READ', 'DO', 'CHECK'][i] ? '' : ''}${esc(t)}</span></li>`).join('')}</ol>`;
@@ -103,11 +111,15 @@ function listHome() {
 }
 function unitHome() {
   document.title = U.short + ' · Biology';
-  const avail = U.activities.filter((a) => ACTS[a]);
   const best = prog().best;
+  const cardOf = (a, main) => `<button class="act ${main ? 'main' : ''}" data-a="${a}"><span class="demo">${ACTS[a].icon}</span><h3>${ACTS[a].name}</h3><p>${ACTS[a].blurb}</p>${best[a] != null ? `<span class="pill">Best ${best[a]}%</span>` : ''}</button>`;
+  const ex = (U.examActs || []).filter((a) => ACTS[a]);
+  const rest = U.activities.filter((a) => ACTS[a] && a !== 'guide');
   app.innerHTML = `<div class="crumbs">${link('/', 'xoyso')}<span class="hint">›</span>${link('/biology', 'Biology')}</div>
    <header class="hero"><h1>${esc(U.title)}</h1><p>${esc(U.blurb)}</p></header>
-   <div class="grid">${avail.map((a) => `<button class="act ${a === 'exam' || a === 'guide' ? 'main' : ''}" data-a="${a}"><span class="demo">${ACTS[a].icon}</span><h3>${ACTS[a].name}</h3><p>${ACTS[a].blurb}</p>${best[a] != null ? `<span class="pill">Best ${best[a]}%</span>` : ''}</button>`).join('')}</div>`;
+   ${ACTS.guide && U.activities.includes('guide') ? `<div class="grid">${cardOf('guide', true)}</div>` : ''}
+   ${ex.length ? `<h2 class="sec" style="margin:18px 0 4px">Exam practice</h2><p class="hint" style="margin:0 0 8px">Built only from the concept map and the summary notes, which is what the exam covers.</p><div class="grid">${ex.map((a) => cardOf(a, a === 'pdfexam')).join('')}</div>` : ''}
+   <h2 class="sec" style="margin:18px 0 4px">${ex.length ? 'More revision (from the book)' : 'Activities'}</h2><div class="grid">${rest.map((a) => cardOf(a, a === 'exam')).join('')}</div>`;
   app.querySelectorAll('[data-a]').forEach((b) => { b.onclick = () => RUN[b.dataset.a](); });
   scrollTo(0, 0);
 }
@@ -185,14 +197,14 @@ const RUN = {
     const stat = (t) => { const o = tp[t.id]; if (!o || o.n < 5) return { n: o ? o.n : 0, pct: null, tag: 'Not enough yet', cls: 'none' }; const pct = Math.round((o.r.reduce((a, b) => a + b, 0) / o.r.length) * 100); return { n: o.n, pct, tag: pct >= 85 ? 'Strong' : pct >= 60 ? 'Getting there' : 'Needs focus', cls: pct >= 85 ? 'good' : pct >= 60 ? 'mid' : 'bad' }; };
     const S = T.map((t) => ({ t, ...stat(t) }));
     const known = S.filter((x) => x.pct != null).sort((a, b) => a.pct - b.pct);
-    const acts = U.activities.filter((a) => ACTS[a] && !['guide', 'focus', 'exam'].includes(a));
+    const acts = [...(U.examActs || []), ...U.activities].filter((a) => ACTS[a] && !['guide', 'focus', 'exam', 'pdfexam'].includes(a));
     const plan = [];
     known.filter((x) => x.pct < 85).slice(0, 2).forEach((x) => plan.push({ go: 'focus:' + x.t.id, text: `Practise ${x.t.name} (10 questions)`, why: `You are at ${x.pct}% on ${x.t.name}.` }));
     if (known.some((x) => x.pct < 60 && ['m', 'p', 'a', 'f'].includes(x.t.id)) && !plan.some((p) => p.go === 'learn')) plan.push({ go: 'learn', text: 'Learn the answers', why: 'Read the key points again, then write them from memory.' });
     S.filter((x) => x.pct == null).slice(0, 2).forEach((x) => plan.push({ go: 'focus:' + x.t.id, text: `Try ${x.t.name} questions`, why: 'You have not answered enough of these yet for me to tell.' }));
     acts.filter((a) => !runs[a] && !plan.some((p) => p.go === a)).slice(0, 2).forEach((a) => plan.push({ go: a, text: `Try ${ACTS[a].name}`, why: 'You have not done this one yet.' }));
     acts.filter((a) => runs[a] && best[a] < 70).slice(0, 2).forEach((a) => plan.push({ go: a, text: `Do ${ACTS[a].name} again`, why: `Your best is ${best[a]}%.` }));
-    if (!plan.length) plan.push({ go: 'exam', text: 'Take the Final exam', why: (best.exam != null ? `Your best is ${best.exam}%. ` : '') + 'You are doing well. Test yourself.' });
+    if (!plan.length) plan.push({ go: U.examActs ? 'pdfexam' : 'exam', text: U.examActs ? 'Take the Exam paper' : 'Take the Final exam', why: (best.pdfexam != null ? `Your best is ${best.pdfexam}%. ` : '') + 'You are doing well. Test yourself.' });
     const first = plan[0];
     const total = Object.values(tp).reduce((a, o) => a + o.n, 0);
     app.innerHTML = `${topBar('<button class="link" id="stop">← Unit home</button>', 'Guide my learning')}
@@ -220,8 +232,15 @@ const RUN = {
     quiz('focus', sample(pool, Math.min(10, pool.length)));
   },
 
-  features() {
-    const cats = U.categories, rows = U.features;
+  xfeatures: () => RUN.features(U.pdffeatures, 'xfeatures'),
+  xcloze: () => RUN.cloze(U.pdfcloze, 'xcloze'),
+  xlabel: () => RUN.label(U.drawings.filter((d) => d.pdf), 'xlabel'),
+  xspell: () => RUN.spell(U.drawings.filter((d) => d.pdf), 'xspell'),
+  xlearn: () => RUN.learn(U.explain.filter((x) => x.src === 'pdf'), 'xlearn'),
+  pdfexam: () => { const pool = (U.quizzes || []).filter((z) => z.id === 'pdf' || z.id === 'pdftf').flatMap((z) => z.items.map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: it.k }))); quiz('pdfexam', sample(pool, Math.min(20, pool.length))); },
+
+  features(rowsIn, actIn) {
+    const act = actIn || 'features', cats = U.categories, rows = rowsIn || U.features;
     app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', 'Features table')}<div class="panel">${how('Do this', 'In every box tap ✓ if the group has the feature or ✗ if it does not. Every box needs an answer. A feature can belong to more than one group.')}
      <table class="grid2"><thead><tr><th></th>${cats.map((c) => `<th>${esc(c.name)}</th>`).join('')}</tr></thead><tbody>
      ${rows.map(([f], r) => `<tr><td>${esc(f)}</td>${cats.map((c, k) => `<td data-r="${r}" data-k="${k}"><button class="tk" data-v="1" aria-label="${esc(f)}: ${esc(c.name)} yes">✓</button><button class="tk" data-v="0" aria-label="${esc(f)}: ${esc(c.name)} no">✗</button></td>`).join('')}</tr>`).join('')}</tbody></table>
@@ -235,13 +254,13 @@ const RUN = {
       app.querySelectorAll('td[data-r]').forEach((td) => { const ok = (td.dataset.v === '1') === !!rows[+td.dataset.r][1][+td.dataset.k]; note(cats[+td.dataset.k].id, ok); if (ok) right++; td.className = ok ? 'ok' : 'no'; td.querySelectorAll('.tk').forEach((b) => (b.disabled = true)); });
       const pct = Math.round((right / total) * 100);
       $('#fb').className = 'fb ' + (pct === 100 ? 'good' : 'bad'); $('#fb').textContent = `${right} of ${total} boxes right.`;
-      $('#chk').textContent = 'Finish'; $('#chk').onclick = () => finishCard('features', `${right}/${total}`, pct, '<p class="hint">Green boxes were right, red were wrong. Look at the red ones before you go again.</p>', RUN.features);
+      $('#chk').textContent = 'Finish'; $('#chk').onclick = () => finishCard(act, `${right}/${total}`, pct, '<p class="hint">Green boxes were right, red were wrong. Look at the red ones before you go again.</p>', () => RUN[act]());
     };
   },
 
-  label() {
-    const ds = shuffle(U.drawings); let i = 0, right = 0, total = 0;
-    const next = () => { if (i >= ds.length) { finishCard('label', `${right}/${total}`, Math.round((right / total) * 100), '', RUN.label); return; } draw(ds[i]); };
+  label(listIn, actIn) {
+    const act = actIn || 'label', ds = shuffle(listIn || U.drawings); let i = 0, right = 0, total = 0;
+    const next = () => { if (i >= ds.length) { finishCard(act, `${right}/${total}`, Math.round((right / total) * 100), '', () => RUN[act]()); return; } draw(ds[i]); };
     const draw = (d) => {
       const bank = shuffle(d.labels.map((l) => l.a)); const placed = d.labels.map(() => null); let selChip = null;
       app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Label the drawing · ${i + 1} of ${ds.length}`)}<div class="panel"><h2 class="sec" style="margin:0">${esc(d.title)}</h2>
@@ -270,11 +289,11 @@ const RUN = {
   },
 
 
-  spell() {
-    const ds = shuffle(U.drawings.filter((d) => d.labels.every((l) => l.a.split(' ').length <= 2))); let i = 0, right = 0, total = 0;
+  spell(listIn, actIn) {
+    const act = actIn || 'spell', ds = shuffle((listIn || U.drawings).filter((d) => d.labels.every((l) => l.a.split(' ').length <= 2))); let i = 0, right = 0, total = 0;
     const norm = (x) => x.toLowerCase().replace(/\s+/g, ' ').trim();
     const dist = (a, b) => { const m = [...Array(a.length + 1)].map((_, r) => [r, ...Array(b.length).fill(0)]); for (let c = 1; c <= b.length; c++) m[0][c] = c; for (let r = 1; r <= a.length; r++) for (let c = 1; c <= b.length; c++) m[r][c] = Math.min(m[r - 1][c] + 1, m[r][c - 1] + 1, m[r - 1][c - 1] + (a[r - 1] === b[c - 1] ? 0 : 1)); return m[a.length][b.length]; };
-    const next = () => { if (i >= ds.length) { finishCard('spell', `${right}/${total}`, Math.round((right / total) * 100), '<p class="hint">Look at the red ones and say each word out loud, letter by letter.</p>', RUN.spell); return; } draw(ds[i]); };
+    const next = () => { if (i >= ds.length) { finishCard(act, `${right}/${total}`, Math.round((right / total) * 100), '<p class="hint">Look at the red ones and say each word out loud, letter by letter.</p>', () => RUN[act]()); return; } draw(ds[i]); };
     const draw = (d) => {
       app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Spell the labels · ${i + 1} of ${ds.length}`)}<div class="panel"><h2 class="sec" style="margin:0">${esc(d.title)}</h2><div class="pic pinbox" id="pic">${d.svg}</div>
        ${how('Do this', 'Type the name for each number. Spelling counts. The number of letters is shown in each box.')}
@@ -295,9 +314,9 @@ const RUN = {
     next();
   },
 
-  cloze() {
-    const items = shuffle(U.cloze).slice(0, 5); let i = 0, right = 0, total = 0;
-    const next = () => { if (i >= items.length) { finishCard('cloze', `${right}/${total}`, Math.round((right / total) * 100), '', RUN.cloze); return; } draw(items[i][0], items[i][1] || [], items[i][2]); };
+  cloze(srcIn, actIn) {
+    const act = actIn || 'cloze', items = shuffle(srcIn || U.cloze).slice(0, srcIn ? 6 : 5); let i = 0, right = 0, total = 0;
+    const next = () => { if (i >= items.length) { finishCard(act, `${right}/${total}`, Math.round((right / total) * 100), '', () => RUN[act]()); return; } draw(items[i][0], items[i][1] || [], items[i][2]); };
     const draw = (text, extra, topic) => {
       // gaps look like {word} or {word~tag}; gaps with the same tag are interchangeable (e.g. "A and B"), so either order is right
       const answers = [], tags = []; const parts = text.split(/\{([^}]+)\}/); // odd indexes are gaps
@@ -310,7 +329,7 @@ const RUN = {
         let g = -1; $('#txt').innerHTML = parts.map((p, k) => { if (!(k % 2)) return esc(p); g++; return `<span class="gap ${sel === 'g' + g ? 'act' : ''}" data-g="${g}">${filled[g] ? esc(filled[g]) : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'}</span>`; }).join('');
         $('#bank').innerHTML = bank.map((w) => `<button class="chip ${Object.values(filled).includes(w) ? 'used' : ''} ${sel === w ? 'sel' : ''}" data-w="${esc(w)}">${esc(w)}</button>`).join('');
         $('#bank').querySelectorAll('.chip').forEach((c) => { c.onclick = () => { if (c.classList.contains('used')) return; sel = sel === c.dataset.w ? null : c.dataset.w; render(); }; });
-        $('#txt').querySelectorAll('.gap').forEach((e) => { e.onclick = () => { const k = +e.dataset.g; if (filled[k]) { delete filled[k]; } else if (sel && !sel.startsWith('g')) { filled[k] = sel; sel = null; } render(); }; });
+        $('#txt').querySelectorAll('.gap').forEach((e) => { e.onclick = () => { const k = +e.dataset.g; if (filled[k]) { delete filled[k]; } else if (sel) { filled[k] = sel; sel = null; } render(); }; });
       };
       render();
       $('#chk').onclick = () => {
@@ -343,8 +362,9 @@ const RUN = {
     ask();
   },
 
-  learn(pre) {
-    const sets = [['Page 60: Summarising', U.explain.filter((x) => x.src === 'p60')], ['Questions from the other pages', U.explain.filter((x) => x.src !== 'p60')]].filter((x) => x[1].length);
+  learn(pre, actIn) {
+    const lact = actIn || 'learn';
+    const sets = [['Exam questions from the PDFs', U.explain.filter((x) => x.src === 'pdf')], ['Page 60: Summarising', U.explain.filter((x) => x.src === 'p60')], ['Questions from the other pages', U.explain.filter((x) => x.src !== 'p60' && x.src !== 'pdf')]].filter((x) => x[1].length);
     const chooser = () => {
       app.innerHTML = `${topBar('<button class="link" id="stop">← Back</button>', 'Learn the answers')}<div class="panel"><p class="prompt">Learn the answers</p>
        ${how('How it works', 'Try each question from memory first.')}${stepsHtml(HOW.learn)}
@@ -375,8 +395,8 @@ const RUN = {
         write(false);
       };
       const end = () => {
-        const pct = Math.round((got / total) * 100); if (first) record('learn', pct);
-        app.innerHTML = `<div class="panel"><p class="eyebrow">Learn the answers</p><div class="big">${got}/${total}</div><p class="clue">key points remembered${gaps.length ? `. ${gaps.length} question${gaps.length > 1 ? 's' : ''} had gaps.` : '. You had them all!'}</p>
+        const pct = Math.round((got / total) * 100); if (first) record(lact, pct);
+        app.innerHTML = `<div class="panel"><p class="eyebrow">${esc(ACTS[lact].name)}</p><div class="big">${got}/${total}</div><p class="clue">key points remembered${gaps.length ? `. ${gaps.length} question${gaps.length > 1 ? 's' : ''} had gaps.` : '. You had them all!'}</p>
          ${gaps.length ? `<div class="card" style="text-align:left;width:100%"><b>Go again on</b><ul>${gaps.map((g) => `<li>${esc(g.q)}</li>`).join('')}</ul></div>` : ''}
          <div class="row">${gaps.length ? '<button class="btn primary" id="redo">Redo the gaps</button>' : ''}<button class="btn ${gaps.length ? '' : 'primary'}" id="hm">Unit home</button></div></div>`;
         if (gaps.length) $('#redo').onclick = () => run(gaps, false);
@@ -384,14 +404,14 @@ const RUN = {
       };
       item();
     };
-    pre ? run(pre, false) : chooser();
+    pre ? run(pre, true) : chooser();
   },
 
   explain() {
     const items = sample(U.explain, Math.min(6, U.explain.length)); let i = 0, got = 0, total = 0;
     const ask = () => {
       const it = items[i];
-      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Explain it · ${i + 1} of ${items.length}`)}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">From the book, ${it.src === 'p60' ? 'page 60 (Summarising)' : 'page ' + it.src.slice(1)}.</p>
+      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Explain it · ${i + 1} of ${items.length}`)}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">${it.src === 'pdf' ? 'From the concept map and summary notes (the PDFs).' : 'From the book, ' + (it.src === 'p60' ? 'page 60 (Summarising)' : 'page ' + it.src.slice(1)) + '.'}</p>
        ${how('Step 1 of 2 · Write on paper', 'Write your answer on paper first, in 2 or 3 sentences. No peeking. Then show the key points.')}
        ${hintUi(it)}<button class="btn primary" id="show">Show the key points</button><div id="kp" style="width:100%"></div></div>`;
       $('#stop').onclick = unitHome;
