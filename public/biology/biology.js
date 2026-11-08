@@ -73,7 +73,7 @@ const app = $('#app');
 const how = (tag, text) => `<div class="how"><b>${tag}</b><span>${text}</span></div>`;
 /* what to do in each activity: shown as a numbered "How it works" screen the first time, and as a highlighted box during it */
 const HOW = {
-  learn: ['Write or say what you know about the question. The key points are hidden. If you do not know it yet, tap Show me the points, read them, cover them, and try again.', 'Press Check my answer. The key points appear.', 'Tick the points you included. Questions with gaps come round again until you have them.'],
+  learn: ['Write what you know about the question on paper. The key points are hidden. If you do not know it yet, tap Show me the points, read them, cover them, and try again.', 'Press I\'ve written it. The key points appear.', 'Tick the points you included. Questions with gaps come round again until you have them.'],
   sort: ['Read the statement.', 'Tap the group it describes.', 'If you are wrong, the right group is shown. Remember it for next time.'],
   features: ['Look at each feature in the list.', 'In every box tap ✓ if the group has it or ✗ if not. Every box needs an answer.', 'Press Check. Green is right, red is wrong.'],
   label: ['Look at the picture and its numbers.', 'Tap a word, then tap the number it belongs to.', 'Press Check. The right names are shown for any mistakes.'],
@@ -81,7 +81,7 @@ const HOW = {
   riddles: ['Read the first clue.', 'Guess as early as you can. Fewer clues means more points.', 'Tap Another clue only if you need one.'],
   order: ['Read the steps. They are in a mixed-up order.', 'Tap them in the order they happen.', 'Press Check. Tap a chosen step to take it back.'],
   vocab: ['Read the question.', 'Tap the right answer.', 'If you are wrong, the right answer is shown. Remember it.'],
-  explain: ['Read the question.', 'Write or say your answer, in 2 or 3 sentences.', 'Show the key points and tick the ones you included. Be honest.'],
+  explain: ['Read the question.', 'Write your answer on paper, in 2 or 3 sentences.', 'Show the key points and tick the ones you included. Be honest.'],
   exam: ['Answer 20 questions from every activity.', 'Tap the best answer each time.', 'Your best score is saved. Check the review list at the end.'],
 };
 const HOWQ = { feeding: 'Tap how it gets its food.', importance: 'Tap Helpful or Harmful.', tf: 'Tap True or False. Then read the reason that appears.' };
@@ -320,10 +320,10 @@ const RUN = {
       const item = () => {
         const it = list[i], n = it.points.length, head = `${topBar('<button class="link" id="stop">← Stop</button>', `Learn · ${i + 1} of ${list.length}`)}<div class="track"><i style="width:${(i / list.length) * 100}%"></i></div>`;
         const write = (peeked) => {
-          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${peeked ? how('Step 2 of 3 · Write', 'The points are hidden. Write or say your answer from memory.') : how('Step 1 of 2 · Write', 'Write or say what you know first. The points are hidden. If you do not know it yet, tap the second button.')}<textarea class="ta" id="ans" rows="5" placeholder="Your answer"></textarea>${hintUi(it)}<button class="btn primary" id="chk">Check my answer</button>${peeked ? '' : '<button class="btn" id="peek">I don\'t know this yet. Show me the points</button>'}</div>`;
-          $('#stop').onclick = unitHome; $('#ans').focus({ preventScroll: true }); wireHint(it);
+          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${peeked ? how('Step 2 of 3 · Write', 'The points are hidden. Write your answer on paper from memory.') : how('Step 1 of 2 · Write on paper', 'Write what you know on paper first. The points are hidden. Then tap the first button. If you do not know it yet, tap the second button.')}${hintUi(it)}<button class="btn primary" id="chk">I've written it. Check my answer</button>${peeked ? '' : '<button class="btn" id="peek">I don\'t know this yet. Show me the points</button>'}</div>`;
+          $('#stop').onclick = unitHome; wireHint(it);
           if (!peeked) $('#peek').onclick = read;
-          $('#chk').onclick = () => check($('#ans').value.trim(), peeked);
+          $('#chk').onclick = () => check('', peeked);
         };
         const read = () => {
           app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how('Step 1 of 3 · Read', 'Read the key points and make sure you understand them.')}<ol class="clues">${it.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ol><button class="btn primary" id="cov">Cover it. I'll write it from memory</button></div>`;
@@ -355,8 +355,8 @@ const RUN = {
     const ask = () => {
       const it = items[i];
       app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Explain it · ${i + 1} of ${items.length}`)}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">From the book, ${it.src === 'p60' ? 'page 60 (Summarising)' : 'page ' + it.src.slice(1)}.</p>
-       ${how('Step 1 of 2', 'Write or say your answer first, in 2 or 3 sentences. No peeking.')}
-       <textarea class="ta" id="ans" rows="4" placeholder="Your answer (optional, it is not saved)"></textarea>${hintUi(it)}<button class="btn primary" id="show">Show the key points</button><div id="kp" style="width:100%"></div></div>`;
+       ${how('Step 1 of 2 · Write on paper', 'Write your answer on paper first, in 2 or 3 sentences. No peeking. Then show the key points.')}
+       ${hintUi(it)}<button class="btn primary" id="show">Show the key points</button><div id="kp" style="width:100%"></div></div>`;
       $('#stop').onclick = unitHome;
       wireHint(it);
       $('#show').onclick = () => {
