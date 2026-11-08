@@ -58,7 +58,7 @@ const ACTS = {
   guide: { name: 'Guide my learning', icon: '🧭', blurb: 'See what you know, what needs work, and what to do next.' },
   focus: { name: 'Topic practice', icon: '◎', blurb: '' },
   sort: { name: 'Sort it', icon: '⇅', blurb: 'Which group does each statement describe?' },
-  features: { name: 'Features table', icon: '▦', blurb: 'Tick every group that has the feature.' },
+  features: { name: 'Features table', icon: '▦', blurb: 'Mark each box with a tick or a cross.' },
   label: { name: 'Label the drawing', icon: '✎', blurb: 'Name the shapes and parts.' },
   cloze: { name: 'Complete the notes', icon: '…', blurb: 'Fill the gaps with the right words.' },
   riddles: { name: 'Who am I?', icon: '?', blurb: 'Fewer clues means more points.' },
@@ -75,7 +75,7 @@ const how = (tag, text) => `<div class="how"><b>${tag}</b><span>${text}</span></
 const HOW = {
   learn: ['Read the key points for the question.', 'Cover them and write or say your answer from memory.', 'Tick the points you included. Questions with gaps come round again until you have them.'],
   sort: ['Read the statement.', 'Tap the group it describes.', 'If you are wrong, the right group is shown. Remember it for next time.'],
-  features: ['Look at each feature in the list.', 'Tick every group that has it. More than one group can have a feature.', 'Press Check. Green is right, red is wrong.'],
+  features: ['Look at each feature in the list.', 'In every box tap ✓ if the group has it or ✗ if not. Every box needs an answer.', 'Press Check. Green is right, red is wrong.'],
   label: ['Look at the picture and its numbers.', 'Tap a word, then tap the number it belongs to.', 'Press Check. The right names are shown for any mistakes.'],
   cloze: ['Read the sentence with its gaps.', 'Tap a word, then tap the gap it fits.', 'Press Check. The right words are shown for any mistakes.'],
   riddles: ['Read the first clue.', 'Guess as early as you can. Fewer clues means more points.', 'Tap Another clue only if you need one.'],
@@ -208,14 +208,17 @@ const RUN = {
 
   features() {
     const cats = U.categories, rows = U.features;
-    app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', 'Features table')}<div class="panel">${how('Do this', 'Tick every group that has each feature. A feature can belong to more than one group.')}
+    app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', 'Features table')}<div class="panel">${how('Do this', 'In every box tap ✓ if the group has the feature or ✗ if it does not. Every box needs an answer. A feature can belong to more than one group.')}
      <table class="grid2"><thead><tr><th></th>${cats.map((c) => `<th>${esc(c.name)}</th>`).join('')}</tr></thead><tbody>
-     ${rows.map(([f], r) => `<tr><td>${esc(f)}</td>${cats.map((c, k) => `<td data-r="${r}" data-k="${k}"><input type="checkbox" aria-label="${esc(f)}: ${esc(c.name)}"></td>`).join('')}</tr>`).join('')}</tbody></table>
+     ${rows.map(([f], r) => `<tr><td>${esc(f)}</td>${cats.map((c, k) => `<td data-r="${r}" data-k="${k}"><button class="tk" data-v="1" aria-label="${esc(f)}: ${esc(c.name)} yes">✓</button><button class="tk" data-v="0" aria-label="${esc(f)}: ${esc(c.name)} no">✗</button></td>`).join('')}</tr>`).join('')}</tbody></table>
      <div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
     $('#stop').onclick = unitHome;
+    app.querySelectorAll('td[data-r]').forEach((td) => td.querySelectorAll('.tk').forEach((b) => { b.onclick = () => { td.dataset.v = b.dataset.v; td.querySelectorAll('.tk').forEach((x) => x.classList.toggle('on', x === b)); }; }));
     $('#chk').onclick = () => {
+      const blank = app.querySelectorAll('td[data-r]:not([data-v])').length;
+      if (blank) { $('#fb').className = 'fb bad'; $('#fb').textContent = `Tap ✓ or ✗ in every box first. ${blank} still empty.`; return; }
       let right = 0; const total = rows.length * cats.length;
-      app.querySelectorAll('td[data-r]').forEach((td) => { const ok = td.firstChild.checked === !!rows[+td.dataset.r][1][+td.dataset.k]; note(cats[+td.dataset.k].id, ok); if (ok) right++; td.className = ok ? 'ok' : 'no'; td.firstChild.disabled = true; });
+      app.querySelectorAll('td[data-r]').forEach((td) => { const ok = (td.dataset.v === '1') === !!rows[+td.dataset.r][1][+td.dataset.k]; note(cats[+td.dataset.k].id, ok); if (ok) right++; td.className = ok ? 'ok' : 'no'; td.querySelectorAll('.tk').forEach((b) => (b.disabled = true)); });
       const pct = Math.round((right / total) * 100);
       $('#fb').className = 'fb ' + (pct === 100 ? 'good' : 'bad'); $('#fb').textContent = `${right} of ${total} boxes right.`;
       $('#chk').textContent = 'Finish'; $('#chk').onclick = () => finishCard('features', `${right}/${total}`, pct, '<p class="hint">Green boxes were right, red were wrong. Look at the red ones before you go again.</p>', RUN.features);
