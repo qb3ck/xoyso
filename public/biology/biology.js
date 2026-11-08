@@ -19,6 +19,8 @@ const ACTS = {
   cloze: { name: 'Complete the notes', icon: '…', blurb: 'Fill the gaps with the right words.' },
   riddles: { name: 'Who am I?', icon: '?', blurb: 'Fewer clues means more points.' },
   order: { name: 'Put in order', icon: '1·2·3', blurb: 'Steps of reproduction in the right order.' },
+  learn: { name: 'Learn the answers', icon: '⟳', blurb: 'Read it, cover it, write it, check it. Then redo the gaps.' },
+  explain: { name: 'Explain it', icon: '✍', blurb: 'Answer as in the exam, then check the key points.' },
   vocab: { name: 'Vocabulary', icon: 'Aa', blurb: 'Key terms and what they mean.' },
   exam: { name: 'Final exam', icon: '★', blurb: 'A mixed test. Your best score is saved.' },
 };
@@ -65,8 +67,8 @@ function quiz(act, qs) {
         app.querySelectorAll('.o').forEach((x) => { x.disabled = true; if (q.opts[+x.dataset.k] === q.answer) x.classList.add('ok'); });
         if (!ok) b.classList.add('no');
         if (ok) score++; else missed.push(q);
-        $('#fb').className = 'fb ' + (ok ? 'good' : 'bad'); $('#fb').textContent = ok ? 'Correct!' : 'The answer is: ' + q.answer;
-        setTimeout(() => { i++; i < qs.length ? ask() : end(); }, ok ? 700 : 1800);
+        $('#fb').className = 'fb ' + (ok ? 'good' : 'bad'); $('#fb').textContent = (ok ? 'Correct!' : 'The answer is: ' + q.answer + '.') + (q.why ? ' ' + q.why : '');
+        setTimeout(() => { i++; i < qs.length ? ask() : end(); }, q.why ? 3200 : ok ? 700 : 1800);
       };
     });
   };
@@ -76,6 +78,7 @@ function quiz(act, qs) {
   };
   ask();
 }
+const quizQ = (set, n) => sample(set.items, n).map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why }));
 const catName = (id) => U.categories.find((c) => c.id === id).name;
 const sortQ = (n) => sample(U.sort, n).map(([t, c]) => ({ prompt: `Which group? <br><span style="font-family:var(--body);font-weight:800">${esc(t)}</span>`, opts: U.categories.map((x) => x.name), answer: catName(c) }));
 const vocabQ = (n) => sample(U.vocab, n).map(([en, def, es], k) => {
@@ -93,7 +96,8 @@ const RUN = {
   sort: () => quiz('sort', sortQ(Math.min(12, U.sort.length))),
   vocab: () => quiz('vocab', vocabQ(Math.min(12, U.vocab.length))),
   exam: () => {
-    const qs = [...sortQ(Math.min(8, U.sort.length)), ...vocabQ(Math.min(8, U.vocab.length)), ...(U.riddles ? riddleQ(Math.min(4, U.riddles.length)) : [])];
+    const pool = (U.quizzes || []).flatMap((z) => z.items.map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why })));
+    const qs = [...sortQ(Math.min(6, U.sort.length)), ...vocabQ(Math.min(4, U.vocab.length)), ...sample(pool, Math.min(8, pool.length)), ...(U.riddles ? riddleQ(Math.min(2, U.riddles.length)) : [])];
     quiz('exam', shuffle(qs));
   },
 
@@ -190,6 +194,64 @@ const RUN = {
     ask();
   },
 
+  learn() {
+    const sets = [['Page 60: Summarising', U.explain.filter((x) => x.src === 'p60')], ['Questions from the other pages', U.explain.filter((x) => x.src !== 'p60')]].filter((x) => x[1].length);
+    const chooser = () => {
+      app.innerHTML = `${topBar('<button class="link" id="stop">← Back</button>', 'Learn the answers')}<div class="panel"><p class="prompt">Learn the answers</p>
+       <p class="clue">For each question: read the key points, cover them, write your answer from memory, then check. Questions with gaps come round again until you have them.</p>
+       <div class="opts">${sets.map((x, k) => `<button class="o" data-k="${k}">${esc(x[0])} (${x[1].length} questions)</button>`).join('')}${sets.length > 1 ? `<button class="o" data-k="all">Everything (${U.explain.length} questions)</button>` : ''}</div></div>`;
+      $('#stop').onclick = unitHome;
+      app.querySelectorAll('.o').forEach((b) => { b.onclick = () => run(b.dataset.k === 'all' ? [...U.explain] : [...sets[+b.dataset.k][1]], true); });
+    };
+    const run = (list, first) => {
+      let i = 0, got = 0, total = 0; const gaps = [];
+      const item = () => {
+        const it = list[i], n = it.points.length, head = `${topBar('<button class="link" id="stop">← Stop</button>', `Learn · ${i + 1} of ${list.length}`)}<div class="track"><i style="width:${(i / list.length) * 100}%"></i></div>`;
+        app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">Step 1 of 3: read and understand the key points.</p><ol class="clues">${it.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ol><button class="btn primary" id="cov">Cover it. I'll write it from memory</button></div>`;
+        $('#stop').onclick = unitHome;
+        $('#cov').onclick = () => {
+          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">Step 2 of 3: write or say your answer from memory, with no peeking.</p><textarea class="ta" id="ans" rows="5" placeholder="Your answer"></textarea><button class="btn primary" id="chk">Check my answer</button></div>`;
+          $('#stop').onclick = unitHome; $('#ans').focus({ preventScroll: true });
+          $('#chk').onclick = () => {
+            const mine = $('#ans').value.trim();
+            app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">Step 3 of 3: tick the key points your answer included.</p>${mine ? `<div class="card" style="text-align:left;width:100%"><b>Your answer</b><p style="margin:4px 0 0;white-space:pre-wrap">${esc(mine)}</p></div>` : ''}
+             <div class="slots">${it.points.map((p, k) => `<label class="slot" style="cursor:pointer"><input type="checkbox" style="width:22px;height:22px;flex:none"><span>${esc(p)}</span></label>`).join('')}</div><div class="row"><button class="btn primary" id="nx">${i + 1 >= list.length ? 'Finish' : 'Next question'}</button></div></div>`;
+            $('#stop').onclick = unitHome;
+            $('#nx').onclick = () => { const t = app.querySelectorAll('.slot input:checked').length; got += t; total += n; if (t < n) gaps.push(it); i++; i < list.length ? item() : end(); };
+          };
+        };
+      };
+      const end = () => {
+        const pct = Math.round((got / total) * 100); if (first) record('learn', pct);
+        app.innerHTML = `<div class="panel"><p class="eyebrow">Learn the answers</p><div class="big">${got}/${total}</div><p class="clue">key points remembered${gaps.length ? `. ${gaps.length} question${gaps.length > 1 ? 's' : ''} had gaps.` : '. You had them all!'}</p>
+         ${gaps.length ? `<div class="card" style="text-align:left;width:100%"><b>Go again on</b><ul>${gaps.map((g) => `<li>${esc(g.q)}</li>`).join('')}</ul></div>` : ''}
+         <div class="row">${gaps.length ? '<button class="btn primary" id="redo">Redo the gaps</button>' : ''}<button class="btn ${gaps.length ? '' : 'primary'}" id="hm">Unit home</button></div></div>`;
+        if (gaps.length) $('#redo').onclick = () => run(gaps, false);
+        $('#hm').onclick = unitHome;
+      };
+      item();
+    };
+    chooser();
+  },
+
+  explain() {
+    const items = sample(U.explain, Math.min(6, U.explain.length)); let i = 0, got = 0, total = 0;
+    const ask = () => {
+      const it = items[i];
+      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Explain it · ${i + 1} of ${items.length}`)}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">From the book, ${it.src === 'p60' ? 'page 60 (Summarising)' : 'page ' + it.src.slice(1)}.</p>
+       <p class="hint">Write or say your answer first, in 2 or 3 sentences. Then check it against the key points.</p>
+       <textarea class="ta" id="ans" rows="4" placeholder="Your answer (optional, it is not saved)"></textarea><button class="btn primary" id="show">Show the key points</button><div id="kp" style="width:100%"></div></div>`;
+      $('#stop').onclick = unitHome;
+      $('#show').onclick = () => {
+        $('#show').hidden = true;
+        $('#kp').innerHTML = `<p class="hint">Tick each point your answer included. Be honest: this is how you find what to revise.</p><div class="slots">${it.points.map((p, k) => `<label class="slot" style="cursor:pointer"><input type="checkbox" data-k="${k}" style="width:22px;height:22px;flex:none"><span>${esc(p)}</span></label>`).join('')}</div><div class="row" style="margin-top:12px"><button class="btn primary" id="nx">${i + 1 >= items.length ? 'Finish' : 'Next question'}</button></div>`;
+        $('#nx').onclick = () => { got += app.querySelectorAll('#kp input:checked').length; total += it.points.length; i++; i < items.length ? ask() : finishCard('explain', `${got}/${total}`, Math.round((got / total) * 100), '<p class="hint">This score is marked by you. Revise the points you missed, then try again.</p>', RUN.explain); };
+        $('#kp').scrollIntoView({ block: 'nearest' });
+      };
+    };
+    ask();
+  },
+
   order() {
     const items = shuffle(U.order); let i = 0, right = 0, total = 0;
     const next = () => { if (i >= items.length) { finishCard('order', `${right}/${total}`, Math.round((right / total) * 100), '', RUN.order); return; } draw(items[i]); };
@@ -221,6 +283,6 @@ const RUN = {
   try {
     UNITS = await (await fetch('/biology/units.json')).json();
     const id = new URLSearchParams(location.search).get('u'); const meta = UNITS.find((u) => u.id === id);
-    if (meta) { U = await (await fetch('/biology/' + meta.file)).json(); U.id = meta.id; unitHome(); } else listHome();
+    if (meta) { U = await (await fetch('/biology/' + meta.file)).json(); U.id = meta.id; (U.quizzes || []).forEach((z) => { ACTS['q-' + z.id] = { name: z.name, icon: z.icon, blurb: z.blurb }; RUN['q-' + z.id] = () => quiz('q-' + z.id, quizQ(z, Math.min(10, z.items.length))); }); unitHome(); } else listHome();
   } catch (e) { app.innerHTML = '<p class="fb bad">Could not load the unit. Check your connection and refresh.</p>'; }
 })();
