@@ -13,7 +13,46 @@ const prog = () => (DB[U.id] = DB[U.id] || { best: {}, runs: {} });
 function record(act, pct) { const p = prog(); p.runs[act] = (p.runs[act] || 0) + 1; if (pct > (p.best[act] || 0)) p.best[act] = pct; store.set(DB); }
 
 /* topic tracking for Guide my learning: prog().topics[k] = {n: answers seen, r: last 20 results (1/0)} */
-function note(k, ok) { if (!k) return; const t = (prog().topics = prog().topics || {}); const o = (t[k] = t[k] || { n: 0, r: [] }); o.n++; o.r.push(ok ? 1 : 0); if (o.r.length > 20) o.r.shift(); store.set(DB); }
+function note(k, ok) {
+  if (!k) return; const t = (prog().topics = prog().topics || {}); const o = (t[k] = t[k] || { n: 0, r: [] }); o.n++; o.r.push(ok ? 1 : 0); if (o.r.length > 20) o.r.shift();
+  const u = session(); if (u && DB.sync && DB.sync.owner === u.username) DB.sync.q.push({ id: `bio:${U.id}:${k}`, c: !!ok });   // owner not set yet: the start-up sync uploads it
+  store.set(DB); syncFlush();
+}
+/* ---- account sync: each topic answer is a Supabase progress row bio:<unit>:<topic>, like the spelling words ---- */
+const session = () => { try { const o = JSON.parse(localStorage.getItem('geo.session')); return o && o.token ? o : null; } catch (e) { return null; } };
+let CFG = null, flushing = false;
+async function rpc(fn, args) {
+  CFG = CFG || await import('/config.js');
+  const res = await fetch(`${CFG.SUPABASE_URL}/rest/v1/rpc/${fn}`, { method: 'POST', headers: { apikey: CFG.SUPABASE_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(args) });
+  const text = await res.text(), data = text ? JSON.parse(text) : null;
+  if (!res.ok) throw new Error((data && data.message) || 'error');
+  return data;
+}
+async function syncFlush() {
+  const u = session(); if (!u || flushing || !DB.sync || DB.sync.owner !== u.username) return false; flushing = true;
+  try { while (DB.sync.q.length) { const e = DB.sync.q[0]; await rpc('record_answer', { p_token: u.token, p_item_id: e.id, p_correct: e.c }); DB.sync.q.shift(); store.set(DB); } return true; }
+  catch (e) { return false; } finally { flushing = false; }
+}
+async function syncStart() {
+  const u = session(); if (!u) return;
+  try {
+    if (DB.sync && DB.sync.owner && DB.sync.owner !== u.username) { Object.values(DB).forEach((p) => { if (p && p.topics) delete p.topics; }); DB.sync = null; }   // a different child used this device
+    if (!DB.sync || !DB.sync.owner) {   // first time for this child: upload the topic history already on this device
+      const remote = await rpc('get_progress', { p_token: u.token }), known = new Set(remote.items.map((i) => i.item_id)); const q = [];
+      Object.entries(DB).forEach(([uid, p]) => { if (p && p.topics) Object.entries(p.topics).forEach(([k, o]) => { if (!known.has(`bio:${uid}:${k}`)) o.r.forEach((c) => q.push({ id: `bio:${uid}:${k}`, c: !!c })); }); });
+      DB.sync = { owner: u.username, q }; store.set(DB);
+    }
+    if (!(await syncFlush())) return;
+    const fresh = await rpc('get_progress', { p_token: u.token });
+    fresh.items.filter((i) => i.item_id.startsWith('bio:' + U.id + ':')).forEach((i) => {
+      const k = i.item_id.split(':')[2], n = i.correct + i.wrong, t = (prog().topics = prog().topics || {});
+      if (t[k] && t[k].n >= n) return;   // this device already knows at least as much
+      const w = Math.min(20, n), good = Math.round((i.correct / n) * w);
+      t[k] = { n, r: [...Array(w - good).fill(0), ...Array(good).fill(1)] };
+    });
+    store.set(DB); if ($('#guideRoot')) RUN.guide();
+  } catch (e) { /* offline: keep working from this device */ }
+}
 
 const ACTS = {
   guide: { name: 'Guide my learning', icon: '🧭', blurb: 'See what you know, what needs work, and what to do next.' },
@@ -91,7 +130,8 @@ function quiz(act, qs) {
         if (!ok) b.classList.add('no');
         if (ok) score++; else missed.push(q); note(q.k, ok);
         $('#fb').className = 'fb ' + (ok ? 'good' : 'bad'); $('#fb').textContent = (ok ? 'Correct!' : 'The answer is: ' + q.answer + '.') + (q.why ? ' ' + q.why : '');
-        setTimeout(() => { i++; i < qs.length ? ask() : end(); }, q.why ? 3200 : ok ? 700 : 1800);
+        const nx = document.createElement('button'); nx.className = 'btn primary'; nx.id = 'nxq'; nx.textContent = i + 1 >= qs.length ? 'Finish' : 'Next'; nx.onclick = () => { i++; i < qs.length ? ask() : end(); };
+        $('#fb').after(nx); nx.focus({ preventScroll: true }); nx.scrollIntoView({ block: 'nearest' });
       };
     });
   };
@@ -142,16 +182,16 @@ const RUN = {
     const first = plan[0];
     const total = Object.values(tp).reduce((a, o) => a + o.n, 0);
     app.innerHTML = `${topBar('<button class="link" id="stop">← Unit home</button>', 'Guide my learning')}
-     <div class="panel"><h2 class="sec" style="margin:0">Your progress by topic</h2>
+     <div class="panel" id="guideRoot"><h2 class="sec" style="margin:0">Your progress by topic</h2>
      ${total < 5 ? how('Start here', 'I have not seen enough answers yet. Do a few activities and come back. Learn the answers and Sort it are good ones to start with.') : how('Do this next', esc(first.text) + '. ' + esc(first.why))}
      <div class="slots">${S.map((x) => `<div class="slot" style="flex-direction:column;align-items:stretch;gap:6px"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(x.t.name)}</b><span class="pill">${x.tag}${x.pct != null ? ' · ' + x.pct + '%' : ''}</span></div><div class="track" style="margin:0"><i style="width:${x.pct || 0}%;${x.cls === 'bad' ? 'background:#c0392b' : x.cls === 'mid' ? 'background:#d68910' : ''}"></i></div></div>`).join('')}</div>
      <h2 class="sec" style="margin:14px 0 0">What to do</h2>
      <div class="slots">${plan.slice(0, 5).map((p, k) => `<button class="slot" data-go="${p.go}" style="text-align:left"><span class="num">${k + 1}</span><span><b>${esc(p.text)}</b><br><span class="hint">${esc(p.why)}</span></span></button>`).join('')}</div>
-     <p class="hint">Topic marks come from your last 20 answers on each topic, across all the activities. For Learn the answers and Explain it they come from the points you ticked.</p>
+     <p class="hint">${session() ? 'Saved to your account, so it follows you to other devices.' : 'Sign in on the main xoyso page to save this to your account.'} Topic marks come from your last 20 answers on each topic, across all the activities. For Learn the answers and Explain it they come from the points you ticked.</p>
      <div class="row"><button class="btn" id="rs">Start my guide again</button></div></div>`;
     $('#stop').onclick = unitHome;
     app.querySelectorAll('[data-go]').forEach((b) => { b.onclick = () => { const g = b.dataset.go; g.startsWith('focus:') ? RUN.focus(g.slice(6)) : RUN[g](); }; });
-    $('#rs').onclick = () => { if (confirm('Clear the topic marks for this unit? Your best scores stay.')) { delete prog().topics; store.set(DB); RUN.guide(); } };
+    $('#rs').onclick = () => { if (confirm('Clear the topic marks for this unit? Your best scores stay.')) { delete prog().topics; if (DB.sync) DB.sync.q = DB.sync.q.filter((e) => !e.id.startsWith('bio:' + U.id + ':')); store.set(DB); const u = session(); if (u) rpc('reset_progress', { p_token: u.token, p_topic: 'bio:' + U.id }).catch(() => {}); RUN.guide(); } };
     scrollTo(0, 0);
   },
 
@@ -364,6 +404,6 @@ function wrapIntros() {
   try {
     UNITS = await (await fetch('/biology/units.json')).json();
     const id = new URLSearchParams(location.search).get('u'); const meta = UNITS.find((u) => u.id === id);
-    if (meta) { U = await (await fetch('/biology/' + meta.file)).json(); U.id = meta.id; (U.quizzes || []).forEach((z) => { ACTS['q-' + z.id] = { name: z.name, icon: z.icon, blurb: z.blurb }; RUN['q-' + z.id] = () => quiz('q-' + z.id, quizQ(z, Math.min(10, z.items.length))); }); wrapIntros(); unitHome(); } else listHome();
+    if (meta) { U = await (await fetch('/biology/' + meta.file)).json(); U.id = meta.id; (U.quizzes || []).forEach((z) => { ACTS['q-' + z.id] = { name: z.name, icon: z.icon, blurb: z.blurb }; RUN['q-' + z.id] = () => quiz('q-' + z.id, quizQ(z, Math.min(10, z.items.length))); }); wrapIntros(); unitHome(); syncStart(); } else listHome();
   } catch (e) { app.innerHTML = '<p class="fb bad">Could not load the unit. Check your connection and refresh.</p>'; }
 })();

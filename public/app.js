@@ -721,7 +721,7 @@ function renderLearn(topic) {
   drawCard();
   screen(h('section', { class: 'play' },
     h('div', { class: 'play-head' }, h('button', { class: 'back', onclick: () => renderTopic(topic) }, '← ', tr('Volver', 'Back')), h('h1', {}, tr(topic.learnTitle)), toggle),
-    h('div', { class: 'play-body' }, map.el, h('aside', { class: 'side' }, card, chips))));
+    h('div', { class: 'play-body' }, map.el, h('aside', { class: 'side' }, howBox('Toca un sitio en el mapa o un nombre de la lista. Léelo y apréndelo. Luego prueba “Encuéntralo”.', 'Tap a place on the map or a name in the list. Read it and learn it. Then try “Find it”.'), card, chips))));
 }
 
 /* --- quizzes --- */
@@ -729,6 +729,7 @@ function startQuiz(topic, mode) {
   const round = { topic, mode, items: pickRound(topic, ROUND_LENGTH), i: 0, score: 0, missed: [] };
   renderQuiz(round);
 }
+const howBox = (es, en) => h('div', { class: 'how' }, h('b', {}, tr('Haz esto', 'Do this')), h('span', {}, tr(es, en)));
 const PRAISE = [['¡Muy bien!', 'Well done!'], ['¡Correcto!', 'Correct!'], ['¡Genial!', 'Great!'], ['¡Perfecto!', 'Perfect!'], ['¡Eso es!', 'That’s it!']];
 function renderQuiz(round) {
   setUserArea();
@@ -756,11 +757,11 @@ function renderQuiz(round) {
     if (mode === 'find' || mode === 'point') {
       map.reset(true);
       const ask = mode === 'point' ? tr(`Señala ${gd(topic).el} ${nEs}`, `Point to the ${nEn}`) : tr(`Toca ${gd(topic).el} ${nEs}`, `Tap the ${nEn}`);
-      prompt.replaceChildren(counter, h('p', { class: 'ask' }, ask), h('h2', { class: 'big-name' }, it.name));
+      prompt.replaceChildren(counter, howBox(mode === 'point' ? 'Toca en el mapa donde crees que está, de memoria. No hay ayuda. Vale con acercarte.' : 'Toca en el mapa el sitio que se nombra.', mode === 'point' ? 'Tap the map where you think it is, from memory. No help is shown. Close is good enough.' : 'Tap the named place on the map.'), h('p', { class: 'ask' }, ask), h('h2', { class: 'big-name' }, it.name));
       answers.append(h('div', { class: 'row' }, hintBtn(box), dontKnow()), box);
     } else {
       map.dimOthers(true); map.setClass(it.id, 'target'); map.focus(it.id);
-      prompt.replaceChildren(counter, h('p', { class: 'ask' }, tr(`¿Qué ${nEs} está iluminad${gd(topic).o}?`, `Which ${nEn} is lit up?`)));
+      prompt.replaceChildren(counter, howBox(mode === 'choose' ? 'Mira el mapa y toca el nombre correcto.' : 'Mira el mapa, escribe el nombre con sus tildes y pulsa Comprobar.', mode === 'choose' ? 'Look at the map and tap the right name.' : 'Look at the map, type the name with its accents, then press Check.'), h('p', { class: 'ask' }, tr(`¿Qué ${nEs} está iluminad${gd(topic).o}?`, `Which ${nEn} is lit up?`)));
       if (mode === 'choose') {
         const others = shuffle(topic.items.filter((x) => x.id !== it.id));
         // include some options from the same group, so it isn't too easy
@@ -997,7 +998,7 @@ function askConn(q, { staged, title, label, pct, back, onDone }) {
   };
   for (const o of connOptions(q)) { answers.append(h('button', { class: 'btn option', 'data-id': o.id, onclick: (e) => pickOpt(o.id, e.currentTarget) }, o.name)); remaining++; }
   const idk = h('button', { type: 'button', class: 'btn ghost', onclick: () => { if (locked) return; wrongs++; if (staged) advance(); else finish(false); } }, tr('No lo sé', 'I don’t know'));
-  shell({ title, label, pct, back, map, side: { prompt: [h('h2', { class: 'question' }, tr(q.q))], rest: [answers, h('div', { class: 'row' }, idk), feedback, nextBtn] } });
+  shell({ title, label, pct, back, map, side: { prompt: [howBox('Lee la pregunta y toca la respuesta correcta. Si fallas, te daré ayudas en el mapa.', 'Read the question and tap the right answer. If you miss, you get help on the map.'), h('h2', { class: 'question' }, tr(q.q))], rest: [answers, h('div', { class: 'row' }, idk), feedback, nextBtn] } });
 }
 
 /* connections round: 10 questions with staged clues */
@@ -1036,10 +1037,10 @@ function askItem({ topic, it, mode }, { title, label, pct, back, onDone }) {
     nextBtn.onclick = () => onDone(ok); nextBtn.hidden = false; nextBtn.focus();
   }
   let ask;
-  if (mode === 'find') { map.reset(true); ask = [h('p', { class: 'ask' }, tr(`Toca ${gd(topic).el} ${nEs}`, `Tap the ${nEn}`)), h('h2', { class: 'big-name' }, it.name)]; }
+  if (mode === 'find') { map.reset(true); ask = [howBox('Toca en el mapa el sitio que se nombra.', 'Tap the named place on the map.'), h('p', { class: 'ask' }, tr(`Toca ${gd(topic).el} ${nEs}`, `Tap the ${nEn}`)), h('h2', { class: 'big-name' }, it.name)]; }
   else {
     map.dimOthers(true); map.setClass(it.id, 'target'); map.focus(it.id);
-    ask = [h('p', { class: 'ask' }, tr(`¿Qué ${nEs} está iluminad${gd(topic).o}?`, `Which ${nEn} is lit up?`))];
+    ask = [howBox(mode === 'choose' ? 'Mira el mapa y toca el nombre correcto.' : 'Mira el mapa, escribe el nombre con sus tildes y pulsa Comprobar.', mode === 'choose' ? 'Look at the map and tap the right name.' : 'Look at the map, type the name with its accents, then press Check.'), h('p', { class: 'ask' }, tr(`¿Qué ${nEs} está iluminad${gd(topic).o}?`, `Which ${nEn} is lit up?`))];
     if (mode === 'choose') {
       const others = shuffle(topic.items.filter((x) => x.id !== it.id)), same = others.filter((x) => x.group === it.group).slice(0, 2);
       for (const o of shuffle([it, ...same, ...others.filter((x) => !same.includes(x))].slice(0, 4)))
