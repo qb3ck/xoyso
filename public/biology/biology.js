@@ -61,6 +61,7 @@ const ACTS = {
   features: { name: 'Features table', icon: '▦', blurb: 'Mark each box with a tick or a cross.' },
   label: { name: 'Label the drawing', icon: '✎', blurb: 'Name the shapes and parts.' },
   cloze: { name: 'Complete the notes', icon: '…', blurb: 'Fill the gaps with the right words.' },
+  spell: { name: 'Spell the labels', icon: 'Abc', blurb: 'Type the names on the drawings. Spelling counts.' },
   riddles: { name: 'Who am I?', icon: '?', blurb: 'Fewer clues means more points.' },
   order: { name: 'Put in order', icon: '1·2·3', blurb: 'Steps of reproduction in the right order.' },
   learn: { name: 'Learn the answers', icon: '⟳', blurb: 'Try it from memory first. Peek at the points only if you need to. Then redo the gaps.' },
@@ -78,6 +79,7 @@ const HOW = {
   features: ['Look at each feature in the list.', 'In every box tap ✓ if the group has it or ✗ if not. Every box needs an answer.', 'Press Check. Green is right, red is wrong.'],
   label: ['Look at the picture and its numbers.', 'Tap a word, then tap the number it belongs to.', 'Press Check. The right names are shown for any mistakes.'],
   cloze: ['Read the sentence with its gaps.', 'Tap a word, then tap the gap it fits.', 'Press Check. The right words are shown for any mistakes.'],
+  spell: ['Look at the drawing and its numbers.', 'Type the name for each number. Spelling counts.', 'Press Check. Spelling slips and the right spelling are shown.'],
   riddles: ['Read the first clue.', 'Guess as early as you can. Fewer clues means more points.', 'Tap Another clue only if you need one.'],
   order: ['Read the steps. They are in a mixed-up order.', 'Tap them in the order they happen.', 'Press Check. Tap a chosen step to take it back.'],
   vocab: ['Read the question.', 'Tap the right answer.', 'If you are wrong, the right answer is shown. Remember it.'],
@@ -155,6 +157,16 @@ const vocabQ = (n) => sample(U.vocab, n).map(([en, def, es], k) => {
   return { prompt: `Spanish for <b>${esc(en)}</b>?`, opts: shuffle([es, ...others(2)]), answer: es, k: 'v' };
 });
 const riddleQ = (n) => { const all = U.riddles.map((r) => cap(r.a)); return sample(U.riddles, n).map((r) => ({ prompt: 'Who am I?<br><span style="font-family:var(--body);font-weight:700;font-size:1rem">' + r.clues.map(esc).join(' ') + '</span>', opts: shuffle(all), answer: cap(r.a), k: r.k })); };
+
+
+/* numbered pins sit beside the thing they name (px,py) with a leader line to the target (x,y), so they never hide what is being tested */
+function addPins(box, d, onTap) {
+  const vb = box.querySelector('svg').viewBox.baseVal, W = vb.width, H = vb.height;
+  const ns = 'http://www.w3.org/2000/svg', ov = document.createElementNS(ns, 'svg'); ov.setAttribute('viewBox', `0 0 ${W} ${H}`); ov.setAttribute('class', 'lead');
+  ov.innerHTML = d.labels.map((l) => (l.px != null ? `<line x1="${l.px}" y1="${l.py}" x2="${l.x}" y2="${l.y}" stroke="#d9480f" stroke-width="2"/>` : '') + `<circle cx="${l.x}" cy="${l.y}" r="3.5" fill="#d9480f" stroke="#fff" stroke-width="1.2"/>`).join('');
+  box.appendChild(ov);
+  d.labels.forEach((l, k) => { const b = document.createElement('button'); b.className = 'pin'; b.textContent = k + 1; b.style.left = ((l.px != null ? l.px : l.x) / W) * 100 + '%'; b.style.top = ((l.py != null ? l.py : l.y) / H) * 100 + '%'; b.setAttribute('aria-label', 'Label ' + (k + 1)); b.onclick = () => onTap && onTap(k); box.appendChild(b); });
+}
 
 /* ---------- activities ---------- */
 const RUN = {
@@ -237,8 +249,7 @@ const RUN = {
        ${how('Do this', 'Tap a word, then tap the number it belongs to. Tap a filled number to take its word back.')}
        <div class="chips" id="bank"></div><div class="slots" id="slots"></div><div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
       $('#stop').onclick = unitHome;
-      const vb = $('#pic svg').viewBox.baseVal;
-      d.labels.forEach((l, k) => { const b = document.createElement('button'); b.className = 'pin'; b.textContent = k + 1; b.style.left = (l.x / vb.width) * 100 + '%'; b.style.top = (l.y / vb.height) * 100 + '%'; b.setAttribute('aria-label', 'Label ' + (k + 1)); b.onclick = () => put(k); $('#pic').appendChild(b); });
+      addPins($('#pic'), d, (k) => put(k));
       const render = () => {
         $('#bank').innerHTML = bank.map((w) => `<button class="chip ${placed.includes(w) ? 'used' : ''} ${selChip === w ? 'sel' : ''}" data-w="${esc(w)}">${esc(w)}</button>`).join('');
         $('#slots').innerHTML = d.labels.map((l, k) => `<button class="slot" data-k="${k}"><span class="num">${k + 1}</span>${placed[k] ? esc(placed[k]) : '<span class="hint">tap to fill</span>'}</button>`).join('');
@@ -254,6 +265,32 @@ const RUN = {
         $('#fb').className = 'fb ' + (r === d.labels.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${d.labels.length} right.`;
         $('#chk').textContent = i >= ds.length ? 'Finish' : 'Next drawing'; $('#chk').onclick = next;
       };
+    };
+    next();
+  },
+
+
+  spell() {
+    const ds = shuffle(U.drawings.filter((d) => d.labels.every((l) => l.a.split(' ').length <= 2))); let i = 0, right = 0, total = 0;
+    const norm = (x) => x.toLowerCase().replace(/\s+/g, ' ').trim();
+    const dist = (a, b) => { const m = [...Array(a.length + 1)].map((_, r) => [r, ...Array(b.length).fill(0)]); for (let c = 1; c <= b.length; c++) m[0][c] = c; for (let r = 1; r <= a.length; r++) for (let c = 1; c <= b.length; c++) m[r][c] = Math.min(m[r - 1][c] + 1, m[r][c - 1] + 1, m[r - 1][c - 1] + (a[r - 1] === b[c - 1] ? 0 : 1)); return m[a.length][b.length]; };
+    const next = () => { if (i >= ds.length) { finishCard('spell', `${right}/${total}`, Math.round((right / total) * 100), '<p class="hint">Look at the red ones and say each word out loud, letter by letter.</p>', RUN.spell); return; } draw(ds[i]); };
+    const draw = (d) => {
+      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Spell the labels · ${i + 1} of ${ds.length}`)}<div class="panel"><h2 class="sec" style="margin:0">${esc(d.title)}</h2><div class="pic pinbox" id="pic">${d.svg}</div>
+       ${how('Do this', 'Type the name for each number. Spelling counts. The number of letters is shown in each box.')}
+       <div class="slots" id="slots">${d.labels.map((l, k) => `<label class="slot"><span class="num">${k + 1}</span><input class="sp" data-k="${k}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${l.a.replace(/ /g, '').length} letters" style="flex:1;min-width:0;font:700 1.05rem var(--body);padding:8px;border:2px solid var(--line,#d6e0e8);border-radius:10px"></label>`).join('')}</div>
+       <div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
+      $('#stop').onclick = unitHome; addPins($('#pic'), d, (k) => app.querySelector(`.sp[data-k="${k}"]`).focus());
+      $('#chk').onclick = () => {
+        const ins = [...app.querySelectorAll('.sp')];
+        if (ins.some((x) => !x.value.trim())) { $('#fb').className = 'fb bad'; $('#fb').textContent = 'Type a name for every number first.'; return; }
+        let r = 0;
+        ins.forEach((x, k) => { const want = d.labels[k].a, got = norm(x.value), ok = got === norm(want); if (ok) r++; note(d.k, ok); x.disabled = true; const slot = x.closest('.slot'); slot.className = 'slot ' + (ok ? 'ok' : 'no'); if (!ok) slot.insertAdjacentHTML('beforeend', ` <span class="hint">${dist(got, norm(want)) <= 2 ? 'Spelling slip. ' : ''}→ ${esc(want)}</span>`); });
+        right += r; total += d.labels.length; i++;
+        $('#fb').className = 'fb ' + (r === d.labels.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${d.labels.length} spelt right.`;
+        $('#chk').textContent = i >= ds.length ? 'Finish' : 'Next drawing'; $('#chk').onclick = next;
+      };
+      const f = app.querySelector('.sp'); if (f) f.focus({ preventScroll: true });
     };
     next();
   },
