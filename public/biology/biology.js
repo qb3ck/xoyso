@@ -119,16 +119,17 @@ function unitHome() {
   app.innerHTML = `<div class="crumbs">${link('/', 'xoyso')}<span class="hint">›</span>${link('/biology', 'Biology')}</div>
    <header class="hero"><h1>${esc(U.title)}</h1><p>${esc(U.blurb)}</p></header>
    ${ACTS.guide && U.activities.includes('guide') ? `<div class="grid">${cardOf('guide', true)}</div>` : ''}
-   ${ex.length ? `<h2 class="sec" style="margin:18px 0 4px">Exam practice</h2><p class="hint" style="margin:0 0 8px">Built only from the concept map and the summary notes, which is what the exam covers. Where to read more in the book: ${esc(U.bookpages || '')}.</p><div class="grid">${ex.map((a) => cardOf(a, a === 'pdfexam')).join('')}</div>` : ''}
+   ${ex.length ? `<div class="row" style="justify-content:flex-start;margin-top:14px"><button class="btn primary" id="nxt">➜ What should I try next?</button></div><h2 class="sec" style="margin:18px 0 4px">Exam practice</h2><p class="hint" style="margin:0 0 8px">Built only from the concept map and the summary notes, which is what the exam covers. Where to read more in the book: ${esc(U.bookpages || '')}.</p><div class="grid">${ex.map((a) => cardOf(a, a === 'pdfexam')).join('')}</div>` : ''}
    <h2 class="sec" style="margin:18px 0 4px">${ex.length ? 'More revision (from the book)' : 'Activities'}</h2><div class="grid">${rest.map((a) => cardOf(a, a === 'exam')).join('')}</div>`;
   app.querySelectorAll('[data-a]').forEach((b) => { b.onclick = () => RUN[b.dataset.a](); });
+  if ($('#nxt')) $('#nxt').onclick = () => RUN.next();
   scrollTo(0, 0);
 }
 const finishCard = (act, label, pct, extra = '', again) => {
   record(act, pct);
   app.innerHTML = `<div class="panel"><p class="eyebrow">${ACTS[act].name}</p><div class="big">${label}</div><p class="clue">${pct >= 90 ? 'Brilliant!' : pct >= 60 ? 'Good work. Run it again to lock it in.' : 'Keep going: do the notes round once more, then try again.'} Best so far: ${prog().best[act]}%.</p>${extra}
-   <div class="row"><button class="btn primary" id="again">Again</button><button class="btn" id="hm">Unit home</button></div></div>`;
-  $('#again').onclick = again; $('#hm').onclick = unitHome;
+   <div class="row"><button class="btn primary" id="again">Again</button>${U.examActs ? '<button class="btn" id="nxs">What should I try next?</button>' : ''}<button class="btn" id="hm">Unit home</button></div></div>`;
+  $('#again').onclick = again; $('#hm').onclick = unitHome; if ($('#nxs')) $('#nxs').onclick = () => RUN.next();
 };
 
 /* ---------- multiple-choice runner (sort, vocab, exam) ---------- */
@@ -181,6 +182,28 @@ function addPins(box, d, onTap) {
   d.labels.forEach((l, k) => { const b = document.createElement('button'); b.className = 'pin'; b.textContent = k + 1; b.style.left = ((l.px != null ? l.px : l.x) / W) * 100 + '%'; b.style.top = ((l.py != null ? l.py : l.y) / H) * 100 + '%'; b.setAttribute('aria-label', 'Label ' + (k + 1)); b.onclick = () => onTap && onTap(k); box.appendChild(b); });
 }
 
+
+/* "What should I try next?": picks one exam-review activity from how he is doing, with the reason */
+function topicStats() { const T = U.topics || [], tp = prog().topics || {}; return T.map((t) => { const o = tp[t.id]; const pct = o && o.n >= 5 ? Math.round((o.r.reduce((a, b) => a + b, 0) / o.r.length) * 100) : null; return { t, pct }; }); }
+function nextStep() {
+  const ex = (U.examActs || []).filter((a) => ACTS[a] && a !== 'pdfexam'), runs = prog().runs, best = prog().best, nm = (a) => ACTS[a].name;
+  const ORDER = ['xlearn', 'q-pdf', 'xcloze', 'xfeatures', 'xlabel', 'xspell', 'q-pdftf'].filter((a) => ex.includes(a));
+  const tried = ORDER.filter((a) => runs[a]), untried = ORDER.filter((a) => !runs[a]);
+  const wk = topicStats().filter((x) => x.pct != null && ['m', 'p', 'a', 'f'].includes(x.t.id)).sort((a, b) => a.pct - b.pct)[0];
+  const weakAct = tried.filter((a) => best[a] < 60).sort((a, b) => best[a] - best[b])[0];
+  if (!tried.length && !runs.pdfexam) return { go: ORDER[0], why: 'You have not started the exam review yet. Begin by writing what you know from memory, then use the points and the book pages to fill the gaps. It shows you straight away what you still need to learn.' };
+  if (weakAct) return { go: weakAct, why: `Your best on ${nm(weakAct)} is ${best[weakAct]}%, so this is where most marks are being lost. Do it again, and read the book page shown on each question before you answer.` };
+  if (wk && wk.pct < 60) return { go: 'focus:' + wk.t.id, why: `${wk.t.name} is your weakest topic: you are getting ${wk.pct}% of those answers right. Ten questions on just ${wk.t.name} will help most.` };
+  if (untried.length) return { go: untried[0], why: `You have not tried ${nm(untried[0])} yet. ${{ xlearn: 'It practises the written answers, which are the longest marks in the exam.', 'q-pdf': 'It checks the facts from the concept map and the summary notes.', xcloze: 'It tests the exact wording of the summary notes.', xfeatures: 'It makes you compare all four groups side by side.', xlabel: 'The exam is likely to ask you to label diagrams.', xspell: 'Spelling is marked, and this practises the diagram words.', 'q-pdftf': 'It catches the small facts that are easy to mix up.' }[untried[0]] || ''}` };
+  const mid = tried.filter((a) => best[a] < 85).sort((a, b) => best[a] - best[b])[0];
+  if (mid) return { go: mid, why: `Your best on ${nm(mid)} is ${best[mid]}%. You are close: one more go should push it above 85%.` };
+  if (wk && wk.pct < 85) return { go: 'focus:' + wk.t.id, why: `${wk.t.name} is still your weakest topic (${wk.pct}%). Ten more questions on it will close the gap.` };
+  if (!runs.pdfexam || best.pdfexam < 85) return { go: 'pdfexam', why: runs.pdfexam ? `Your best on the Exam paper is ${best.pdfexam}%. You are doing well on the parts, so try the mixed paper again.` : 'You have done well on all the parts. Now try the mixed Exam paper, which is the closest to the real thing.' };
+  return { go: 'pdfexam', why: `You are doing really well (Exam paper best ${best.pdfexam}%). Keep it fresh with another Exam paper tomorrow.` };
+}
+const goTo = (g) => (g.startsWith('focus:') ? RUN.focus(g.slice(6)) : RUN[g]());
+const goName = (g) => (g.startsWith('focus:') ? `Practise ${(U.topics.find((x) => x.id === g.slice(6)) || {}).name}` : ACTS[g].name);
+
 /* ---------- activities ---------- */
 const RUN = {
   sort: () => quiz('sort', sortQ(Math.min(12, U.sort.length))),
@@ -192,7 +215,13 @@ const RUN = {
   },
 
 
-  /* ---------- Guide my learning ---------- */
+  /* ---------- Guide my learning ---------- */  next() {
+    const n = nextStep();
+    app.innerHTML = `${topBar('<button class="link" id="stop">← Unit home</button>', 'What should I try next?')}<div class="panel"><p class="eyebrow">I suggest</p><h2 class="sec" style="margin:0">${esc(goName(n.go))}</h2>${how('Why', esc(n.why))}
+     <div class="row"><button class="btn primary" id="go">Start: ${esc(goName(n.go))}</button><button class="btn" id="gd">See all my progress</button></div></div>`;
+    $('#stop').onclick = unitHome; $('#go').onclick = () => goTo(n.go); $('#gd').onclick = () => RUN.guide(); scrollTo(0, 0);
+  },
+
   guide() {
     const T = U.topics || [], tp = prog().topics || {}, runs = prog().runs, best = prog().best;
     const stat = (t) => { const o = tp[t.id]; if (!o || o.n < 5) return { n: o ? o.n : 0, pct: null, tag: 'Not enough yet', cls: 'none' }; const pct = Math.round((o.r.reduce((a, b) => a + b, 0) / o.r.length) * 100); return { n: o.n, pct, tag: pct >= 85 ? 'Strong' : pct >= 60 ? 'Getting there' : 'Needs focus', cls: pct >= 85 ? 'good' : pct >= 60 ? 'mid' : 'bad' }; };
@@ -456,7 +485,7 @@ const RUN = {
 /* ---------- first-time "How it works" screen for every activity ---------- */
 function wrapIntros() {
   Object.keys(RUN).forEach((k) => {
-    if (RUN[k].wrapped || k === 'guide' || k === 'focus') return; const raw = RUN[k];
+    if (RUN[k].wrapped || ['guide', 'focus', 'next'].includes(k)) return; const raw = RUN[k];
     RUN[k] = (...a) => {
       const steps = HOW[k] || HOW[k.replace('q-', '')] || (ACTS[k] ? [ACTS[k].blurb, HOWQ[k.replace('q-', '')] || 'Tap the right answer.', 'Read what appears after each answer.'] : null);
       if (a.length || seen(k) || !steps) return raw(...a);
