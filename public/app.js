@@ -551,12 +551,15 @@ const YEARS = [
     { id: 'english', title: ['Inglés', 'English'], blurb: ['Ortografía y vocabulario', 'Spelling and vocabulary'], icon: 'Aa',
       units: [{ href: '/prefix', title: ['Prefijos re- e inter-', 'Prefixes re- and inter-'], blurb: ['19 palabras: juegos de ortografía.', '19 words: spelling games.'] },
         { href: '/subsuper', title: ['Sub- y super-', 'Sub- and super-'], blurb: ['Paso 1: la segunda parte de cada palabra.', 'Step 1: the second part of each word.'] }] },
+    { id: 'math3', title: ['Matemáticas', 'Maths'], blurb: ['Un reto cada día', 'A challenge every day'], icon: '+×',
+      units: [{ href: '/maths-day', title: ['Reto de mates del día', 'Maths question of the day'], blurb: ['Una pregunta nueva cada día, con calendario.', 'A new question every day, with a calendar.'] }] },
     { id: 'pe', title: ['Educación Física', 'Physical Education'], blurb: ['El cuerpo humano', 'The human body'], icon: 'EF',
       units: [{ href: '/huesos', title: ['Los huesos', 'The bones'], blurb: ['14 huesos del esqueleto: arrastrar, encontrar y escribir.', '14 skeleton bones: drag, find and spell.'] }] }] },
   { id: '1eso', title: ['1º ESO', '1st ESO'], subjects: [
     { id: 'geo', title: ['Geografía', 'Geography'], blurb: ['Mapa físico y comunidades autónomas', 'Physical map and autonomous communities'], section: SECTIONS[0] },
     { id: 'math', title: ['Matemáticas', 'Maths'], blurb: ['Concurso de decimales de π', 'The π digits competition'], icon: 'π',
-      units: [{ href: '/pi', title: ['Decimales de π', 'Digits of π'], blurb: ['Aprende, enlaza y recita los decimales en grupos.', 'Learn, link and recite the digits in groups.'] }] },
+      units: [{ href: '/maths-day', title: ['Reto de mates del día', 'Maths question of the day'], blurb: ['Una pregunta nueva cada día, con calendario.', 'A new question every day, with a calendar.'] },
+        { href: '/pi', title: ['Decimales de π', 'Digits of π'], blurb: ['Aprende, enlaza y recita los decimales en grupos.', 'Learn, link and recite the digits in groups.'] }] },
     { id: 'bio', title: ['Biología', 'Biology'], blurb: ['Unidades de repaso en inglés', 'Revision units in English'], icon: 'Bio',
       units: [{ href: '/biology', title: ['Unidades de Biología', 'Biology units'], blurb: ['Monera, Protoctista y Fungi, y las unidades que vengan.', 'Monera, Protoctista and Fungi, plus the units to come.'] }] }] },
 ];
@@ -595,6 +598,7 @@ function renderHome() {
   screen(h('section', { class: 'home' },
     h('h1', {}, tr(`¡Hola, ${state.session.username}!`, `Hi ${state.session.username}!`)),
     ...(mine ? [] : [pickYear]),
+    h('a', { class: 'card topic-card', href: '/maths-day', style: 'text-decoration:none;color:inherit;display:block;margin:0 0 14px' }, h('h2', {}, tr('Reto de mates del día', 'Maths question of the day')), h('p', { class: 'muted' }, tr('Una pregunta nueva cada día. ¿La has hecho hoy?', 'A new question every day. Have you done today’s?'))),
     h('p', { class: 'muted lead' }, tr(mine ? 'Empieza por tu curso o elige otro.' : '¿De qué curso quieres repasar?', mine ? 'Start with your year, or pick another.' : 'Which year do you want to revise?')),
     h('div', { class: 'topic-grid' }, ...cards),
     ...(mine ? [h('details', { class: 'muted' }, h('summary', {}, tr('Cambiar mi curso', 'Change my year')), pickYear)] : [])));
