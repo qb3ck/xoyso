@@ -63,7 +63,7 @@ const ACTS = {
   cloze: { name: 'Complete the notes', icon: '…', blurb: 'Fill the gaps with the right words.' },
   riddles: { name: 'Who am I?', icon: '?', blurb: 'Fewer clues means more points.' },
   order: { name: 'Put in order', icon: '1·2·3', blurb: 'Steps of reproduction in the right order.' },
-  learn: { name: 'Learn the answers', icon: '⟳', blurb: 'Read it, cover it, write it, check it. Then redo the gaps.' },
+  learn: { name: 'Learn the answers', icon: '⟳', blurb: 'Try it from memory first. Peek at the points only if you need to. Then redo the gaps.' },
   explain: { name: 'Explain it', icon: '✍', blurb: 'Answer as in the exam, then check the key points.' },
   vocab: { name: 'Vocabulary', icon: 'Aa', blurb: 'Key terms and what they mean.' },
   exam: { name: 'Final exam', icon: '★', blurb: 'A mixed test. Your best score is saved.' },
@@ -73,7 +73,7 @@ const app = $('#app');
 const how = (tag, text) => `<div class="how"><b>${tag}</b><span>${text}</span></div>`;
 /* what to do in each activity: shown as a numbered "How it works" screen the first time, and as a highlighted box during it */
 const HOW = {
-  learn: ['Read the key points for the question.', 'Cover them and write or say your answer from memory.', 'Tick the points you included. Questions with gaps come round again until you have them.'],
+  learn: ['Write or say what you know about the question. The key points are hidden. If you do not know it yet, tap Show me the points, read them, cover them, and try again.', 'Press Check my answer. The key points appear.', 'Tick the points you included. Questions with gaps come round again until you have them.'],
   sort: ['Read the statement.', 'Tap the group it describes.', 'If you are wrong, the right group is shown. Remember it for next time.'],
   features: ['Look at each feature in the list.', 'In every box tap ✓ if the group has it or ✗ if not. Every box needs an answer.', 'Press Check. Green is right, red is wrong.'],
   label: ['Look at the picture and its numbers.', 'Tap a word, then tap the number it belongs to.', 'Press Check. The right names are shown for any mistakes.'],
@@ -308,7 +308,7 @@ const RUN = {
     const sets = [['Page 60: Summarising', U.explain.filter((x) => x.src === 'p60')], ['Questions from the other pages', U.explain.filter((x) => x.src !== 'p60')]].filter((x) => x[1].length);
     const chooser = () => {
       app.innerHTML = `${topBar('<button class="link" id="stop">← Back</button>', 'Learn the answers')}<div class="panel"><p class="prompt">Learn the answers</p>
-       ${how('How it works', 'Every question has 3 steps. Do all 3.')}${stepsHtml(HOW.learn)}
+       ${how('How it works', 'Try each question from memory first.')}${stepsHtml(HOW.learn)}
        <div class="opts">${sets.map((x, k) => `<button class="o" data-k="${k}">${esc(x[0])} (${x[1].length} questions)</button>`).join('')}${sets.length > 1 ? `<button class="o" data-k="all">Everything (${U.explain.length} questions)</button>` : ''}</div></div>`;
       $('#stop').onclick = unitHome;
       app.querySelectorAll('.o').forEach((b) => { b.onclick = () => run(b.dataset.k === 'all' ? [...U.explain] : [...sets[+b.dataset.k][1]], true); });
@@ -317,19 +317,23 @@ const RUN = {
       let i = 0, got = 0, total = 0; const gaps = [];
       const item = () => {
         const it = list[i], n = it.points.length, head = `${topBar('<button class="link" id="stop">← Stop</button>', `Learn · ${i + 1} of ${list.length}`)}<div class="track"><i style="width:${(i / list.length) * 100}%"></i></div>`;
-        app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how('Step 1 of 3 · Read', 'Read the key points and make sure you understand them.')}<ol class="clues">${it.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ol><button class="btn primary" id="cov">Cover it. I'll write it from memory</button></div>`;
-        $('#stop').onclick = unitHome;
-        $('#cov').onclick = () => {
-          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how('Step 2 of 3 · Write', 'The points are hidden. Write or say your answer from memory.')}<textarea class="ta" id="ans" rows="5" placeholder="Your answer"></textarea><button class="btn primary" id="chk">Check my answer</button></div>`;
+        const write = (peeked) => {
+          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${peeked ? how('Step 2 of 3 · Write', 'The points are hidden. Write or say your answer from memory.') : how('Step 1 of 2 · Write', 'Write or say what you know first. The points are hidden. If you do not know it yet, tap the second button.')}<textarea class="ta" id="ans" rows="5" placeholder="Your answer"></textarea><button class="btn primary" id="chk">Check my answer</button>${peeked ? '' : '<button class="btn" id="peek">I don\'t know this yet. Show me the points</button>'}</div>`;
           $('#stop').onclick = unitHome; $('#ans').focus({ preventScroll: true });
-          $('#chk').onclick = () => {
-            const mine = $('#ans').value.trim();
-            app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how('Step 3 of 3 · Check', 'Tick the key points your answer included. Be honest.')}${mine ? `<div class="card" style="text-align:left;width:100%"><b>Your answer</b><p style="margin:4px 0 0;white-space:pre-wrap">${esc(mine)}</p></div>` : ''}
-             <div class="slots">${it.points.map((p, k) => `<label class="slot" style="cursor:pointer"><input type="checkbox" style="width:22px;height:22px;flex:none"><span>${esc(p)}</span></label>`).join('')}</div><div class="row"><button class="btn primary" id="nx">${i + 1 >= list.length ? 'Finish' : 'Next question'}</button></div></div>`;
-            $('#stop').onclick = unitHome;
-            $('#nx').onclick = () => { app.querySelectorAll('.slot input').forEach((c) => note(it.k, c.checked)); const t = app.querySelectorAll('.slot input:checked').length; got += t; total += n; if (t < n) gaps.push(it); i++; i < list.length ? item() : end(); };
-          };
+          if (!peeked) $('#peek').onclick = read;
+          $('#chk').onclick = () => check($('#ans').value.trim(), peeked);
         };
+        const read = () => {
+          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how('Step 1 of 3 · Read', 'Read the key points and make sure you understand them.')}<ol class="clues">${it.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ol><button class="btn primary" id="cov">Cover it. I'll write it from memory</button></div>`;
+          $('#stop').onclick = unitHome; $('#cov').onclick = () => write(true); scrollTo(0, 0);
+        };
+        const check = (mine, peeked) => {
+          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how(peeked ? 'Step 3 of 3 · Check' : 'Step 2 of 2 · Check', 'Tick the key points your answer included. Be honest.')}${mine ? `<div class="card" style="text-align:left;width:100%"><b>Your answer</b><p style="margin:4px 0 0;white-space:pre-wrap">${esc(mine)}</p></div>` : ''}
+           <div class="slots">${it.points.map((p) => `<label class="slot" style="cursor:pointer"><input type="checkbox" style="width:22px;height:22px;flex:none"><span>${esc(p)}</span></label>`).join('')}</div><div class="row"><button class="btn primary" id="nx">${i + 1 >= list.length ? 'Finish' : 'Next question'}</button></div></div>`;
+          $('#stop').onclick = unitHome; scrollTo(0, 0);
+          $('#nx').onclick = () => { app.querySelectorAll('.slot input').forEach((c) => note(it.k, c.checked)); const t = app.querySelectorAll('.slot input:checked').length; got += t; total += n; if (t < n) gaps.push(it); i++; i < list.length ? item() : end(); };
+        };
+        write(false);
       };
       const end = () => {
         const pct = Math.round((got / total) * 100); if (first) record('learn', pct);
