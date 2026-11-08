@@ -98,6 +98,7 @@ const HOWQ = { feeding: 'Tap how it gets its food.', importance: 'Tap Helpful or
 const seen = (k) => { try { return !!JSON.parse(localStorage.getItem('bio-seen') || '{}')[k]; } catch (e) { return false; } };
 const markSeen = (k) => { try { const o = JSON.parse(localStorage.getItem('bio-seen') || '{}'); o[k] = 1; localStorage.setItem('bio-seen', JSON.stringify(o)); } catch (e) { /* storage unavailable */ } };
 const stepsHtml = (arr) => `<ol class="steps">${arr.map((t, i) => `<li><i>${i + 1}</i><span>${['READ', 'DO', 'CHECK'][i] ? '' : ''}${esc(t)}</span></li>`).join('')}</ol>`;
+const bk = (it) => it.pg ? `<p class="hint" style="margin:0">📖 In the book: ${esc(it.pg)}</p>` : '';
 const hintUi = (it) => it.hint ? '<button class="btn" id="hint">💡 Hint: what to include</button><div id="hb" style="width:100%"></div>' : '';
 const wireHint = (it) => { const b = $('#hint'); if (b) b.onclick = () => { $('#hb').innerHTML = how('Hint', esc(it.hint)); b.hidden = true; }; };
 const topBar = (left, right = '') => `<div class="top">${left}<span class="eyebrow">${right}</span></div>`;
@@ -118,7 +119,7 @@ function unitHome() {
   app.innerHTML = `<div class="crumbs">${link('/', 'xoyso')}<span class="hint">›</span>${link('/biology', 'Biology')}</div>
    <header class="hero"><h1>${esc(U.title)}</h1><p>${esc(U.blurb)}</p></header>
    ${ACTS.guide && U.activities.includes('guide') ? `<div class="grid">${cardOf('guide', true)}</div>` : ''}
-   ${ex.length ? `<h2 class="sec" style="margin:18px 0 4px">Exam practice</h2><p class="hint" style="margin:0 0 8px">Built only from the concept map and the summary notes, which is what the exam covers.</p><div class="grid">${ex.map((a) => cardOf(a, a === 'pdfexam')).join('')}</div>` : ''}
+   ${ex.length ? `<h2 class="sec" style="margin:18px 0 4px">Exam practice</h2><p class="hint" style="margin:0 0 8px">Built only from the concept map and the summary notes, which is what the exam covers. Where to read more in the book: ${esc(U.bookpages || '')}.</p><div class="grid">${ex.map((a) => cardOf(a, a === 'pdfexam')).join('')}</div>` : ''}
    <h2 class="sec" style="margin:18px 0 4px">${ex.length ? 'More revision (from the book)' : 'Activities'}</h2><div class="grid">${rest.map((a) => cardOf(a, a === 'exam')).join('')}</div>`;
   app.querySelectorAll('[data-a]').forEach((b) => { b.onclick = () => RUN[b.dataset.a](); });
   scrollTo(0, 0);
@@ -145,7 +146,7 @@ function quiz(act, qs) {
         app.querySelectorAll('.o').forEach((x) => { x.disabled = true; if (q.opts[+x.dataset.k] === q.answer) x.classList.add('ok'); });
         if (!ok) b.classList.add('no');
         if (ok) score++; else missed.push(q); note(q.k, ok);
-        $('#fb').className = 'fb ' + (ok ? 'good' : 'bad'); $('#fb').textContent = (ok ? 'Correct!' : 'The answer is: ' + q.answer + '.') + (q.why ? ' ' + q.why : '');
+        $('#fb').className = 'fb ' + (ok ? 'good' : 'bad'); $('#fb').textContent = (ok ? 'Correct!' : 'The answer is: ' + q.answer + '.') + (q.why ? ' ' + q.why : '') + (q.pg ? ` (Book: ${q.pg})` : '');
         const nx = document.createElement('button'); nx.className = 'btn primary'; nx.id = 'nxq'; nx.textContent = i + 1 >= qs.length ? 'Finish' : 'Next'; nx.onclick = () => { i++; i < qs.length ? ask() : end(); };
         $('#fb').after(nx); nx.focus({ preventScroll: true }); nx.scrollIntoView({ block: 'nearest' });
       };
@@ -157,7 +158,7 @@ function quiz(act, qs) {
   };
   ask();
 }
-const quizQ = (set, n) => sample(set.items, n).map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: it.k }));
+const quizQ = (set, n) => sample(set.items, n).map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: it.k, pg: it.pg }));
 const catName = (id) => U.categories.find((c) => c.id === id).name;
 const sortQ = (n) => sample(U.sort, n).map(([t, c]) => ({ prompt: `Which group? <br><span style="font-family:var(--body);font-weight:800">${esc(t)}</span>`, opts: U.categories.map((x) => x.name), answer: catName(c), k: c }));
 const vocabQ = (n) => sample(U.vocab, n).map(([en, def, es], k) => {
@@ -185,7 +186,7 @@ const RUN = {
   sort: () => quiz('sort', sortQ(Math.min(12, U.sort.length))),
   vocab: () => quiz('vocab', vocabQ(Math.min(12, U.vocab.length))),
   exam: () => {
-    const pool = (U.quizzes || []).flatMap((z) => z.items.map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: it.k })));
+    const pool = (U.quizzes || []).flatMap((z) => z.items.map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: it.k, pg: it.pg })));
     const qs = [...sortQ(Math.min(6, U.sort.length)), ...vocabQ(Math.min(4, U.vocab.length)), ...sample(pool, Math.min(8, pool.length)), ...(U.riddles ? riddleQ(Math.min(2, U.riddles.length)) : [])];
     quiz('exam', shuffle(qs));
   },
@@ -224,7 +225,7 @@ const RUN = {
   focus(t) {
     if (t) RUN.focus.t = t; t = RUN.focus.t; const T = (U.topics || []).find((x) => x.id === t);
     const pool = [];
-    (U.quizzes || []).forEach((z) => z.items.filter((it) => it.k === t).forEach((it) => pool.push({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: t })));
+    (U.quizzes || []).forEach((z) => z.items.filter((it) => it.k === t).forEach((it) => pool.push({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: t, pg: it.pg })));
     U.sort.filter(([, c]) => c === t).forEach(([x, c]) => pool.push({ prompt: `Which group? <br><span style="font-family:var(--body);font-weight:800">${esc(x)}</span>`, opts: U.categories.map((y) => y.name), answer: catName(c), k: t }));
     if (t === 'v') pool.push(...vocabQ(U.vocab.length));
     U.riddles.filter((r) => r.k === t).forEach((r) => pool.push(riddleQ(U.riddles.length).find((q) => q.answer === cap(r.a)) || riddleQ(1)[0]));
@@ -237,7 +238,7 @@ const RUN = {
   xlabel: () => RUN.label(U.drawings.filter((d) => d.pdf), 'xlabel'),
   xspell: () => RUN.spell(U.drawings.filter((d) => d.pdf), 'xspell'),
   xlearn: () => RUN.learn(U.explain.filter((x) => x.src === 'pdf'), 'xlearn'),
-  pdfexam: () => { const pool = (U.quizzes || []).filter((z) => z.id === 'pdf' || z.id === 'pdftf').flatMap((z) => z.items.map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: it.k }))); quiz('pdfexam', sample(pool, Math.min(20, pool.length))); },
+  pdfexam: () => { const pool = (U.quizzes || []).filter((z) => z.id === 'pdf' || z.id === 'pdftf').flatMap((z) => z.items.map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: it.k, pg: it.pg }))); quiz('pdfexam', sample(pool, Math.min(20, pool.length))); },
 
   features(rowsIn, actIn) {
     const act = actIn || 'features', cats = U.categories, rows = rowsIn || U.features;
@@ -253,7 +254,7 @@ const RUN = {
       let right = 0; const total = rows.length * cats.length;
       app.querySelectorAll('td[data-r]').forEach((td) => { const ok = (td.dataset.v === '1') === !!rows[+td.dataset.r][1][+td.dataset.k]; note(cats[+td.dataset.k].id, ok); if (ok) right++; td.className = ok ? 'ok' : 'no'; td.querySelectorAll('.tk').forEach((b) => (b.disabled = true)); });
       const pct = Math.round((right / total) * 100);
-      $('#fb').className = 'fb ' + (pct === 100 ? 'good' : 'bad'); $('#fb').textContent = `${right} of ${total} boxes right.`;
+      $('#fb').className = 'fb ' + (pct === 100 ? 'good' : 'bad'); $('#fb').textContent = `${right} of ${total} boxes right.` + (act === 'xfeatures' && U.bookpages ? ` Book: ${U.bookpages}.` : '');
       $('#chk').textContent = 'Finish'; $('#chk').onclick = () => finishCard(act, `${right}/${total}`, pct, '<p class="hint">Green boxes were right, red were wrong. Look at the red ones before you go again.</p>', () => RUN[act]());
     };
   },
@@ -281,7 +282,7 @@ const RUN = {
         if (placed.includes(null)) { $('#fb').className = 'fb bad'; $('#fb').textContent = 'Fill every number first.'; return; }
         let r = 0; $('#slots').querySelectorAll('.slot').forEach((s, k) => { const ok = placed[k] === d.labels[k].a; if (ok) r++; note(d.k, ok); s.className = 'slot ' + (ok ? 'ok' : 'no'); if (!ok) s.innerHTML += ` <span class="hint">→ ${esc(d.labels[k].a)}</span>`; s.disabled = true; });
         right += r; total += d.labels.length; i++;
-        $('#fb').className = 'fb ' + (r === d.labels.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${d.labels.length} right.`;
+        $('#fb').className = 'fb ' + (r === d.labels.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${d.labels.length} right.` + (d.pg ? ` Book: ${d.pg}.` : '');
         $('#chk').textContent = i >= ds.length ? 'Finish' : 'Next drawing'; $('#chk').onclick = next;
       };
     };
@@ -306,7 +307,7 @@ const RUN = {
         let r = 0;
         ins.forEach((x, k) => { const want = d.labels[k].a, got = norm(x.value), ok = got === norm(want); if (ok) r++; note(d.k, ok); x.disabled = true; const slot = x.closest('.slot'); slot.className = 'slot ' + (ok ? 'ok' : 'no'); if (!ok) slot.insertAdjacentHTML('beforeend', ` <span class="hint">${dist(got, norm(want)) <= 2 ? 'Spelling slip. ' : ''}→ ${esc(want)}</span>`); });
         right += r; total += d.labels.length; i++;
-        $('#fb').className = 'fb ' + (r === d.labels.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${d.labels.length} spelt right.`;
+        $('#fb').className = 'fb ' + (r === d.labels.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${d.labels.length} spelt right.` + (d.pg ? ` Book: ${d.pg}.` : '');
         $('#chk').textContent = i >= ds.length ? 'Finish' : 'Next drawing'; $('#chk').onclick = next;
       };
       const f = app.querySelector('.sp'); if (f) f.focus({ preventScroll: true });
@@ -316,8 +317,8 @@ const RUN = {
 
   cloze(srcIn, actIn) {
     const act = actIn || 'cloze', items = shuffle(srcIn || U.cloze).slice(0, srcIn ? 6 : 5); let i = 0, right = 0, total = 0;
-    const next = () => { if (i >= items.length) { finishCard(act, `${right}/${total}`, Math.round((right / total) * 100), '', () => RUN[act]()); return; } draw(items[i][0], items[i][1] || [], items[i][2]); };
-    const draw = (text, extra, topic) => {
+    const next = () => { if (i >= items.length) { finishCard(act, `${right}/${total}`, Math.round((right / total) * 100), '', () => RUN[act]()); return; } draw(items[i][0], items[i][1] || [], items[i][2], items[i][3]); };
+    const draw = (text, extra, topic, pg) => {
       // gaps look like {word} or {word~tag}; gaps with the same tag are interchangeable (e.g. "A and B"), so either order is right
       const answers = [], tags = []; const parts = text.split(/\{([^}]+)\}/); // odd indexes are gaps
       parts.forEach((p, k) => { if (k % 2) { const [a, t] = p.split('~'); answers.push(a); tags.push(t || null); parts[k] = a; } });
@@ -336,7 +337,7 @@ const RUN = {
         if (answers.some((_, k) => !filled[k])) { $('#fb').className = 'fb bad'; $('#fb').textContent = 'Fill every gap first.'; return; }
         let r = 0; $('#txt').querySelectorAll('.gap').forEach((e) => { const k = +e.dataset.g; const ok = accepts(k, filled[k]); if (ok) r++; note(topic, ok); e.classList.add(ok ? 'ok' : 'no'); e.onclick = null; if (!ok) e.innerHTML += ` → ${esc(answers[k])}`; });
         right += r; total += answers.length; i++;
-        $('#fb').className = 'fb ' + (r === answers.length ? 'good' : 'bad'); $('#fb').textContent = r === answers.length ? 'All right!' : 'Not quite: the right words are shown.';
+        $('#fb').className = 'fb ' + (r === answers.length ? 'good' : 'bad'); $('#fb').textContent = (r === answers.length ? 'All right!' : 'Not quite: the right words are shown.') + (pg ? ` Book: ${pg}.` : '');
         $('#chk').textContent = i >= items.length ? 'Finish' : 'Next'; $('#chk').onclick = next;
       };
     };
@@ -377,17 +378,17 @@ const RUN = {
       const item = () => {
         const it = list[i], n = it.points.length, head = `${topBar('<button class="link" id="stop">← Stop</button>', `Learn · ${i + 1} of ${list.length}`)}<div class="track"><i style="width:${(i / list.length) * 100}%"></i></div>`;
         const write = (peeked) => {
-          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${peeked ? how('Step 2 of 3 · Write', 'The points are hidden. Write your answer on paper from memory.') : how('Step 1 of 2 · Write on paper', 'Write what you know on paper first. The points are hidden. Then tap the first button. If you do not know it yet, tap the second button.')}${hintUi(it)}<button class="btn primary" id="chk">I've written it. Check my answer</button>${peeked ? '' : '<button class="btn" id="peek">I don\'t know this yet. Show me the points</button>'}</div>`;
+          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${bk(it)}${peeked ? how('Step 2 of 3 · Write', 'The points are hidden. Write your answer on paper from memory.') : how('Step 1 of 2 · Write on paper', 'Write what you know on paper first. The points are hidden. Then tap the first button. If you do not know it yet, tap the second button.')}${hintUi(it)}<button class="btn primary" id="chk">I've written it. Check my answer</button>${peeked ? '' : '<button class="btn" id="peek">I don\'t know this yet. Show me the points</button>'}</div>`;
           $('#stop').onclick = unitHome; wireHint(it);
           if (!peeked) $('#peek').onclick = read;
           $('#chk').onclick = () => check('', peeked);
         };
         const read = () => {
-          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how('Step 1 of 3 · Read', 'Read the key points and make sure you understand them.')}<ol class="clues">${it.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ol><button class="btn primary" id="cov">Cover it. I'll write it from memory</button></div>`;
+          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${bk(it)}${how('Step 1 of 3 · Read', 'Read the key points and make sure you understand them.')}<ol class="clues">${it.points.map((p) => `<li>${esc(p)}</li>`).join('')}</ol><button class="btn primary" id="cov">Cover it. I'll write it from memory</button></div>`;
           $('#stop').onclick = unitHome; $('#cov').onclick = () => write(true); scrollTo(0, 0);
         };
         const check = (mine, peeked) => {
-          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how(peeked ? 'Step 3 of 3 · Check' : 'Step 2 of 2 · Check', 'Tick the key points your answer included. Be honest.')}${mine ? `<div class="card" style="text-align:left;width:100%"><b>Your answer</b><p style="margin:4px 0 0;white-space:pre-wrap">${esc(mine)}</p></div>` : ''}
+          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${bk(it)}${how(peeked ? 'Step 3 of 3 · Check' : 'Step 2 of 2 · Check', 'Tick the key points your answer included. Be honest.')}${mine ? `<div class="card" style="text-align:left;width:100%"><b>Your answer</b><p style="margin:4px 0 0;white-space:pre-wrap">${esc(mine)}</p></div>` : ''}
            <div class="slots">${it.points.map((p) => `<label class="slot" style="cursor:pointer"><input type="checkbox" style="width:22px;height:22px;flex:none"><span>${esc(p)}</span></label>`).join('')}</div><div class="row"><button class="btn primary" id="nx">${i + 1 >= list.length ? 'Finish' : 'Next question'}</button></div></div>`;
           $('#stop').onclick = unitHome; scrollTo(0, 0);
           $('#nx').onclick = () => { app.querySelectorAll('.slot input').forEach((c) => note(it.k, c.checked)); const t = app.querySelectorAll('.slot input:checked').length; got += t; total += n; if (t < n) gaps.push(it); i++; i < list.length ? item() : end(); };
@@ -411,7 +412,7 @@ const RUN = {
     const items = sample(U.explain, Math.min(6, U.explain.length)); let i = 0, got = 0, total = 0;
     const ask = () => {
       const it = items[i];
-      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Explain it · ${i + 1} of ${items.length}`)}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">${it.src === 'pdf' ? 'From the concept map and summary notes (the PDFs).' : 'From the book, ' + (it.src === 'p60' ? 'page 60 (Summarising)' : 'page ' + it.src.slice(1)) + '.'}</p>
+      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Explain it · ${i + 1} of ${items.length}`)}<div class="panel"><p class="prompt">${esc(it.q)}</p>${bk(it)}<p class="hint">${it.src === 'pdf' ? 'From the concept map and summary notes (the PDFs).' : 'From the book, ' + (it.src === 'p60' ? 'page 60 (Summarising)' : 'page ' + it.src.slice(1)) + '.'}</p>
        ${how('Step 1 of 2 · Write on paper', 'Write your answer on paper first, in 2 or 3 sentences. No peeking. Then show the key points.')}
        ${hintUi(it)}<button class="btn primary" id="show">Show the key points</button><div id="kp" style="width:100%"></div></div>`;
       $('#stop').onclick = unitHome;
