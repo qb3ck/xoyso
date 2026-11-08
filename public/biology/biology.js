@@ -137,7 +137,7 @@ function quiz(act, qs) {
   const ask = () => {
     const q = qs[i]; let done = false;
     app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `${ACTS[act].name} · ${i + 1} of ${qs.length}`)}<div class="track"><i style="width:${(i / qs.length) * 100}%"></i></div>
-     <div class="panel">${how('Do this', HOWQ[act.replace('q-', '')] || (HOW[act] ? HOW[act][1] : 'Tap the right answer.'))}<p class="prompt">${q.prompt}</p><div class="opts">${q.opts.map((o, k) => `<button class="o" data-k="${k}">${esc(o)}</button>`).join('')}</div><div class="fb" id="fb"></div></div>`;
+     <div class="panel">${how('Do this', HOWQ[act.replace('q-', '')] || (HOW[act] ? HOW[act][1] : 'Tap the right answer.'))}<p class="prompt">${q.prompt}</p>${q.pg ? `<p class="hint" style="margin:0">📖 In the book: ${esc(q.pg)}</p>` : ''}<div class="opts">${q.opts.map((o, k) => `<button class="o" data-k="${k}">${esc(o)}</button>`).join('')}</div><div class="fb" id="fb"></div></div>`;
     $('#stop').onclick = unitHome;
     app.querySelectorAll('.o').forEach((b) => {
       b.onclick = () => {
@@ -146,7 +146,7 @@ function quiz(act, qs) {
         app.querySelectorAll('.o').forEach((x) => { x.disabled = true; if (q.opts[+x.dataset.k] === q.answer) x.classList.add('ok'); });
         if (!ok) b.classList.add('no');
         if (ok) score++; else missed.push(q); note(q.k, ok);
-        $('#fb').className = 'fb ' + (ok ? 'good' : 'bad'); $('#fb').textContent = (ok ? 'Correct!' : 'The answer is: ' + q.answer + '.') + (q.why ? ' ' + q.why : '') + (q.pg ? ` (Book: ${q.pg})` : '');
+        $('#fb').className = 'fb ' + (ok ? 'good' : 'bad'); $('#fb').textContent = (ok ? 'Correct!' : 'The answer is: ' + q.answer + '.') + (q.why ? ' ' + q.why : '');
         const nx = document.createElement('button'); nx.className = 'btn primary'; nx.id = 'nxq'; nx.textContent = i + 1 >= qs.length ? 'Finish' : 'Next'; nx.onclick = () => { i++; i < qs.length ? ask() : end(); };
         $('#fb').after(nx); nx.focus({ preventScroll: true }); nx.scrollIntoView({ block: 'nearest' });
       };
@@ -242,7 +242,7 @@ const RUN = {
 
   features(rowsIn, actIn) {
     const act = actIn || 'features', cats = U.categories, rows = rowsIn || U.features;
-    app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', 'Features table')}<div class="panel">${how('Do this', 'In every box tap ✓ if the group has the feature or ✗ if it does not. Every box needs an answer. A feature can belong to more than one group.')}
+    app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', 'Features table')}<div class="panel">${act === 'xfeatures' && U.bookpages ? `<p class="hint" style="margin:0">📖 In the book: ${esc(U.bookpages)}</p>` : ''}${how('Do this', 'In every box tap ✓ if the group has the feature or ✗ if it does not. Every box needs an answer. A feature can belong to more than one group.')}
      <table class="grid2"><thead><tr><th></th>${cats.map((c) => `<th>${esc(c.name)}</th>`).join('')}</tr></thead><tbody>
      ${rows.map(([f], r) => `<tr><td>${esc(f)}</td>${cats.map((c, k) => `<td data-r="${r}" data-k="${k}"><button class="tk" data-v="1" aria-label="${esc(f)}: ${esc(c.name)} yes">✓</button><button class="tk" data-v="0" aria-label="${esc(f)}: ${esc(c.name)} no">✗</button></td>`).join('')}</tr>`).join('')}</tbody></table>
      <div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
@@ -254,7 +254,7 @@ const RUN = {
       let right = 0; const total = rows.length * cats.length;
       app.querySelectorAll('td[data-r]').forEach((td) => { const ok = (td.dataset.v === '1') === !!rows[+td.dataset.r][1][+td.dataset.k]; note(cats[+td.dataset.k].id, ok); if (ok) right++; td.className = ok ? 'ok' : 'no'; td.querySelectorAll('.tk').forEach((b) => (b.disabled = true)); });
       const pct = Math.round((right / total) * 100);
-      $('#fb').className = 'fb ' + (pct === 100 ? 'good' : 'bad'); $('#fb').textContent = `${right} of ${total} boxes right.` + (act === 'xfeatures' && U.bookpages ? ` Book: ${U.bookpages}.` : '');
+      $('#fb').className = 'fb ' + (pct === 100 ? 'good' : 'bad'); $('#fb').textContent = `${right} of ${total} boxes right.`;
       $('#chk').textContent = 'Finish'; $('#chk').onclick = () => finishCard(act, `${right}/${total}`, pct, '<p class="hint">Green boxes were right, red were wrong. Look at the red ones before you go again.</p>', () => RUN[act]());
     };
   },
@@ -264,7 +264,7 @@ const RUN = {
     const next = () => { if (i >= ds.length) { finishCard(act, `${right}/${total}`, Math.round((right / total) * 100), '', () => RUN[act]()); return; } draw(ds[i]); };
     const draw = (d) => {
       const bank = shuffle(d.labels.map((l) => l.a)); const placed = d.labels.map(() => null); let selChip = null;
-      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Label the drawing · ${i + 1} of ${ds.length}`)}<div class="panel"><h2 class="sec" style="margin:0">${esc(d.title)}</h2>
+      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Label the drawing · ${i + 1} of ${ds.length}`)}<div class="panel"><h2 class="sec" style="margin:0">${esc(d.title)}</h2>${d.pg ? `<p class="hint" style="margin:0">📖 In the book: ${esc(d.pg)}</p>` : ''}
        <div class="pic pinbox" id="pic">${d.svg}</div>
        ${how('Do this', 'Tap a word, then tap the number it belongs to. Tap a filled number to take its word back.')}
        <div class="chips" id="bank"></div><div class="slots" id="slots"></div><div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
@@ -282,7 +282,7 @@ const RUN = {
         if (placed.includes(null)) { $('#fb').className = 'fb bad'; $('#fb').textContent = 'Fill every number first.'; return; }
         let r = 0; $('#slots').querySelectorAll('.slot').forEach((s, k) => { const ok = placed[k] === d.labels[k].a; if (ok) r++; note(d.k, ok); s.className = 'slot ' + (ok ? 'ok' : 'no'); if (!ok) s.innerHTML += ` <span class="hint">→ ${esc(d.labels[k].a)}</span>`; s.disabled = true; });
         right += r; total += d.labels.length; i++;
-        $('#fb').className = 'fb ' + (r === d.labels.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${d.labels.length} right.` + (d.pg ? ` Book: ${d.pg}.` : '');
+        $('#fb').className = 'fb ' + (r === d.labels.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${d.labels.length} right.`;
         $('#chk').textContent = i >= ds.length ? 'Finish' : 'Next drawing'; $('#chk').onclick = next;
       };
     };
@@ -296,7 +296,7 @@ const RUN = {
     const dist = (a, b) => { const m = [...Array(a.length + 1)].map((_, r) => [r, ...Array(b.length).fill(0)]); for (let c = 1; c <= b.length; c++) m[0][c] = c; for (let r = 1; r <= a.length; r++) for (let c = 1; c <= b.length; c++) m[r][c] = Math.min(m[r - 1][c] + 1, m[r][c - 1] + 1, m[r - 1][c - 1] + (a[r - 1] === b[c - 1] ? 0 : 1)); return m[a.length][b.length]; };
     const next = () => { if (i >= ds.length) { finishCard(act, `${right}/${total}`, Math.round((right / total) * 100), '<p class="hint">Look at the red ones and say each word out loud, letter by letter.</p>', () => RUN[act]()); return; } draw(ds[i]); };
     const draw = (d) => {
-      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Spell the labels · ${i + 1} of ${ds.length}`)}<div class="panel"><h2 class="sec" style="margin:0">${esc(d.title)}</h2><div class="pic pinbox" id="pic">${d.svg}</div>
+      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Spell the labels · ${i + 1} of ${ds.length}`)}<div class="panel"><h2 class="sec" style="margin:0">${esc(d.title)}</h2>${d.pg ? `<p class="hint" style="margin:0">📖 In the book: ${esc(d.pg)}</p>` : ''}<div class="pic pinbox" id="pic">${d.svg}</div>
        ${how('Do this', 'Type the name for each number. Spelling counts. The number of letters is shown in each box.')}
        <div class="slots" id="slots">${d.labels.map((l, k) => `<label class="slot"><span class="num">${k + 1}</span><input class="sp" data-k="${k}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${l.a.replace(/ /g, '').length} letters" style="flex:1;min-width:0;font:700 1.05rem var(--body);padding:8px;border:2px solid var(--line,#d6e0e8);border-radius:10px"></label>`).join('')}</div>
        <div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
@@ -307,7 +307,7 @@ const RUN = {
         let r = 0;
         ins.forEach((x, k) => { const want = d.labels[k].a, got = norm(x.value), ok = got === norm(want); if (ok) r++; note(d.k, ok); x.disabled = true; const slot = x.closest('.slot'); slot.className = 'slot ' + (ok ? 'ok' : 'no'); if (!ok) slot.insertAdjacentHTML('beforeend', ` <span class="hint">${dist(got, norm(want)) <= 2 ? 'Spelling slip. ' : ''}→ ${esc(want)}</span>`); });
         right += r; total += d.labels.length; i++;
-        $('#fb').className = 'fb ' + (r === d.labels.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${d.labels.length} spelt right.` + (d.pg ? ` Book: ${d.pg}.` : '');
+        $('#fb').className = 'fb ' + (r === d.labels.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${d.labels.length} spelt right.`;
         $('#chk').textContent = i >= ds.length ? 'Finish' : 'Next drawing'; $('#chk').onclick = next;
       };
       const f = app.querySelector('.sp'); if (f) f.focus({ preventScroll: true });
@@ -324,7 +324,7 @@ const RUN = {
       parts.forEach((p, k) => { if (k % 2) { const [a, t] = p.split('~'); answers.push(a); tags.push(t || null); parts[k] = a; } });
       const bank = shuffle([...parts.filter((_, k) => k % 2), ...(extra.length ? extra : sample(U.cloze.flatMap((c) => c[0].match(/\{[^}~]+/g) || []).map((x) => x.slice(1)).filter((x) => !answers.includes(x)), 3))]); const filled = []; let sel = null;
       const accepts = (k, w) => w === answers[k] || (tags[k] && answers.some((a, j) => tags[j] === tags[k] && a === w));
-      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Complete the notes · ${i + 1} of ${items.length}`)}<div class="panel">${how('Do this', 'Tap a word, then tap the gap it fits. Tap a filled gap to take the word back.')}<p class="cloze" id="txt"></p><div class="chips" id="bank"></div><div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
+      app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Complete the notes · ${i + 1} of ${items.length}`)}<div class="panel">${how('Do this', 'Tap a word, then tap the gap it fits. Tap a filled gap to take the word back.')}${pg ? `<p class="hint" style="margin:0">📖 In the book: ${esc(pg)}</p>` : ''}<p class="cloze" id="txt"></p><div class="chips" id="bank"></div><div class="fb" id="fb"></div><div class="row"><button class="btn primary" id="chk">Check</button></div></div>`;
       $('#stop').onclick = unitHome;
       const render = () => {
         let g = -1; $('#txt').innerHTML = parts.map((p, k) => { if (!(k % 2)) return esc(p); g++; return `<span class="gap ${sel === 'g' + g ? 'act' : ''}" data-g="${g}">${filled[g] ? esc(filled[g]) : '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'}</span>`; }).join('');
@@ -337,7 +337,7 @@ const RUN = {
         if (answers.some((_, k) => !filled[k])) { $('#fb').className = 'fb bad'; $('#fb').textContent = 'Fill every gap first.'; return; }
         let r = 0; $('#txt').querySelectorAll('.gap').forEach((e) => { const k = +e.dataset.g; const ok = accepts(k, filled[k]); if (ok) r++; note(topic, ok); e.classList.add(ok ? 'ok' : 'no'); e.onclick = null; if (!ok) e.innerHTML += ` → ${esc(answers[k])}`; });
         right += r; total += answers.length; i++;
-        $('#fb').className = 'fb ' + (r === answers.length ? 'good' : 'bad'); $('#fb').textContent = (r === answers.length ? 'All right!' : 'Not quite: the right words are shown.') + (pg ? ` Book: ${pg}.` : '');
+        $('#fb').className = 'fb ' + (r === answers.length ? 'good' : 'bad'); $('#fb').textContent = (r === answers.length ? 'All right!' : 'Not quite: the right words are shown.');
         $('#chk').textContent = i >= items.length ? 'Finish' : 'Next'; $('#chk').onclick = next;
       };
     };
