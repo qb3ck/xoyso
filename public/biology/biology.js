@@ -12,7 +12,12 @@ let DB = store.get(), UNITS = [], U = null;
 const prog = () => (DB[U.id] = DB[U.id] || { best: {}, runs: {} });
 function record(act, pct) { const p = prog(); p.runs[act] = (p.runs[act] || 0) + 1; if (pct > (p.best[act] || 0)) p.best[act] = pct; store.set(DB); }
 
+/* topic tracking for Guide my learning: prog().topics[k] = {n: answers seen, r: last 20 results (1/0)} */
+function note(k, ok) { if (!k) return; const t = (prog().topics = prog().topics || {}); const o = (t[k] = t[k] || { n: 0, r: [] }); o.n++; o.r.push(ok ? 1 : 0); if (o.r.length > 20) o.r.shift(); store.set(DB); }
+
 const ACTS = {
+  guide: { name: 'Guide my learning', icon: '🧭', blurb: 'See what you know, what needs work, and what to do next.' },
+  focus: { name: 'Topic practice', icon: '◎', blurb: '' },
   sort: { name: 'Sort it', icon: '⇅', blurb: 'Which group does each statement describe?' },
   features: { name: 'Features table', icon: '▦', blurb: 'Tick every group that has the feature.' },
   label: { name: 'Label the drawing', icon: '✎', blurb: 'Name the shapes and parts.' },
@@ -59,7 +64,7 @@ function unitHome() {
   const best = prog().best;
   app.innerHTML = `<div class="crumbs">${link('/', 'xoyso')}<span class="hint">›</span>${link('/biology', 'Biology')}</div>
    <header class="hero"><h1>${esc(U.title)}</h1><p>${esc(U.blurb)}</p></header>
-   <div class="grid">${avail.map((a) => `<button class="act ${a === 'exam' ? 'main' : ''}" data-a="${a}"><span class="demo">${ACTS[a].icon}</span><h3>${ACTS[a].name}</h3><p>${ACTS[a].blurb}</p>${best[a] != null ? `<span class="pill">Best ${best[a]}%</span>` : ''}</button>`).join('')}</div>`;
+   <div class="grid">${avail.map((a) => `<button class="act ${a === 'exam' || a === 'guide' ? 'main' : ''}" data-a="${a}"><span class="demo">${ACTS[a].icon}</span><h3>${ACTS[a].name}</h3><p>${ACTS[a].blurb}</p>${best[a] != null ? `<span class="pill">Best ${best[a]}%</span>` : ''}</button>`).join('')}</div>`;
   app.querySelectorAll('[data-a]').forEach((b) => { b.onclick = () => RUN[b.dataset.a](); });
   scrollTo(0, 0);
 }
@@ -84,7 +89,7 @@ function quiz(act, qs) {
         const ok = q.opts[+b.dataset.k] === q.answer;
         app.querySelectorAll('.o').forEach((x) => { x.disabled = true; if (q.opts[+x.dataset.k] === q.answer) x.classList.add('ok'); });
         if (!ok) b.classList.add('no');
-        if (ok) score++; else missed.push(q);
+        if (ok) score++; else missed.push(q); note(q.k, ok);
         $('#fb').className = 'fb ' + (ok ? 'good' : 'bad'); $('#fb').textContent = (ok ? 'Correct!' : 'The answer is: ' + q.answer + '.') + (q.why ? ' ' + q.why : '');
         setTimeout(() => { i++; i < qs.length ? ask() : end(); }, q.why ? 3200 : ok ? 700 : 1800);
       };
@@ -96,27 +101,69 @@ function quiz(act, qs) {
   };
   ask();
 }
-const quizQ = (set, n) => sample(set.items, n).map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why }));
+const quizQ = (set, n) => sample(set.items, n).map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: it.k }));
 const catName = (id) => U.categories.find((c) => c.id === id).name;
-const sortQ = (n) => sample(U.sort, n).map(([t, c]) => ({ prompt: `Which group? <br><span style="font-family:var(--body);font-weight:800">${esc(t)}</span>`, opts: U.categories.map((x) => x.name), answer: catName(c) }));
+const sortQ = (n) => sample(U.sort, n).map(([t, c]) => ({ prompt: `Which group? <br><span style="font-family:var(--body);font-weight:800">${esc(t)}</span>`, opts: U.categories.map((x) => x.name), answer: catName(c), k: c }));
 const vocabQ = (n) => sample(U.vocab, n).map(([en, def, es], k) => {
   const hasEs = es !== undefined; // Spanish column is optional per unit
   const others = (idx) => shuffle(U.vocab.filter((v) => v[0] !== en)).slice(0, 3).map((v) => v[idx]);
   const mode = k % (hasEs ? 3 : 2);
-  if (mode === 0) return { prompt: `Which term means: <em>${esc(def)}</em>?`, opts: shuffle([en, ...others(0)]), answer: en };
-  if (mode === 1) return { prompt: `What does <b>${esc(en)}</b> mean?`, opts: shuffle([def, ...others(1)]), answer: def };
-  return { prompt: `Spanish for <b>${esc(en)}</b>?`, opts: shuffle([es, ...others(2)]), answer: es };
+  if (mode === 0) return { prompt: `Which term means: <em>${esc(def)}</em>?`, opts: shuffle([en, ...others(0)]), answer: en, k: 'v' };
+  if (mode === 1) return { prompt: `What does <b>${esc(en)}</b> mean?`, opts: shuffle([def, ...others(1)]), answer: def, k: 'v' };
+  return { prompt: `Spanish for <b>${esc(en)}</b>?`, opts: shuffle([es, ...others(2)]), answer: es, k: 'v' };
 });
-const riddleQ = (n) => { const all = U.riddles.map((r) => cap(r.a)); return sample(U.riddles, n).map((r) => ({ prompt: 'Who am I?<br><span style="font-family:var(--body);font-weight:700;font-size:1rem">' + r.clues.map(esc).join(' ') + '</span>', opts: shuffle(all), answer: cap(r.a) })); };
+const riddleQ = (n) => { const all = U.riddles.map((r) => cap(r.a)); return sample(U.riddles, n).map((r) => ({ prompt: 'Who am I?<br><span style="font-family:var(--body);font-weight:700;font-size:1rem">' + r.clues.map(esc).join(' ') + '</span>', opts: shuffle(all), answer: cap(r.a), k: r.k })); };
 
 /* ---------- activities ---------- */
 const RUN = {
   sort: () => quiz('sort', sortQ(Math.min(12, U.sort.length))),
   vocab: () => quiz('vocab', vocabQ(Math.min(12, U.vocab.length))),
   exam: () => {
-    const pool = (U.quizzes || []).flatMap((z) => z.items.map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why })));
+    const pool = (U.quizzes || []).flatMap((z) => z.items.map((it) => ({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: it.k })));
     const qs = [...sortQ(Math.min(6, U.sort.length)), ...vocabQ(Math.min(4, U.vocab.length)), ...sample(pool, Math.min(8, pool.length)), ...(U.riddles ? riddleQ(Math.min(2, U.riddles.length)) : [])];
     quiz('exam', shuffle(qs));
+  },
+
+
+  /* ---------- Guide my learning ---------- */
+  guide() {
+    const T = U.topics || [], tp = prog().topics || {}, runs = prog().runs, best = prog().best;
+    const stat = (t) => { const o = tp[t.id]; if (!o || o.n < 5) return { n: o ? o.n : 0, pct: null, tag: 'Not enough yet', cls: 'none' }; const pct = Math.round((o.r.reduce((a, b) => a + b, 0) / o.r.length) * 100); return { n: o.n, pct, tag: pct >= 85 ? 'Strong' : pct >= 60 ? 'Getting there' : 'Needs focus', cls: pct >= 85 ? 'good' : pct >= 60 ? 'mid' : 'bad' }; };
+    const S = T.map((t) => ({ t, ...stat(t) }));
+    const known = S.filter((x) => x.pct != null).sort((a, b) => a.pct - b.pct);
+    const acts = U.activities.filter((a) => ACTS[a] && !['guide', 'focus', 'exam'].includes(a));
+    const plan = [];
+    known.filter((x) => x.pct < 85).slice(0, 2).forEach((x) => plan.push({ go: 'focus:' + x.t.id, text: `Practise ${x.t.name} (10 questions)`, why: `You are at ${x.pct}% on ${x.t.name}.` }));
+    if (known.some((x) => x.pct < 60 && ['m', 'p', 'a', 'f'].includes(x.t.id)) && !plan.some((p) => p.go === 'learn')) plan.push({ go: 'learn', text: 'Learn the answers', why: 'Read the key points again, then write them from memory.' });
+    S.filter((x) => x.pct == null).slice(0, 2).forEach((x) => plan.push({ go: 'focus:' + x.t.id, text: `Try ${x.t.name} questions`, why: 'You have not answered enough of these yet for me to tell.' }));
+    acts.filter((a) => !runs[a] && !plan.some((p) => p.go === a)).slice(0, 2).forEach((a) => plan.push({ go: a, text: `Try ${ACTS[a].name}`, why: 'You have not done this one yet.' }));
+    acts.filter((a) => runs[a] && best[a] < 70).slice(0, 2).forEach((a) => plan.push({ go: a, text: `Do ${ACTS[a].name} again`, why: `Your best is ${best[a]}%.` }));
+    if (!plan.length) plan.push({ go: 'exam', text: 'Take the Final exam', why: (best.exam != null ? `Your best is ${best.exam}%. ` : '') + 'You are doing well. Test yourself.' });
+    const first = plan[0];
+    const total = Object.values(tp).reduce((a, o) => a + o.n, 0);
+    app.innerHTML = `${topBar('<button class="link" id="stop">← Unit home</button>', 'Guide my learning')}
+     <div class="panel"><h2 class="sec" style="margin:0">Your progress by topic</h2>
+     ${total < 5 ? how('Start here', 'I have not seen enough answers yet. Do a few activities and come back. Learn the answers and Sort it are good ones to start with.') : how('Do this next', esc(first.text) + '. ' + esc(first.why))}
+     <div class="slots">${S.map((x) => `<div class="slot" style="flex-direction:column;align-items:stretch;gap:6px"><div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(x.t.name)}</b><span class="pill">${x.tag}${x.pct != null ? ' · ' + x.pct + '%' : ''}</span></div><div class="track" style="margin:0"><i style="width:${x.pct || 0}%;${x.cls === 'bad' ? 'background:#c0392b' : x.cls === 'mid' ? 'background:#d68910' : ''}"></i></div></div>`).join('')}</div>
+     <h2 class="sec" style="margin:14px 0 0">What to do</h2>
+     <div class="slots">${plan.slice(0, 5).map((p, k) => `<button class="slot" data-go="${p.go}" style="text-align:left"><span class="num">${k + 1}</span><span><b>${esc(p.text)}</b><br><span class="hint">${esc(p.why)}</span></span></button>`).join('')}</div>
+     <p class="hint">Topic marks come from your last 20 answers on each topic, across all the activities. For Learn the answers and Explain it they come from the points you ticked.</p>
+     <div class="row"><button class="btn" id="rs">Start my guide again</button></div></div>`;
+    $('#stop').onclick = unitHome;
+    app.querySelectorAll('[data-go]').forEach((b) => { b.onclick = () => { const g = b.dataset.go; g.startsWith('focus:') ? RUN.focus(g.slice(6)) : RUN[g](); }; });
+    $('#rs').onclick = () => { if (confirm('Clear the topic marks for this unit? Your best scores stay.')) { delete prog().topics; store.set(DB); RUN.guide(); } };
+    scrollTo(0, 0);
+  },
+
+  focus(t) {
+    if (t) RUN.focus.t = t; t = RUN.focus.t; const T = (U.topics || []).find((x) => x.id === t);
+    const pool = [];
+    (U.quizzes || []).forEach((z) => z.items.filter((it) => it.k === t).forEach((it) => pool.push({ prompt: esc(it.q), opts: it.opts, answer: it.a, why: it.why, k: t })));
+    U.sort.filter(([, c]) => c === t).forEach(([x, c]) => pool.push({ prompt: `Which group? <br><span style="font-family:var(--body);font-weight:800">${esc(x)}</span>`, opts: U.categories.map((y) => y.name), answer: catName(c), k: t }));
+    if (t === 'v') pool.push(...vocabQ(U.vocab.length));
+    U.riddles.filter((r) => r.k === t).forEach((r) => pool.push(riddleQ(U.riddles.length).find((q) => q.answer === cap(r.a)) || riddleQ(1)[0]));
+    ACTS.focus.name = 'Practise ' + (T ? T.name : 'topic');
+    quiz('focus', sample(pool, Math.min(10, pool.length)));
   },
 
   features() {
@@ -128,7 +175,7 @@ const RUN = {
     $('#stop').onclick = unitHome;
     $('#chk').onclick = () => {
       let right = 0; const total = rows.length * cats.length;
-      app.querySelectorAll('td[data-r]').forEach((td) => { const ok = td.firstChild.checked === !!rows[+td.dataset.r][1][+td.dataset.k]; if (ok) right++; td.className = ok ? 'ok' : 'no'; td.firstChild.disabled = true; });
+      app.querySelectorAll('td[data-r]').forEach((td) => { const ok = td.firstChild.checked === !!rows[+td.dataset.r][1][+td.dataset.k]; note(cats[+td.dataset.k].id, ok); if (ok) right++; td.className = ok ? 'ok' : 'no'; td.firstChild.disabled = true; });
       const pct = Math.round((right / total) * 100);
       $('#fb').className = 'fb ' + (pct === 100 ? 'good' : 'bad'); $('#fb').textContent = `${right} of ${total} boxes right.`;
       $('#chk').textContent = 'Finish'; $('#chk').onclick = () => finishCard('features', `${right}/${total}`, pct, '<p class="hint">Green boxes were right, red were wrong. Look at the red ones before you go again.</p>', RUN.features);
@@ -157,7 +204,7 @@ const RUN = {
       render();
       $('#chk').onclick = () => {
         if (placed.includes(null)) { $('#fb').className = 'fb bad'; $('#fb').textContent = 'Fill every number first.'; return; }
-        let r = 0; $('#slots').querySelectorAll('.slot').forEach((s, k) => { const ok = placed[k] === d.labels[k].a; if (ok) r++; s.className = 'slot ' + (ok ? 'ok' : 'no'); if (!ok) s.innerHTML += ` <span class="hint">→ ${esc(d.labels[k].a)}</span>`; s.disabled = true; });
+        let r = 0; $('#slots').querySelectorAll('.slot').forEach((s, k) => { const ok = placed[k] === d.labels[k].a; if (ok) r++; note(d.k, ok); s.className = 'slot ' + (ok ? 'ok' : 'no'); if (!ok) s.innerHTML += ` <span class="hint">→ ${esc(d.labels[k].a)}</span>`; s.disabled = true; });
         right += r; total += d.labels.length; i++;
         $('#fb').className = 'fb ' + (r === d.labels.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${d.labels.length} right.`;
         $('#chk').textContent = i >= ds.length ? 'Finish' : 'Next drawing'; $('#chk').onclick = next;
@@ -168,8 +215,8 @@ const RUN = {
 
   cloze() {
     const items = shuffle(U.cloze).slice(0, 5); let i = 0, right = 0, total = 0;
-    const next = () => { if (i >= items.length) { finishCard('cloze', `${right}/${total}`, Math.round((right / total) * 100), '', RUN.cloze); return; } draw(items[i][0], items[i][1] || []); };
-    const draw = (text, extra) => {
+    const next = () => { if (i >= items.length) { finishCard('cloze', `${right}/${total}`, Math.round((right / total) * 100), '', RUN.cloze); return; } draw(items[i][0], items[i][1] || [], items[i][2]); };
+    const draw = (text, extra, topic) => {
       // gaps look like {word} or {word~tag}; gaps with the same tag are interchangeable (e.g. "A and B"), so either order is right
       const answers = [], tags = []; const parts = text.split(/\{([^}]+)\}/); // odd indexes are gaps
       parts.forEach((p, k) => { if (k % 2) { const [a, t] = p.split('~'); answers.push(a); tags.push(t || null); parts[k] = a; } });
@@ -186,7 +233,7 @@ const RUN = {
       render();
       $('#chk').onclick = () => {
         if (answers.some((_, k) => !filled[k])) { $('#fb').className = 'fb bad'; $('#fb').textContent = 'Fill every gap first.'; return; }
-        let r = 0; $('#txt').querySelectorAll('.gap').forEach((e) => { const k = +e.dataset.g; const ok = accepts(k, filled[k]); if (ok) r++; e.classList.add(ok ? 'ok' : 'no'); e.onclick = null; if (!ok) e.innerHTML += ` → ${esc(answers[k])}`; });
+        let r = 0; $('#txt').querySelectorAll('.gap').forEach((e) => { const k = +e.dataset.g; const ok = accepts(k, filled[k]); if (ok) r++; note(topic, ok); e.classList.add(ok ? 'ok' : 'no'); e.onclick = null; if (!ok) e.innerHTML += ` → ${esc(answers[k])}`; });
         right += r; total += answers.length; i++;
         $('#fb').className = 'fb ' + (r === answers.length ? 'good' : 'bad'); $('#fb').textContent = r === answers.length ? 'All right!' : 'Not quite: the right words are shown.';
         $('#chk').textContent = i >= items.length ? 'Finish' : 'Next'; $('#chk').onclick = next;
@@ -207,14 +254,14 @@ const RUN = {
       clues(); $('#more').onclick = () => { shown++; clues(); };
       app.querySelectorAll('.o').forEach((b) => { b.onclick = () => {
         if (done) return;
-        if (b.dataset.o === cap(r.a)) { done = true; const got = Math.max(1, MAX + 1 - shown); pts += got; b.classList.add('ok'); app.querySelectorAll('.o').forEach((x) => (x.disabled = true)); $('#more').disabled = true; $('#fb').className = 'fb good'; $('#fb').textContent = `Yes! ${got} point${got > 1 ? 's' : ''}.`; setTimeout(() => { i++; i < rs.length ? ask() : finishCard('riddles', `${pts}/${rs.length * MAX}`, Math.round((pts / (rs.length * MAX)) * 100), '', RUN.riddles); }, 1100); }
+        if (b.dataset.o === cap(r.a)) { done = true; const got = Math.max(1, MAX + 1 - shown); pts += got; note(r.k, got >= 3); b.classList.add('ok'); app.querySelectorAll('.o').forEach((x) => (x.disabled = true)); $('#more').disabled = true; $('#fb').className = 'fb good'; $('#fb').textContent = `Yes! ${got} point${got > 1 ? 's' : ''}.`; setTimeout(() => { i++; i < rs.length ? ask() : finishCard('riddles', `${pts}/${rs.length * MAX}`, Math.round((pts / (rs.length * MAX)) * 100), '', RUN.riddles); }, 1100); }
         else { b.classList.add('no'); b.disabled = true; if (shown < r.clues.length) { shown++; clues(); } $('#fb').className = 'fb bad'; $('#fb').textContent = 'Not that one. Here is another clue.'; }
       }; });
     };
     ask();
   },
 
-  learn() {
+  learn(pre) {
     const sets = [['Page 60: Summarising', U.explain.filter((x) => x.src === 'p60')], ['Questions from the other pages', U.explain.filter((x) => x.src !== 'p60')]].filter((x) => x[1].length);
     const chooser = () => {
       app.innerHTML = `${topBar('<button class="link" id="stop">← Back</button>', 'Learn the answers')}<div class="panel"><p class="prompt">Learn the answers</p>
@@ -237,7 +284,7 @@ const RUN = {
             app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${how('Step 3 of 3 · Check', 'Tick the key points your answer included. Be honest.')}${mine ? `<div class="card" style="text-align:left;width:100%"><b>Your answer</b><p style="margin:4px 0 0;white-space:pre-wrap">${esc(mine)}</p></div>` : ''}
              <div class="slots">${it.points.map((p, k) => `<label class="slot" style="cursor:pointer"><input type="checkbox" style="width:22px;height:22px;flex:none"><span>${esc(p)}</span></label>`).join('')}</div><div class="row"><button class="btn primary" id="nx">${i + 1 >= list.length ? 'Finish' : 'Next question'}</button></div></div>`;
             $('#stop').onclick = unitHome;
-            $('#nx').onclick = () => { const t = app.querySelectorAll('.slot input:checked').length; got += t; total += n; if (t < n) gaps.push(it); i++; i < list.length ? item() : end(); };
+            $('#nx').onclick = () => { app.querySelectorAll('.slot input').forEach((c) => note(it.k, c.checked)); const t = app.querySelectorAll('.slot input:checked').length; got += t; total += n; if (t < n) gaps.push(it); i++; i < list.length ? item() : end(); };
           };
         };
       };
@@ -251,7 +298,7 @@ const RUN = {
       };
       item();
     };
-    chooser();
+    pre ? run(pre, false) : chooser();
   },
 
   explain() {
@@ -265,7 +312,7 @@ const RUN = {
       $('#show').onclick = () => {
         $('#show').hidden = true;
         $('#kp').innerHTML = `${how('Step 2 of 2', 'Tick each point your answer included. Be honest: this is how you find what to revise.')}<div class="slots">${it.points.map((p, k) => `<label class="slot" style="cursor:pointer"><input type="checkbox" data-k="${k}" style="width:22px;height:22px;flex:none"><span>${esc(p)}</span></label>`).join('')}</div><div class="row" style="margin-top:12px"><button class="btn primary" id="nx">${i + 1 >= items.length ? 'Finish' : 'Next question'}</button></div>`;
-        $('#nx').onclick = () => { got += app.querySelectorAll('#kp input:checked').length; total += it.points.length; i++; i < items.length ? ask() : finishCard('explain', `${got}/${total}`, Math.round((got / total) * 100), '<p class="hint">This score is marked by you. Revise the points you missed, then try again.</p>', RUN.explain); };
+        $('#nx').onclick = () => { app.querySelectorAll('#kp input').forEach((c) => note(it.k, c.checked)); got += app.querySelectorAll('#kp input:checked').length; total += it.points.length; i++; i < items.length ? ask() : finishCard('explain', `${got}/${total}`, Math.round((got / total) * 100), '<p class="hint">This score is marked by you. Revise the points you missed, then try again.</p>', RUN.explain); };
         $('#kp').scrollIntoView({ block: 'nearest' });
       };
     };
@@ -288,7 +335,7 @@ const RUN = {
       render();
       $('#chk').onclick = () => {
         if (chosen.length < it.steps.length) { $('#fb').className = 'fb bad'; $('#fb').textContent = 'Choose all the steps first.'; return; }
-        let r = 0; $('#got').querySelectorAll('.step').forEach((b, k) => { const ok = chosen[k] === it.steps[k]; if (ok) r++; b.className = 'step ' + (ok ? 'ok' : 'no'); b.disabled = true; if (!ok) b.innerHTML += ` <span class="hint">→ step ${k + 1}: ${esc(it.steps[k])}</span>`; });
+        let r = 0; $('#got').querySelectorAll('.step').forEach((b, k) => { const ok = chosen[k] === it.steps[k]; if (ok) r++; note(it.k, ok); b.className = 'step ' + (ok ? 'ok' : 'no'); b.disabled = true; if (!ok) b.innerHTML += ` <span class="hint">→ step ${k + 1}: ${esc(it.steps[k])}</span>`; });
         right += r; total += it.steps.length; i++;
         $('#fb').className = 'fb ' + (r === it.steps.length ? 'good' : 'bad'); $('#fb').textContent = `${r} of ${it.steps.length} in the right place.`;
         $('#chk').textContent = i >= items.length ? 'Finish' : 'Next'; $('#chk').onclick = next;
@@ -301,7 +348,7 @@ const RUN = {
 /* ---------- first-time "How it works" screen for every activity ---------- */
 function wrapIntros() {
   Object.keys(RUN).forEach((k) => {
-    if (RUN[k].wrapped) return; const raw = RUN[k];
+    if (RUN[k].wrapped || k === 'guide' || k === 'focus') return; const raw = RUN[k];
     RUN[k] = (...a) => {
       const steps = HOW[k] || HOW[k.replace('q-', '')] || (ACTS[k] ? [ACTS[k].blurb, HOWQ[k.replace('q-', '')] || 'Tap the right answer.', 'Read what appears after each answer.'] : null);
       if (a.length || seen(k) || !steps) return raw(...a);
