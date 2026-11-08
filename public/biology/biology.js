@@ -88,6 +88,8 @@ const HOWQ = { feeding: 'Tap how it gets its food.', importance: 'Tap Helpful or
 const seen = (k) => { try { return !!JSON.parse(localStorage.getItem('bio-seen') || '{}')[k]; } catch (e) { return false; } };
 const markSeen = (k) => { try { const o = JSON.parse(localStorage.getItem('bio-seen') || '{}'); o[k] = 1; localStorage.setItem('bio-seen', JSON.stringify(o)); } catch (e) { /* storage unavailable */ } };
 const stepsHtml = (arr) => `<ol class="steps">${arr.map((t, i) => `<li><i>${i + 1}</i><span>${['READ', 'DO', 'CHECK'][i] ? '' : ''}${esc(t)}</span></li>`).join('')}</ol>`;
+const hintUi = (it) => it.hint ? '<button class="btn" id="hint">💡 Hint: what to include</button><div id="hb" style="width:100%"></div>' : '';
+const wireHint = (it) => { const b = $('#hint'); if (b) b.onclick = () => { $('#hb').innerHTML = how('Hint', esc(it.hint)); b.hidden = true; }; };
 const topBar = (left, right = '') => `<div class="top">${left}<span class="eyebrow">${right}</span></div>`;
 const link = (href, text) => `<a class="link" href="${href}">${text}</a>`;
 
@@ -318,8 +320,8 @@ const RUN = {
       const item = () => {
         const it = list[i], n = it.points.length, head = `${topBar('<button class="link" id="stop">← Stop</button>', `Learn · ${i + 1} of ${list.length}`)}<div class="track"><i style="width:${(i / list.length) * 100}%"></i></div>`;
         const write = (peeked) => {
-          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${peeked ? how('Step 2 of 3 · Write', 'The points are hidden. Write or say your answer from memory.') : how('Step 1 of 2 · Write', 'Write or say what you know first. The points are hidden. If you do not know it yet, tap the second button.')}<textarea class="ta" id="ans" rows="5" placeholder="Your answer"></textarea><button class="btn primary" id="chk">Check my answer</button>${peeked ? '' : '<button class="btn" id="peek">I don\'t know this yet. Show me the points</button>'}</div>`;
-          $('#stop').onclick = unitHome; $('#ans').focus({ preventScroll: true });
+          app.innerHTML = `${head}<div class="panel"><p class="prompt">${esc(it.q)}</p>${peeked ? how('Step 2 of 3 · Write', 'The points are hidden. Write or say your answer from memory.') : how('Step 1 of 2 · Write', 'Write or say what you know first. The points are hidden. If you do not know it yet, tap the second button.')}<textarea class="ta" id="ans" rows="5" placeholder="Your answer"></textarea>${hintUi(it)}<button class="btn primary" id="chk">Check my answer</button>${peeked ? '' : '<button class="btn" id="peek">I don\'t know this yet. Show me the points</button>'}</div>`;
+          $('#stop').onclick = unitHome; $('#ans').focus({ preventScroll: true }); wireHint(it);
           if (!peeked) $('#peek').onclick = read;
           $('#chk').onclick = () => check($('#ans').value.trim(), peeked);
         };
@@ -354,10 +356,11 @@ const RUN = {
       const it = items[i];
       app.innerHTML = `${topBar('<button class="link" id="stop">← Stop</button>', `Explain it · ${i + 1} of ${items.length}`)}<div class="panel"><p class="prompt">${esc(it.q)}</p><p class="hint">From the book, ${it.src === 'p60' ? 'page 60 (Summarising)' : 'page ' + it.src.slice(1)}.</p>
        ${how('Step 1 of 2', 'Write or say your answer first, in 2 or 3 sentences. No peeking.')}
-       <textarea class="ta" id="ans" rows="4" placeholder="Your answer (optional, it is not saved)"></textarea><button class="btn primary" id="show">Show the key points</button><div id="kp" style="width:100%"></div></div>`;
+       <textarea class="ta" id="ans" rows="4" placeholder="Your answer (optional, it is not saved)"></textarea>${hintUi(it)}<button class="btn primary" id="show">Show the key points</button><div id="kp" style="width:100%"></div></div>`;
       $('#stop').onclick = unitHome;
+      wireHint(it);
       $('#show').onclick = () => {
-        $('#show').hidden = true;
+        $('#show').hidden = true; if ($('#hint')) $('#hint').hidden = true;
         $('#kp').innerHTML = `${how('Step 2 of 2', 'Tick each point your answer included. Be honest: this is how you find what to revise.')}<div class="slots">${it.points.map((p, k) => `<label class="slot" style="cursor:pointer"><input type="checkbox" data-k="${k}" style="width:22px;height:22px;flex:none"><span>${esc(p)}</span></label>`).join('')}</div><div class="row" style="margin-top:12px"><button class="btn primary" id="nx">${i + 1 >= items.length ? 'Finish' : 'Next question'}</button></div>`;
         $('#nx').onclick = () => { app.querySelectorAll('#kp input').forEach((c) => note(it.k, c.checked)); got += app.querySelectorAll('#kp input:checked').length; total += it.points.length; i++; i < items.length ? ask() : finishCard('explain', `${got}/${total}`, Math.round((got / total) * 100), '<p class="hint">This score is marked by you. Revise the points you missed, then try again.</p>', RUN.explain); };
         $('#kp').scrollIntoView({ block: 'nearest' });
