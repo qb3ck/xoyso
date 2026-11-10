@@ -551,6 +551,8 @@ const YEARS = [
     { id: 'english', title: ['Inglés', 'English'], blurb: ['Ortografía y vocabulario', 'Spelling and vocabulary'], icon: 'Aa',
       units: [{ href: '/prefix', title: ['Prefijos re- e inter-', 'Prefixes re- and inter-'], blurb: ['19 palabras: juegos de ortografía.', '19 words: spelling games.'] },
         { href: '/subsuper', title: ['Sub- y super-', 'Sub- and super-'], blurb: ['Paso 1: la segunda parte de cada palabra.', 'Step 1: the second part of each word.'] }] },
+    { id: 'lengua3', title: ['Lengua', 'Spanish language'], blurb: ['Ortografía: los acentos', 'Spelling: accents'], icon: 'Ñ',
+      units: [{ href: '/acentos?n=3prim', title: ['Los acentos', 'Accents'], blurb: ['Sílaba tónica, agudas, llanas, esdrújulas y la tilde.', 'Stressed syllable, agudas, llanas, esdrújulas and the tilde.'] }] },
     { id: 'math3', title: ['Matemáticas', 'Maths'], blurb: ['Un reto cada día', 'A challenge every day'], icon: '+×',
       units: [{ href: '/maths-day', title: ['Reto de mates del día', 'Maths question of the day'], blurb: ['Una pregunta nueva cada día, con calendario.', 'A new question every day, with a calendar.'] }] },
     { id: 'pe', title: ['Educación Física', 'Physical Education'], blurb: ['El cuerpo humano', 'The human body'], icon: 'EF',
@@ -560,6 +562,8 @@ const YEARS = [
     { id: 'math', title: ['Matemáticas', 'Maths'], blurb: ['Concurso de decimales de π', 'The π digits competition'], icon: 'π',
       units: [{ href: '/maths-day', title: ['Reto de mates del día', 'Maths question of the day'], blurb: ['Una pregunta nueva cada día, con calendario.', 'A new question every day, with a calendar.'] },
         { href: '/pi', title: ['Decimales de π', 'Digits of π'], blurb: ['Aprende, enlaza y recita los decimales en grupos.', 'Learn, link and recite the digits in groups.'] }] },
+    { id: 'lengua', title: ['Lengua', 'Spanish language'], blurb: ['Ortografía: los acentos', 'Spelling: accents'], icon: 'Ñ',
+      units: [{ href: '/acentos?n=1eso', title: ['Los acentos', 'Accents'], blurb: ['Reglas de la tilde, excepciones, diptongos, hiatos y tilde diacrítica.', 'Tilde rules, exceptions, diphthongs, hiatus and the diacritical accent.'] }] },
     { id: 'bio', title: ['Biología', 'Biology'], blurb: ['Unidades de repaso en inglés', 'Revision units in English'], icon: 'Bio',
       units: [{ href: '/biology', title: ['Unidades de Biología', 'Biology units'], blurb: ['Monera, Protoctista y Fungi, y las unidades que vengan.', 'Monera, Protoctista and Fungi, plus the units to come.'] }] }] },
 ];

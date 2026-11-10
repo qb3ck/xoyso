@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Los acentos</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700;800&display=swap">
+<style>
+:root{
+  --bg:#eef4f8; --card:#ffffff; --ink:#13233f; --muted:#56677f; --line:#d3dfeb;
+  --hi:#0a7c86; --hi-soft:#d8f1f3; --warm:#d9480f; --warm-soft:#ffe9dc;
+  --good:#1b7f45; --good-soft:#dcf5e5; --bad:#c2362b; --bad-soft:#fde4e1;
+  --display:'Fredoka','Trebuchet MS',system-ui,sans-serif; --body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1829; --card:#172540; --ink:#e8eefb; --muted:#9db0cf; --line:#2a3b59;
+  --hi:#4fd1d9; --hi-soft:#0f3a42; --warm:#ff9a5c; --warm-soft:#3a2416; --good:#4cd98a; --good-soft:#12382a; --bad:#ff8a80; --bad-soft:#3d1a1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1829; --card:#172540; --ink:#e8eefb; --muted:#9db0cf; --line:#2a3b59;
+  --hi:#4fd1d9; --hi-soft:#0f3a42; --warm:#ff9a5c; --warm-soft:#3a2416; --good:#4cd98a; --good-soft:#12382a; --bad:#ff8a80; --bad-soft:#3d1a1a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;margin:0;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#app{max-width:820px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance;line-height:1.1}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.link{background:none;border:0;padding:8px 4px;font-weight:800;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+a.link{display:inline-block}
+.hero{display:grid;gap:12px;margin-bottom:8px} .hero h1{font-size:clamp(2.2rem,7vw,3.4rem)} .hero p{margin:0;color:var(--muted);max-width:58ch}
+.sec{font-family:var(--display);font-size:1.25rem;margin:24px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.act{text-align:left;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px 18px;display:grid;gap:6px;min-width:0}
+.act:hover{border-color:var(--ink)}
+.act .ic{font-family:var(--display);font-size:1.7rem;font-weight:600;color:var(--warm)} .act h3{font-size:1.15rem} .act p{margin:0;color:var(--muted);font-size:.95rem}
+.act .best{font-weight:800;font-size:.9rem;color:var(--muted)} .act .best.good{color:var(--good)}
+.act.start{border-color:var(--warm);background:var(--warm-soft)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px} .count{font-weight:800;color:var(--muted)}
+.track{height:10px;border-radius:99px;background:var(--line);margin:4px 0 14px;overflow:hidden} .track i{display:block;height:100%;background:var(--hi);border-radius:99px;transition:width .25s}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:clamp(16px,4vw,26px);display:grid;gap:14px;justify-items:center;text-align:center;align-content:start}
+.panel.left{justify-items:stretch;text-align:left}
+.eyebrow{margin:0;font-weight:800;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.big{font-family:var(--display);font-size:clamp(1.8rem,6vw,2.7rem);font-weight:600;overflow-wrap:anywhere;line-height:1.2}
+.big b.st{color:var(--warm)} .big i{font-style:normal;color:var(--muted);font-weight:500;margin:0 .08em}
+.sent{font-family:var(--display);font-size:clamp(1.3rem,4.6vw,1.9rem);line-height:1.3} .gap{display:inline-block;min-width:3.2ch;border-bottom:3px solid var(--warm);text-align:center;color:var(--warm)}
+.opts{display:grid;gap:10px;width:100%} .opts.row{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
+.opt{min-height:54px;padding:10px 16px;border-radius:16px;border:2px solid var(--line);background:var(--bg);font-family:var(--display);font-size:1.3rem;font-weight:500}
+.opt:hover:not(:disabled){border-color:var(--ink)} .opt:disabled{cursor:default}
+.opt.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)} .opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.fb{min-height:1px;width:100%;text-align:left;font-weight:700} .fb .v{font-family:var(--display);font-size:1.2rem;font-weight:600} .fb.good .v{color:var(--good)} .fb.bad .v{color:var(--bad)}
+.btn{min-height:50px;padding:10px 24px;border-radius:14px;border:2px solid var(--ink);background:var(--card);font-weight:800}
+.btn.primary{background:var(--ink);color:var(--bg)} .btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.say{background:var(--hi-soft);border:2px solid var(--hi);color:var(--ink);border-radius:99px;padding:6px 14px;font-weight:800}
+.en{color:var(--muted);font-weight:600;font-size:.88em}
+/* lesson */
+.lesson h2{font-size:1.5rem;color:var(--warm)} .lesson p{margin:0} .lesson ul{margin:0;padding-left:1.2em;display:grid;gap:6px}
+.ex{display:flex;flex-wrap:wrap;gap:8px} .ex span{background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:3px 12px;font-family:var(--display);font-size:1.2rem}
+.ex span b{color:var(--warm)}
+table.t{border-collapse:collapse;width:100%;font-size:.98rem} .t th,.t td{border:2px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top} .t th{background:var(--hi-soft)}
+.t td.y{background:var(--good-soft)} .t td.n{background:var(--bad-soft)}
+.tip{background:var(--warm-soft);border:2px solid var(--warm);border-radius:14px;padding:10px 14px;font-weight:700}
+.dots{display:flex;gap:6px;justify-content:center} .dots i{width:10px;height:10px;border-radius:50%;background:var(--line)} .dots i.on{background:var(--warm)}
+.miss{display:grid;gap:8px;width:100%;text-align:left} .miss div{background:var(--bg);border-left:6px solid var(--bad);border-radius:10px;padding:8px 12px}
+</style>
+<link rel="stylesheet" href="/how.css">
+</head><body>
+<div id="app"></div>
+<script>
+/* Content + rule engine for the accents unit. Words are syllabified by hand with * before the stressed syllable;
+   the class (aguda, llana...) and whether a tilde is needed are DERIVED from the rules, then checked by chk.js. */
+const VOW = 'aeiouáéíóúü', ACUTE = 'áéíóú', PLAINV = 'aeiou';
+const plain = (s) => s.replace(/[áéíóú]/g, (m) => PLAINV[ACUTE.indexOf(m)]);
+const isV = (c) => VOW.includes((c || '').toLowerCase());
+function W(s, flag = '') {
+  const parts = s.split('-'), st = parts.findIndex((x) => x[0] === '*'), sy = parts.map((x) => x.replace('*', '')), w = sy.join(''), n = sy.length, d = n - 1 - st;
+  const cls = n === 1 ? 'monosílaba' : d === 0 ? 'aguda' : d === 1 ? 'llana' : d === 2 ? 'esdrújula' : 'sobresdrújula';
+  const last = w.slice(-1).toLowerCase(), prev = w.slice(-2, -1).toLowerCase();
+  const simple = isV(last) || last === 'n' || (last === 's' && isV(prev));   // ends in vowel, -n, or -s after a vowel
+  const forced = flag.includes('H');                                            // hiato with a stressed i/u
+  const need = forced || cls === 'esdrújula' || cls === 'sobresdrújula' || (cls === 'aguda' && simple) || (cls === 'llana' && !simple);
+  return { s, sy, st, w, n, cls, simple, need, forced, flag, ends: last, plainW: plain(w), hasT: /[áéíóú]/.test(w) };
+}
+/* [word, flag]: '' normal, 'H' hiato (stressed weak vowel), 'x' tricky ending (-s after a consonant), 'S' sobresdrújula */
+const WORDS = [
+  // agudas con tilde
+  'can-*ción', 'ca-*fé', 'so-*fá', 'ja-*món', 'a-de-*más', 'com-*pás', 'in-*glés', 'a-*quí', 'ra-*tón', 'co-ra-*zón', 'bo-*tón', 'es-ta-*ción', 'lec-*ción', 'ca-*mión', 'pu-*ré', 'bam-*bú', 'me-lo-co-*tón', 'a-vis-*pón', 'cons-*truí',
+  // agudas sin tilde
+  're-*loj', 'ciu-*dad', 'pa-*pel', 'ac-*tor', 'a-*mor', 'ju-*gar', 'co-*mer', 'vi-*vir', 'ca-*paz', 'ha-*blar', 'mu-*jer', 'lu-*gar', 'se-*ñor', 'ver-*dad', 'sa-*lud', 'ca-rru-*sel',
+  // llanas sin tilde
+  '*ca-sa', '*li-bro', '*me-sa', 'ca-*mi-nan', 'e-*xa-men', '*lu-nes', '*can-tan', '*pe-rro', 'ven-*ta-na', 'co-*mi-da', 'a-ma-*ri-llo', '*jue-ves', 'ma-*ña-na', '*vier-nes', 'za-*pa-tos', 'cua-*der-no', 'ca-*be-llo', 'to-*ma-te', '*jo-ven', '*vir-gen', 'ham-bur-*gue-sa',
+  // llanas con tilde
+  '*ár-bol', '*lá-piz', '*fá-cil', '*cár-cel', '*dé-bil', 'ca-*rác-ter', '*ál-bum', 'a-*zú-car', '*á-gil', '*tré-bol', '*dó-lar', '*mó-vil', 'di-*fí-cil', '*fút-bol', '*cés-ped', '*án-gel',
+  // esdrújulas
+  '*pá-ja-ro', '*mú-si-ca', '*mé-di-co', 'te-*lé-fo-no', '*sá-ba-do', '*ár-bo-les', 'ma-te-*má-ti-cas', '*cá-ma-ra', '*lá-gri-ma', '*dé-ci-mo', '*ú-ni-co', 'he-li-*cóp-te-ro', '*pá-gi-na', '*ré-gi-men', 'A-*mé-ri-ca', '*plá-ta-no', 'pe-*lí-cu-la', '*sí-la-ba', 'e-*xá-me-nes', 'cien-*tí-fi-co', 'fan-*tás-ti-co',
+].map((s) => [s, '']).concat([
+  ['*bí-ceps', 'x'], ['*có-mics', 'x'], ['*ré-cords', 'x'], ['ro-*bots', 'x'], ['vi-*rrey', 'x'], ['U-ru-*guay', 'x'],
+  ['*cuén-ta-me-lo', 'S'], ['*dí-ga-se-lo', 'S'], ['*cóm-pra-se-lo', 'S'], ['*llé-va-te-lo', 'S'], ['en-*tré-ga-se-lo', 'S'],
+  ['pa-*ís', 'H'], ['Ma-*rí-a', 'H'], ['*rí-o', 'H'], ['ba-*úl', 'H'], ['ca-*í-da', 'H'], ['re-*ír', 'H'], ['o-*í-do', 'H'], ['ma-*íz', 'H'], ['ha-*bí-a', 'H'], ['*dí-a', 'H'], ['*tí-o', 'H'], ['con-ti-*nú-a', 'H'], ['ac-*tú-a', 'H'], ['*grú-a', 'H'], ['Ra-*úl', 'H'], ['a-*hí', 'H'], ['pro-*hí-be', 'H'], ['*mí-a', 'H'],
+  ['le-*ón', ''], ['*ca-os', ''], ['te-*a-tro', ''], ['po-*e-ta', ''], ['*hé-ro-e', ''], ['mu-*se-o', ''], ['pa-*se-o', ''], ['ma-*es-tro', ''],
+]).map(([s, f]) => W(s, f));
+// hand-checked spellings that must never change (chk.js asserts these)
+const MUST = 'canción café sofá jamón además compás inglés aquí ratón corazón botón estación camión melocotón construí reloj ciudad papel actor amor jugar comer vivir capaz hablar mujer lugar señor verdad salud casa libro mesa caminan examen lunes cantan perro ventana comida amarillo jueves mañana viernes zapatos cuaderno cabello tomate joven virgen hamburguesa árbol lápiz fácil cárcel débil carácter álbum azúcar ágil trébol dólar móvil difícil fútbol césped '.trim().split(' ');
+
+/* diptongo / triptongo / hiato: [word, kind, note] */
+const DIP = [
+  ['bue-no', 'diptongo', 'u + e: cerrada + abierta en la misma sílaba'], ['pei-ne', 'diptongo', 'e + i: abierta + cerrada en la misma sílaba'], ['a-gua', 'diptongo', 'u + a: cerrada + abierta en la misma sílaba'],
+  ['ciu-dad', 'diptongo', 'i + u: dos cerradas distintas forman diptongo'], ['cuo-ta', 'diptongo', 'u + o: cerrada + abierta'], ['rei-na', 'diptongo', 'e + i: abierta + cerrada'],
+  ['vien-to', 'diptongo', 'i + e: cerrada + abierta'], ['pue-blo', 'diptongo', 'u + e: cerrada + abierta'], ['au-la', 'diptongo', 'a + u: abierta + cerrada'],
+  ['es-tu-diáis', 'triptongo', 'i + á + i: cerrada + abierta + cerrada en una sílaba (diáis)'], ['a-ve-ri-güéis', 'triptongo', 'ü + é + i: cerrada + abierta + cerrada (güéis)'], ['cam-biéis', 'triptongo', 'i + é + i: cerrada + abierta + cerrada (biéis)'],
+  ['a-pre-ciáis', 'triptongo', 'i + á + i (ciáis)'], ['buey', 'triptongo', 'u + e + y: la y final suena como i'], ['miau', 'triptongo', 'i + a + u: tres vocales en una sílaba'], ['U-ru-guay', 'triptongo', 'u + a + y (guay)'],
+  ['pa-ís', 'hiato', 'a + í: la cerrada es la tónica, así que se separan'], ['Ma-rí-a', 'hiato', 'í + a: cerrada tónica + abierta, se separan'], ['rí-o', 'hiato', 'í + o: cerrada tónica + abierta'], ['ba-úl', 'hiato', 'a + ú: abierta + cerrada tónica'],
+  ['ca-í-da', 'hiato', 'a + í: abierta + cerrada tónica'], ['re-ír', 'hiato', 'e + í: abierta + cerrada tónica'], ['o-í-do', 'hiato', 'o + í: abierta + cerrada tónica'], ['dí-a', 'hiato', 'í + a: cerrada tónica + abierta'],
+  ['con-ti-nú-a', 'hiato', 'ú + a: cerrada tónica + abierta'], ['le-ón', 'hiato', 'e + o: dos vocales abiertas siempre se separan'], ['ca-os', 'hiato', 'a + o: dos vocales abiertas'], ['te-a-tro', 'hiato', 'e + a: dos vocales abiertas'],
+  ['po-e-ta', 'hiato', 'o + e: dos vocales abiertas'], ['mu-se-o', 'hiato', 'e + o: dos vocales abiertas'], ['pa-se-o', 'hiato', 'e + o: dos vocales abiertas'], ['ma-es-tro', 'hiato', 'a + e: dos vocales abiertas'],
+];
+
+/* tilde diacrítica: [sentence with ___, correct, wrong(s), why] */
+const DIAC = [
+  ['___ madre te llama.', 'Tu', ['Tú'], 'Tu (sin tilde) es el posesivo: «tu madre».'], ['¿___ quieres venir?', 'Tú', ['Tu'], 'Tú (con tilde) es el pronombre personal: «tú quieres».'],
+  ['___ perro come mucho.', 'El', ['Él'], 'El (sin tilde) es el artículo: «el perro».'], ['___ dijo que sí.', 'Él', ['El'], 'Él (con tilde) es el pronombre personal: «él dijo».'],
+  ['Este regalo es para ___.', 'mí', ['mi'], 'Mí (con tilde) es pronombre y va tras preposición: «para mí».'], ['___ casa es grande.', 'Mi', ['Mí'], 'Mi (sin tilde) es el posesivo: «mi casa».'],
+  ['___ llueve, no salimos.', 'Si', ['Sí'], 'Si (sin tilde) es conjunción condicional: «si llueve».'], ['Me preguntó si quería ir y le dije que ___.', 'sí', ['si'], 'Sí (con tilde) es afirmación: «dije que sí».'],
+  ['Quiero un ___ caliente.', 'té', ['te'], 'Té (con tilde) es la infusión.'], ['___ espero en casa.', 'Te', ['Té'], 'Te (sin tilde) es un pronombre: «te espero».'],
+  ['Yo no ___ la respuesta.', 'sé', ['se'], 'Sé (con tilde) es del verbo saber (yo sé) o del verbo ser (sé bueno).'], ['Ella ___ lava las manos.', 'se', ['sé'], 'Se (sin tilde) es un pronombre: «se lava».'],
+  ['Quiero que me ___ la mano.', 'dé', ['de'], 'Dé (con tilde) es del verbo dar: «que me dé».'], ['El libro ___ Ana está aquí.', 'de', ['dé'], 'De (sin tilde) es una preposición: «libro de Ana».'],
+  ['Quiero ___ agua, por favor.', 'más', ['mas'], 'Más (con tilde) indica cantidad: «más agua».'], ['Lo intentó, ___ no pudo.', 'mas', ['más'], 'Mas (sin tilde) significa «pero».'],
+  ['___ no he comido nada.', 'Aún', ['Aun'], 'Aún (con tilde) equivale a «todavía».'], ['___ así, iré a la fiesta.', 'Aun', ['Aún'], 'Aun (sin tilde) equivale a «incluso»: «aun así».'],
+  ['¿___ hora es?', 'Qué', ['Que'], 'Qué (con tilde) en preguntas y exclamaciones.'], ['El libro ___ compré es nuevo.', 'que', ['qué'], 'Que (sin tilde) une dos partes de la frase.'], ['Dime ___ quieres para cenar.', 'qué', ['que'], 'Qué lleva tilde también en las preguntas indirectas: «dime qué quieres».'],
+  ['¿___ te llamas?', 'Cómo', ['Como'], 'Cómo (con tilde) pregunta por la manera.'], ['Corre ___ el viento.', 'como', ['cómo'], 'Como (sin tilde) compara: «como el viento».'],
+  ['¿___ vives?', 'Dónde', ['Donde'], 'Dónde (con tilde) pregunta por el lugar.'], ['Esta es la casa ___ nací.', 'donde', ['dónde'], 'Donde (sin tilde) no pregunta: «la casa donde nací».'],
+  ['¿___ llegas?', 'Cuándo', ['Cuando'], 'Cuándo (con tilde) pregunta por el momento.'], ['Llámame ___ llegues.', 'cuando', ['cuándo'], 'Cuando (sin tilde) no pregunta: «cuando llegues».'],
+  ['¿___ es ese chico?', 'Quién', ['Quien'], 'Quién (con tilde) pregunta por la persona.'], ['Fue Ana ___ lo dijo.', 'quien', ['quién'], 'Quien (sin tilde) no pregunta: «Ana, quien lo dijo».'],
+  ['¿___ cuesta este libro?', 'Cuánto', ['Cuanto'], 'Cuánto (con tilde) pregunta por la cantidad.'], ['Come ___ quieras.', 'cuanto', ['cuánto'], 'Cuanto (sin tilde) no pregunta: «cuanto quieras».'],
+  ['¿___ no vienes a la fiesta?', 'Por qué', ['Porque', 'Porqué', 'Por que'], '«Por qué» (separado y con tilde) se usa para preguntar.'], ['No vengo ___ estoy enfermo.', 'porque', ['por qué', 'porqué', 'por que'], '«Porque» (junto y sin tilde) sirve para responder: expresa la causa.'],
+  ['No entiendo el ___ de su enfado.', 'porqué', ['porque', 'por qué', 'por que'], '«Porqué» (junto y con tilde) es un sustantivo: «el porqué» = el motivo.'],
+];
+
+/* tricky cases: [question, [options], correct, why] */
+const EXC = [
+  ['¿Cuál está bien escrita?', ['fué', 'fue'], 'fue', 'Las palabras de una sola sílaba (fue, fui, dio, vio, fe, pie) no llevan tilde.'],
+  ['¿Cuál está bien escrita?', ['guión', 'guion'], 'guion', 'Guion es monosílaba (io es diptongo), así que no lleva tilde.'],
+  ['¿Cuál está bien escrita?', ['biceps', 'bíceps'], 'bíceps', 'Es llana y acaba en -s después de consonante (ps): cuenta como consonante, así que lleva tilde.'],
+  ['¿Cuál está bien escrita?', ['cómics', 'comics'], 'cómics', 'Es llana y acaba en -s tras consonante (cs): lleva tilde, como récords o bíceps.'],
+  ['¿Cuál está bien escrita?', ['robóts', 'robots'], 'robots', 'Es aguda y acaba en -s tras consonante (ts): cuenta como consonante, así que no lleva tilde.'],
+  ['¿Cuál está bien escrita? (la y final cuenta como consonante)', ['virrey', 'virréy'], 'virrey', 'Es aguda y acaba en y, que cuenta como consonante: no lleva tilde.'],
+  ['¿Cómo se escribe el adverbio de «rápido»?', ['rapidamente', 'rápidamente', 'rápidaménte'], 'rápidamente', 'Los adverbios en -mente conservan la tilde del adjetivo del que vienen.'],
+  ['¿Cómo se escribe el adverbio de «fácil»?', ['facilmente', 'fácilmente', 'facílmente'], 'fácilmente', 'Fácil lleva tilde, así que fácilmente también.'],
+  ['¿Cómo se escribe el adverbio de «lento»?', ['lentamente', 'léntamente', 'lentaménte'], 'lentamente', 'Lento no lleva tilde, así que lentamente tampoco.'],
+  ['¿Cuál está bien escrita? Se escribe al principio de una frase.', ['Africa', 'África'], 'África', 'Las mayúsculas también llevan tilde.'],
+  ['¿Cuál está bien escrito?', ['Álvaro', 'Alvaro'], 'Álvaro', 'Es esdrújula: lleva tilde aunque empiece por mayúscula.'],
+  ['Según la RAE actual, ¿cuál está bien escrita?', ['sólo', 'solo'], 'solo', 'Desde 2010 «solo» no lleva tilde, ni como adjetivo ni como adverbio. (Si tu profesor pide otra cosa, sigue a tu profesor.)'],
+  ['¿Cuál está bien escrita?', ['pais', 'país'], 'país', 'Hiato: la i es la vocal fuerte y va junto a una abierta, así que la tilde va siempre.'],
+  ['¿Cuál está bien escrito?', ['Raul', 'Raúl'], 'Raúl', 'Hiato con la ú tónica: tilde obligatoria, aunque las agudas acabadas en -l no la lleven.'],
+  ['¿Cuál está bien escrita? Esta casa es ___.', ['mia', 'mía'], 'mía', 'Hiato í + a: la tilde se pone en la vocal cerrada tónica.'],
+  ['¿Cuál está bien escrita?', ['oido', 'oído'], 'oído', 'Hiato o + í: la tilde va en la í.'],
+  ['¿Cuál está bien escrito?', ['reir', 'reír'], 'reír', 'Hiato e + í: la tilde va en la í.'],
+  ['¿Cuál está bien escrita?', ['véo', 'veo'], 'veo', 'e + o son dos abiertas: se aplican las reglas generales. Es llana acabada en vocal: sin tilde.'],
+  ['¿Cuál está bien escrita?', ['leon', 'león'], 'león', 'Es aguda acabada en -n: lleva tilde.'],
+  ['¿Cuál está bien escrita?', ['cuentamelo', 'cuéntamelo'], 'cuéntamelo', 'Es sobresdrújula: siempre lleva tilde.'],
+  ['¿Cuál está bien escrita?', ['construi', 'construí'], 'construí', 'Es aguda acabada en vocal: lleva tilde.'],
+  ['¿Cuál está bien escrita?', ['examenes', 'exámenes'], 'exámenes', 'Al hacer el plural, examen (llana) pasa a ser esdrújula, y las esdrújulas siempre llevan tilde.'],
+  ['¿Cuál está bien escrita?', ['teorico-practico', 'teórico-práctico', 'teórico-practico'], 'teórico-práctico', 'Con guion, cada palabra conserva su propia tilde.'],
+  ['¿Cuál está bien escrita?', ['dia', 'día'], 'día', 'Hiato í + a: la tilde va siempre.'],
+  ['¿Cuál está bien escrita?', ['cantais', 'cantáis'], 'cantáis', 'Es aguda acabada en -s: lleva tilde (el diptongo ai no cambia la regla).'],
+  ['¿Cuál está bien escrita?', ['estudiais', 'estudiáis'], 'estudiáis', 'Triptongo iái: la tilde va en la vocal abierta.'],
+  ['¿Cuál está bien escrita?', ['lingüistica', 'lingüística'], 'lingüística', 'Es esdrújula: siempre lleva tilde. La diéresis (ü) es otra cosa: sirve para pronunciar la u en güe y güi.'],
+];
+
+/* vocabulary: [term, definition, level] level p = both, e = 1ESO only */
+const VOC = [
+  ['sílaba', 'cada grupo de sonidos que se pronuncia de un golpe de voz', 'p'], ['sílaba tónica', 'la sílaba que se pronuncia con más fuerza', 'p'], ['sílaba átona', 'cada sílaba que se pronuncia con menos fuerza', 'p'],
+  ['tilde', 'el signo ´ que se escribe sobre una vocal', 'p'], ['palabra aguda', 'palabra cuya sílaba tónica es la última', 'p'], ['palabra llana', 'palabra cuya sílaba tónica es la penúltima', 'p'],
+  ['palabra esdrújula', 'palabra cuya sílaba tónica es la antepenúltima', 'p'], ['palabra sobresdrújula', 'palabra cuya sílaba tónica va antes de la antepenúltima', 'e'], ['monosílaba', 'palabra de una sola sílaba', 'e'],
+  ['diptongo', 'dos vocales seguidas que se pronuncian en la misma sílaba', 'e'], ['triptongo', 'tres vocales seguidas que se pronuncian en la misma sílaba', 'e'], ['hiato', 'dos vocales seguidas que se pronuncian en sílabas distintas', 'e'],
+  ['vocal abierta', 'a, e, o', 'e'], ['vocal cerrada', 'i, u', 'e'], ['tilde diacrítica', 'la que distingue dos palabras que se escriben igual pero tienen distinta función, como tú y tu', 'e'],
+  ['diéresis', 'los dos puntos sobre la u en güe y güi, como en pingüino', 'e'],
+];
+const EN = { 'sílaba': 'syllable', 'sílaba tónica': 'stressed syllable', 'sílaba átona': 'unstressed syllable', 'tilde': 'written accent mark', 'palabra aguda': 'stress on the last syllable', 'palabra llana': 'stress on the second-to-last', 'palabra esdrújula': 'stress on the third-to-last', 'palabra sobresdrújula': 'stress before the third-to-last', 'monosílaba': 'one-syllable word', 'diptongo': 'diphthong', 'triptongo': 'triphthong', 'hiato': 'hiatus', 'vocal abierta': 'strong vowel', 'vocal cerrada': 'weak vowel', 'tilde diacrítica': 'diacritical accent', 'diéresis': 'diaeresis' };
+
+/* why a tilde is or is not needed */
+function reason(o) {
+  const sf = o.sy[o.st].replace(/[áéíóú]/g, (m) => PLAINV[ACUTE.indexOf(m)]);
+  const cls = o.cls, endTxt = o.simple ? 'termina en vocal, -n o -s' : (o.ends === 's' ? 'termina en -s detrás de otra consonante, que cuenta como consonante' : o.ends === 'y' ? 'termina en y, que cuenta como consonante' : 'no termina en vocal, -n ni -s');
+  let r = `La sílaba fuerte es «${sf}»: es ${cls}. `;
+  if (o.forced) return r + 'Es un hiato con una vocal cerrada tónica (í, ú) junto a una abierta: la tilde se pone siempre, aunque la regla general no la pida.';
+  if (cls === 'esdrújula' || cls === 'sobresdrújula') return r + 'Las ' + cls + 's llevan tilde siempre.';
+  if (cls === 'aguda') return r + (o.need ? `Las agudas llevan tilde si terminan en vocal, -n o -s, y esta ${endTxt}.` : `Las agudas solo llevan tilde si terminan en vocal, -n o -s, y esta ${endTxt}: sin tilde.`);
+  if (cls === 'llana') return r + (o.need ? `Las llanas llevan tilde si NO terminan en vocal, -n o -s, y esta ${endTxt}.` : `Las llanas no llevan tilde si terminan en vocal, -n o -s, y esta ${endTxt}: sin tilde.`);
+  return r + 'Las palabras de una sílaba no llevan tilde.';
+}
+if (typeof module !== 'undefined') module.exports = { W, WORDS, MUST, DIP, DIAC, EXC, VOC, plain, reason, isV };
+
+</script>
+<script>
+const $ = (s, r = document) => r.querySelector(s), esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const LV = new URLSearchParams(location.search).get('n') === '3prim' ? 'p' : 'e';   // p = 3º Primaria (simple), e = 1º ESO (full)
+const YEAR = LV === 'p' ? '3º Primaria' : '1º ESO';
+const sample = (a, n) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [b[i], b[j]] = [b[j], b[i]]; } return b.slice(0, n); };
+const shuffle = (a) => sample(a, a.length);
+const how = (t, h) => `<div class="how"><b>${t}</b><span>${h}</span></div>`;
+const store = { get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { } } };
+const KEY = 'acentos.v1';
+const P = () => store.get(KEY, { best: {}, runs: {} });
+
+/* ---- account sync: every answer is recorded as acentos:<level>:<topic>, queued if offline ---- */
+const session = () => { const o = store.get('geo.session', null); return o && o.token ? o : null; };
+let CFG = null;
+async function rpc(fn, args) { CFG = CFG || await import('/config.js'); const r = await fetch(`${CFG.SUPABASE_URL}/rest/v1/rpc/${fn}`, { method: 'POST', headers: { apikey: CFG.SUPABASE_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(args) }); if (!r.ok) throw new Error(r.status); return r.json(); }
+let flushing = false;
+async function flush() {
+  const u = session(); if (!u || flushing) return; flushing = true;
+  try { let q = store.get('acentos.q', []); while (q.length) { await rpc('record_answer', { p_token: u.token, p_item_id: q[0].id, p_correct: q[0].c }); q.shift(); store.set('acentos.q', q); } } catch { }
+  flushing = false;
+}
+const queue = (topic, ok) => { if (!session()) return; const q = store.get('acentos.q', []); q.push({ id: `acentos:${LV === 'p' ? '3prim' : '1eso'}:${topic}`, c: !!ok }); store.set('acentos.q', q); };
+
+/* ---- word helpers ---- */
+const POOL = WORDS.filter((o) => LV === 'e' || (!['x', 'S', 'H'].some((f) => o.flag.includes(f)) && o.n >= 2));
+const CLASSES = LV === 'p' ? ['aguda', 'llana', 'esdrújula'] : ['aguda', 'llana', 'esdrújula', 'sobresdrújula'];
+const CLS_HELP = { aguda: 'la última sílaba es la fuerte', llana: 'la penúltima sílaba es la fuerte', 'esdrújula': 'la antepenúltima sílaba es la fuerte', 'sobresdrújula': 'la fuerte va antes de la antepenúltima' };
+const chips = (o, plainForm = true) => `<span class="big">${o.sy.map((s, i) => `${i ? '<i>-</i>' : ''}${i === o.st ? `<b class="st">${esc(plainForm ? plain(s) : s)}</b>` : esc(plainForm ? plain(s) : s)}`).join('')}</span>`;
+function variants(o) {   // wrong spellings: tilde missing, or on the wrong vowel
+  const pos = [];   // [syllable index, char index] for the vowel that would carry the tilde in each syllable
+  o.sy.forEach((s, i) => { const pl = plain(s); let k = -1; for (const v of 'aeo') { k = pl.indexOf(v); if (k >= 0) break; } if (k < 0) for (let j = pl.length - 1; j >= 0; j--) if ('iu'.includes(pl[j]) && pl[j - 1] !== 'g' && pl[j - 1] !== 'q') { k = j; break; } if (k < 0) k = [...pl].findIndex((c) => PLAINV.includes(c)); if (k >= 0) pos.push([i, k]); });
+  const put = (i, k) => o.sy.map((s, j) => { const pl = plain(s); return j === i ? pl.slice(0, k) + ACUTE[PLAINV.indexOf(pl[k])] + pl.slice(k + 1) : pl; }).join('');
+  const out = new Set(), correct = o.w;
+  if (o.hasT) out.add(o.plainW);
+  const others = pos.filter(([i]) => i !== o.st), here = pos.filter(([i]) => i === o.st);
+  if (o.hasT) { sample(others, 2).forEach(([i, k]) => out.add(put(i, k))); } else { here.forEach(([i, k]) => out.add(put(i, k))); sample(others, 2).forEach(([i, k]) => out.add(put(i, k))); }
+  out.delete(correct); return [...out];
+}
+const cap1 = (w, o) => (o.w[0] !== o.w[0].toLowerCase() ? w[0].toUpperCase() + w.slice(1) : w);
+
+/* ---- question generators. {p: prompt html, o: options, c: index of correct, why, t: topic, row?: options in a row} ---- */
+function qTon(o) { return { t: 'ton', p: `${chips(o)}<p class="clue">¿Cuál es la sílaba tónica (la que suena más fuerte)?</p>`, o: o.sy.map(plain), c: o.st, row: true, why: `${esc(reason(o))}`, say: o.w }; }
+function qCls(o) { return { t: 'cls', p: `${chips(o, false)}<p class="clue">La sílaba fuerte está en rojo. ¿Cómo es la palabra?</p>`, o: CLASSES, c: CLASSES.indexOf(o.cls), why: `«${esc(o.w)}» es ${o.cls}: ${CLS_HELP[o.cls]}.`, say: o.w }; }
+function qTil(o) {
+  const wr = variants(o).slice(0, 2); if (!wr.length) return null;
+  const opts = shuffle([o.w, ...wr.map((w) => cap1(w, o))]);
+  return { t: 'til', p: `${chips(o)}<p class="clue">La sílaba fuerte está en rojo. ¿Cómo se escribe?</p>`, o: opts, c: opts.indexOf(o.w), why: esc(reason(o)), say: o.w };
+}
+function qDip(d) { const [s, k, note] = d, opts = ['diptongo', 'triptongo', 'hiato']; return { t: 'dip', p: `<span class="big">${esc(s)}</span><p class="clue">Mira las vocales que van seguidas. ¿Qué hay?</p>`, o: opts, c: opts.indexOf(k), why: `${esc(note)}.`, say: s.replace(/-/g, '') }; }
+function qDia(d) { const [s, ok, wr, why] = d, opts = shuffle([ok, ...wr]), parts = s.split('___'); return { t: 'dia', p: `<span class="sent">${esc(parts[0])}<span class="gap">?</span>${esc(parts[1])}</span><p class="clue">Elige la palabra correcta.</p>`, o: opts, c: opts.indexOf(ok), row: true, why: esc(why) }; }
+function qExc(e) { const [q, op, a, why] = e, o = shuffle(op); return { t: 'exc', p: `<p class="sent" style="margin:0">${esc(q)}</p>`, o, c: o.indexOf(a), row: true, why: esc(why) }; }
+function qVoc() {
+  const pool = VOC.filter((v) => LV === 'e' || v[2] === 'p'), t = sample(pool, 4), a = t[0], o = shuffle(t.map((x) => x[0]));
+  return { t: 'voc', p: `<p class="sent" style="margin:0">¿Qué término es este?<br><span style="color:var(--hi)">${esc(a[1])}</span></p>`, o, c: o.indexOf(a[0]), why: `${esc(a[0])} <span class="en">(${EN[a[0]]})</span>: ${esc(a[1])}.` };
+}
+const mk = (arr, f, n) => sample(arr, Math.min(n, arr.length)).map(f).filter(Boolean);
+const ACTS = {
+  ton: { n: 'La sílaba fuerte', ic: '🔊', d: 'Encuentra la sílaba tónica de cada palabra.', how: 'Toca la sílaba que se pronuncia con más fuerza. Puedes pulsar 🔊 para oír la palabra.', gen: (n) => mk(POOL, qTon, n) },
+  cls: { n: 'Agudas, llanas y esdrújulas', ic: 'A·L·E', d: 'Clasifica palabras según su sílaba fuerte.', how: 'La sílaba fuerte está marcada en rojo. Cuenta desde el final de la palabra y toca el tipo.', gen: (n) => mk(POOL, qCls, n) },
+  til: { n: '¿Lleva tilde?', ic: 'á', d: 'Elige la forma bien escrita.', how: 'Mira dónde está la sílaba fuerte y aplica la regla. Toca la palabra bien escrita.', gen: (n) => mk(POOL, qTil, n) },
+  dip: { n: 'Diptongo, triptongo o hiato', ic: 'ia', d: 'Reconoce los grupos de vocales.', how: 'Mira cómo se dividen las vocales seguidas y toca lo que son.', e: 1, gen: (n) => mk(DIP, qDip, n) },
+  dia: { n: 'Tilde diacrítica', ic: 'tú/tu', d: 'Elige la palabra que encaja en la frase.', how: 'Lee la frase entera. Toca la palabra, con o sin tilde, que encaja.', e: 1, gen: (n) => mk(DIAC, qDia, n) },
+  exc: { n: 'Excepciones y casos difíciles', ic: '!', d: 'Monosílabas, adverbios, mayúsculas, hiatos…', how: 'Aquí están los casos que más confunden. Elige la forma correcta.', e: 1, gen: (n) => mk(EXC, qExc, n) },
+  voc: { n: 'Vocabulario', ic: 'Aa', d: 'Aprende los nombres de las cosas.', how: 'Lee la definición y toca el término.', gen: (n) => Array.from({ length: n }, qVoc) },
+  mix: { n: 'Reto mixto', ic: '★', d: '15 preguntas de todo lo anterior.', how: 'Preguntas de todos los tipos mezcladas, como en un examen.', gen: (n) => shuffle(['ton', 'cls', 'til', ...(LV === 'e' ? ['dip', 'dia', 'exc', 'til', 'cls'] : ['til', 'cls']), 'voc'].flatMap((k) => ACTS[k].gen(4))).slice(0, n) },
+};
+const LIST = Object.keys(ACTS).filter((k) => LV === 'e' || !ACTS[k].e);
+const bestOf = (k) => P().best[LV + ':' + k];
+
+/* ---- lessons ---- */
+const ex = (...w) => `<div class="ex">${w.map((x) => `<span>${x}</span>`).join('')}</div>`;
+const LESSON_P = [
+  ['Las sílabas', `<p>Las palabras se dividen en <b>sílabas</b> <span class="en">(syllables)</span>. Cada sílaba es un golpe de voz. Prueba a dar una palmada por cada una.</p>${ex('ca-sa', 'ár-bol', 'me-lo-co-tón', 'te-lé-fo-no')}<p>Si una palabra no cabe al final del renglón, la partimos con un guion <b>entre dos sílabas</b>, nunca por la mitad de una.</p>`],
+  ['La sílaba tónica', `<p>En toda palabra hay una sílaba que suena <b>más fuerte</b>. Es la <b>sílaba tónica</b> <span class="en">(stressed syllable)</span>. Las demás son <b>átonas</b>.</p>${ex('me-lo-co-<b>tón</b>', '<b>ár</b>-bol', 'ca-<b>fé</b>', '<b>ca</b>-sa')}<div class="tip">Ojo: la fuerza al hablar se llama <b>acento</b>. El signo ´ que se escribe se llama <b>tilde</b>. Todas las palabras tienen sílaba tónica, pero no todas llevan tilde.</div>`],
+  ['Agudas, llanas y esdrújulas', `<p>Contamos las sílabas <b>desde el final</b> para saber dónde está la sílaba tónica:</p><table class="t"><tr><th>Tipo</th><th>Sílaba fuerte</th><th>Ejemplos</th></tr><tr><td><b>Aguda</b></td><td>la última</td><td>ca-<b>fé</b>, re-<b>loj</b>, can-<b>ción</b></td></tr><tr><td><b>Llana</b></td><td>la penúltima</td><td><b>ca</b>-sa, <b>ár</b>-bol, <b>lá</b>-piz</td></tr><tr><td><b>Esdrújula</b></td><td>la antepenúltima</td><td><b>mé</b>-di-co, <b>pá</b>-ja-ro</td></tr></table>`],
+  ['¿Cuándo lleva tilde?', `<table class="t"><tr><th>Tipo</th><th>Lleva tilde…</th><th>Ejemplos</th></tr><tr><td><b>Aguda</b></td><td class="y">si termina en <b>vocal, -n o -s</b></td><td>café, melocotón, además<br><span class="en">sin tilde:</span> reloj, papel, ciudad</td></tr><tr><td><b>Llana</b></td><td class="y">si <b>NO</b> termina en vocal, -n ni -s</td><td>árbol, lápiz, césped<br><span class="en">sin tilde:</span> casa, comen, lunes</td></tr><tr><td><b>Esdrújula</b></td><td class="y"><b>siempre</b></td><td>médico, pájaro, teléfono</td></tr></table><div class="tip">Truco: las agudas y las llanas son <b>contrarias</b>. Una lleva tilde cuando termina en vocal, n o s; la otra, cuando no.</div>`],
+  ['Los cuatro pasos', `<ul><li><b>1.</b> Divide la palabra en sílabas.</li><li><b>2.</b> Busca la sílaba tónica (la que suena más fuerte).</li><li><b>3.</b> Cuenta desde el final: ¿aguda, llana o esdrújula?</li><li><b>4.</b> Mira cómo termina y aplica la regla.</li></ul><p>Ejemplo: <b>can-ción</b> → la fuerte es <b>ción</b> → aguda → termina en <b>n</b> → <b>lleva tilde</b>: canción.</p>`],
+];
+const LESSON_E = [
+  ['Sílaba tónica y tilde', `<p>Toda palabra tiene una <b>sílaba tónica</b> <span class="en">(stressed syllable)</span>: la que se pronuncia con más fuerza. La fuerza al hablar es el <b>acento</b>; el signo ´ que se escribe es la <b>tilde</b>. Toda palabra tiene acento, pero no toda palabra lleva tilde.</p>${ex('me-lo-co-<b>tón</b>', '<b>ár</b>-bol', '<b>ca</b>-sa', 'te-<b>lé</b>-fo-no')}<p>Las palabras de una sola sílaba son <b>monosílabas</b> y, en general, no llevan tilde (fe, fue, dio, vio, pie, guion).</p>`],
+  ['Según la sílaba tónica', `<table class="t"><tr><th>Tipo</th><th>Sílaba fuerte</th><th>Ejemplos</th></tr><tr><td><b>Aguda</b></td><td>la última</td><td>ca-<b>fé</b>, re-<b>loj</b></td></tr><tr><td><b>Llana</b></td><td>la penúltima</td><td><b>ca</b>-sa, <b>ár</b>-bol</td></tr><tr><td><b>Esdrújula</b></td><td>la antepenúltima</td><td><b>mé</b>-di-co, <b>pá</b>-ja-ro</td></tr><tr><td><b>Sobresdrújula</b></td><td>antes de la antepenúltima</td><td><b>cuén</b>-ta-me-lo, <b>dí</b>-ga-se-lo</td></tr></table><p>Las sobresdrújulas suelen ser verbos con pronombres pegados: <i>cuéntamelo</i>, <i>llévatelo</i>.</p>`],
+  ['Reglas generales', `<table class="t"><tr><th>Tipo</th><th>Lleva tilde…</th><th>Ejemplos</th></tr><tr><td><b>Aguda</b></td><td class="y">si termina en <b>vocal, -n o -s</b></td><td>café, canción, además<br><span class="en">sin tilde:</span> reloj, papel, ciudad</td></tr><tr><td><b>Llana</b></td><td class="y">si <b>NO</b> termina en vocal, -n ni -s</td><td>árbol, lápiz, difícil<br><span class="en">sin tilde:</span> casa, examen, lunes</td></tr><tr><td><b>Esdrújula</b></td><td class="y"><b>siempre</b></td><td>médico, teléfono, régimen</td></tr><tr><td><b>Sobresdrújula</b></td><td class="y"><b>siempre</b></td><td>cuéntamelo, dígaselo</td></tr></table><div class="tip">Truco: las agudas y las llanas son <b>contrarias</b>.</div>`],
+  ['Excepciones y casos especiales', `<ul><li><b>-s detrás de consonante</b> cuenta como consonante: la llana <i>bíceps</i>, <i>cómics</i>, <i>récords</i> lleva tilde; la aguda <i>robots</i> no la lleva.</li><li>La <b>y</b> final cuenta como consonante: <i>virrey</i>, <i>Uruguay</i> (agudas, sin tilde).</li><li>Las <b>monosílabas</b> no llevan tilde: <i>fe, fue, fui, dio, vio, pie, guion</i>.</li><li>Los <b>adverbios en -mente</b> conservan la tilde del adjetivo: <i>fácil → fácilmente</i>, <i>lento → lentamente</i>.</li><li>Las <b>mayúsculas</b> también llevan tilde: <i>África, Álvaro</i>.</li><li>Con guion, cada palabra conserva la suya: <i>teórico-práctico</i>.</li><li><b>solo</b>, <b>este</b>, <b>ese</b>, <b>aquel</b> ya no llevan tilde (RAE 2010). Si tu profesor pide otra cosa, sigue a tu profesor.</li></ul>`],
+  ['Diptongo, triptongo y hiato', `<p>Las vocales <b>abiertas</b> <span class="en">(strong)</span> son <b>a, e, o</b>. Las <b>cerradas</b> <span class="en">(weak)</span> son <b>i, u</b>.</p><ul><li><b>Diptongo:</b> dos vocales en la <b>misma sílaba</b>: abierta + cerrada, cerrada + abierta, o dos cerradas distintas. <i>bue-no, rei-na, ciu-dad</i>.</li><li><b>Triptongo:</b> cerrada + abierta + cerrada en la misma sílaba: <i>es-tu-diáis, buey</i>.</li><li><b>Hiato:</b> dos vocales seguidas en <b>sílabas distintas</b>: dos abiertas (<i>le-ón, ca-os, po-e-ta</i>) o una cerrada <b>tónica</b> con una abierta (<i>pa-ís, rí-o, ba-úl</i>).</li></ul><p>La <b>h</b> entre vocales no impide el hiato: <i>a-hí, pro-hí-be</i>.</p>`],
+  ['La tilde en esos grupos', `<ul><li><b>Diptongo y triptongo:</b> se aplican las reglas generales. Si hay tilde, va en la vocal <b>abierta</b> (<i>can-ción, es-tu-diáis, a-ve-ri-güéis</i>). En <i>iu</i> y <i>ui</i> va en la <b>segunda</b> (<i>cuí-da-te</i>).</li><li><b>Hiato de dos abiertas</b> (le-ón, ca-os): también reglas generales.</li><li><b>Hiato con cerrada tónica</b> (í o ú junto a a, e, o): <b>siempre lleva tilde</b> en la cerrada, aunque las reglas generales no la pidan: <i>pa-ís, Ma-rí-a, rí-o, ba-úl, Ra-úl, ha-bí-a</i>.</li></ul><div class="tip">Compara: <b>pa-PEL</b> (aguda acabada en -l, sin tilde) y <b>Ra-ÚL</b> (con tilde). Raúl es un hiato con la ú tónica, y esa tilde nunca falta.</div>`],
+  ['Tilde diacrítica', `<p>Sirve para distinguir dos palabras que se escriben igual pero tienen distinta función. La que lleva tilde es la tónica.</p><table class="t"><tr><th>Con tilde</th><th>Sin tilde</th></tr><tr><td><b>tú</b> (pronombre): tú cantas</td><td><b>tu</b> (posesivo): tu casa</td></tr><tr><td><b>él</b> (pronombre): él canta</td><td><b>el</b> (artículo): el perro</td></tr><tr><td><b>mí</b> (pronombre): para mí</td><td><b>mi</b> (posesivo): mi casa</td></tr><tr><td><b>sí</b> (afirmación): dijo que sí</td><td><b>si</b> (condición): si llueve</td></tr><tr><td><b>té</b> (infusión)</td><td><b>te</b> (pronombre): te veo</td></tr><tr><td><b>sé</b> (saber / ser): yo sé</td><td><b>se</b> (pronombre): se lava</td></tr><tr><td><b>dé</b> (dar): que me dé</td><td><b>de</b> (preposición): libro de Ana</td></tr><tr><td><b>más</b> (cantidad): más agua</td><td><b>mas</b> (= pero)</td></tr><tr><td><b>aún</b> (= todavía)</td><td><b>aun</b> (= incluso)</td></tr></table>`],
+  ['Interrogativos y exclamativos', `<p>Qué, quién, cómo, dónde, cuándo, cuánto y cuál llevan tilde cuando <b>preguntan o exclaman</b>, también en preguntas indirectas: <i>¿Qué quieres? Dime qué quieres. ¡Qué bien!</i></p><p>Sin tilde, enlazan partes de la frase: <i>El libro que compré. La casa donde nací.</i></p><table class="t"><tr><th>Forma</th><th>Uso</th></tr><tr><td><b>¿Por qué?</b></td><td>pregunta: ¿Por qué lloras?</td></tr><tr><td><b>porque</b></td><td>respuesta, causa: Lloro porque estoy triste.</td></tr><tr><td><b>el porqué</b></td><td>sustantivo, = el motivo: no entiendo el porqué.</td></tr></table>`],
+  ['Los pasos', `<ul><li><b>1.</b> Divide en sílabas y mira si hay diptongo, triptongo o hiato.</li><li><b>2.</b> Busca la sílaba tónica.</li><li><b>3.</b> Clasifica: ¿aguda, llana, esdrújula o sobresdrújula?</li><li><b>4.</b> Aplica la regla según cómo termina.</li><li><b>5.</b> Comprueba los casos especiales: hiato con i/u tónica, monosílaba, adverbio en -mente, tilde diacrítica.</li></ul>`],
+];
+const LESSON = LV === 'p' ? LESSON_P : LESSON_E;
+
+/* ---- screens ---- */
+const app = $('#app');
+function home() {
+  const b = P().best, started = Object.keys(b).some((k) => k.startsWith(LV + ':'));
+  const card = (k) => { const a = ACTS[k], v = bestOf(k); return `<button class="act" data-a="${k}"><div class="ic">${a.ic}</div><h3>${a.n}</h3><p>${a.d}</p><span class="best ${v >= 85 ? 'good' : ''}">${v == null ? 'Aún no lo has probado' : `Mejor: ${v}%${v >= 85 ? ' ★' : ''}`}</span></button>`; };
+  app.innerHTML = `<header class="hero"><a class="link" href="/" style="justify-self:start">← xoyso</a><h1>Los acentos</h1><p>${YEAR}. ${LV === 'p' ? 'Sílaba tónica, palabras agudas, llanas y esdrújulas, y cuándo llevan tilde.' : 'Sílaba tónica, reglas de la tilde, excepciones, diptongos, triptongos, hiatos y tilde diacrítica.'}</p></header>
+    <h2 class="sec">Empieza aquí</h2><div class="grid"><button class="act start" data-l="1"><div class="ic">📖</div><h3>Aprende las reglas</h3><p>${LESSON.length} pasos cortos con ejemplos.</p></button>${LV === 'e' ? '<button class="act" data-c="1"><div class="ic">📋</div><h3>Chuleta</h3><p>Todas las reglas en una página.</p></button>' : ''}</div>
+    <h2 class="sec">Ejercicios</h2><div class="grid">${LIST.map(card).join('')}</div>`;
+  app.querySelectorAll('[data-a]').forEach((x) => { x.onclick = () => run(x.dataset.a); });
+  $('[data-l]').onclick = () => lesson(0); const c = $('[data-c]'); if (c) c.onclick = cheat(); scrollTo(0, 0);
+}
+function cheat() { return () => { app.innerHTML = `<div class="top"><button class="link" id="bk">← Menú</button></div><h2 class="sec" style="margin-top:0">Chuleta de acentuación</h2><div class="panel left lesson">${LESSON.slice(2, 7).map(([t, h]) => `<h2>${t}</h2>${h}`).join('<hr style="width:100%;border:0;border-top:2px solid var(--line)">')}</div>`; $('#bk').onclick = home; scrollTo(0, 0); }; }
+function lesson(i) {
+  const [t, h] = LESSON[i];
+  app.innerHTML = `<div class="top"><button class="link" id="bk">← Menú</button><span class="count">Paso ${i + 1} de ${LESSON.length}</span></div><div class="panel left lesson"><h2>${t}</h2>${h}</div>
+    <div class="dots" style="margin:14px 0">${LESSON.map((_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('')}</div>
+    <div class="row">${i ? '<button class="btn" id="pv">Atrás</button>' : ''}${i < LESSON.length - 1 ? '<button class="btn primary" id="nx">Siguiente</button>' : '<button class="btn primary" id="go">¡A practicar!</button>'}</div>`;
+  $('#bk').onclick = home; if ($('#pv')) $('#pv').onclick = () => lesson(i - 1); if ($('#nx')) $('#nx').onclick = () => lesson(i + 1); if ($('#go')) $('#go').onclick = () => run('til'); scrollTo(0, 0);
+}
+function say(text) { try { const u = new SpeechSynthesisUtterance(text); u.lang = 'es-ES'; u.rate = 0.8; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch { } }
+function run(k) {
+  const a = ACTS[k], N = k === 'mix' ? 15 : 10, Q = a.gen(N); let i = 0, score = 0; const wrong = [];
+  const show = () => {
+    const q = Q[i];
+    app.innerHTML = `<div class="top"><button class="link" id="bk">← Menú</button><span class="count">${i + 1} / ${Q.length}</span></div><div class="track"><i style="width:${(100 * i) / Q.length}%"></i></div>
+      <div class="panel">${how('Haz esto', a.how)}${q.p}${q.say && 'speechSynthesis' in window ? '<button class="say" id="sp" aria-label="Escuchar la palabra">🔊 Escuchar</button>' : ''}<div class="opts ${q.row ? 'row' : ''}">${q.o.map((o, j) => `<button class="opt" data-j="${j}">${esc(o)}</button>`).join('')}</div><div class="fb" id="fb" aria-live="polite"></div></div>`;
+    $('#bk').onclick = home; if ($('#sp')) $('#sp').onclick = () => say(q.say);
+    app.querySelectorAll('.opt').forEach((b) => { b.onclick = () => {
+      const j = +b.dataset.j, ok = j === q.c; app.querySelectorAll('.opt').forEach((x, m) => { x.disabled = true; if (m === q.c) x.classList.add('ok'); });
+      if (!ok) { b.classList.add('no'); wrong.push({ p: q.o[q.c], why: q.why }); } else score++;
+      queue(q.t, ok); $('#fb').className = 'fb ' + (ok ? 'good' : 'bad');
+      $('#fb').innerHTML = `<div class="v">${ok ? '¡Correcto!' : `No: la respuesta es «${esc(q.o[q.c])}».`}</div><div>${q.why}</div><div class="row" style="margin-top:12px"><button class="btn primary" id="nq">${i + 1 < Q.length ? 'Siguiente' : 'Terminar'}</button></div>`;
+      $('#nq').onclick = () => { i++; i < Q.length ? show() : finish(); }; $('#nq').focus({ preventScroll: true });
+    }; });
+    scrollTo(0, 0);
+  };
+  const finish = () => {
+    const pct = Math.round((100 * score) / Q.length), p = P(), key = LV + ':' + k; p.runs[key] = (p.runs[key] || 0) + 1; if (pct > (p.best[key] || 0)) p.best[key] = pct; store.set(KEY, p); flush();
+    const next = LIST.filter((x) => x !== k && x !== 'mix').sort((x, y) => (bestOf(x) ?? -1) - (bestOf(y) ?? -1))[0];
+    app.innerHTML = `<div class="panel"><p class="eyebrow">${a.n}</p><div class="big">${score} de ${Q.length}</div><p style="margin:0;font-weight:800">${pct >= 85 ? '¡Muy bien! Lo dominas.' : pct >= 60 ? 'Vas bien. Repasa los fallos y vuelve a intentarlo.' : 'Aún te cuesta. Repasa la lección y prueba otra vez.'}</p>
+      ${wrong.length ? `<div class="miss"><b>Para repasar</b>${wrong.map((w) => `<div><b>${esc(w.p)}</b><br>${w.why}</div>`).join('')}</div>` : ''}
+      <div class="row"><button class="btn primary" id="ag">Otra vez</button>${next ? `<button class="btn" id="nt">Probar: ${ACTS[next].n}</button>` : ''}<button class="btn" id="hm">Menú</button></div></div>`;
+    $('#ag').onclick = () => run(k); if ($('#nt')) $('#nt').onclick = () => run(next); $('#hm').onclick = home; scrollTo(0, 0);
+  };
+  show();
+}
+home(); flush();
+</script>
+</body></html>
