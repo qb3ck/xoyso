@@ -1,0 +1,11 @@
+{
+  "name": "xoyso-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "iOS wrapper for https://xoyso.vercel.app (Capacitor)",
+  "dependencies": {
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/ios": "^7.0.0"
+  }
+}

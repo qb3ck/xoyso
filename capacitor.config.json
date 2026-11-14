@@ -1,0 +1,11 @@
+{
+  "appId": "com.xoyso.app",
+  "appName": "xoyso",
+  "webDir": "public",
+  "server": {
+    "url": "https://xoyso.vercel.app",
+    "allowNavigation": ["xoyso.vercel.app", "xzhgenzgarhwvnyxsubi.supabase.co"],
+    "cleartext": false
+  },
+  "ios": { "contentInset": "always", "backgroundColor": "#eef4f8" }
+}
