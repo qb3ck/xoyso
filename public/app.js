@@ -565,11 +565,10 @@ const YEARS = [
         { href: '/pi', title: ['Decimales de π', 'Digits of π'], blurb: ['Aprende, enlaza y recita los decimales en grupos.', 'Learn, link and recite the digits in groups.'] }] },
     { id: 'lengua', title: ['Lengua', 'Spanish language'], blurb: ['Ortografía: los acentos', 'Spelling: accents'], icon: 'Ñ',
       units: [{ href: '/acentos?n=1eso', title: ['Los acentos', 'Accents'], blurb: ['Reglas de la tilde, excepciones, diptongos, hiatos y tilde diacrítica.', 'Tilde rules, exceptions, diphthongs, hiatus and the diacritical accent.'] }] },
-    { id: 'georel', title: ['Geografía: relieve', 'Geography: relief'], blurb: ['Relieve y aguas: lectura y ejercicios', 'Relief and waters: reading and exercises'], icon: '⛰',
-      units: [{ href: '/geografia', title: ['Relieve y aguas', 'Relief and waters'], blurb: ['Lee por apartados y practica: preguntas, V/F, dibujos y orden.', 'Read by section, then practise: questions, true/false, pictures and ordering.'] }] },
     { id: 'bio', title: ['Biología', 'Biology'], blurb: ['Unidades de repaso en inglés', 'Revision units in English'], icon: 'Bio',
       units: [{ href: '/biology', title: ['Unidades de Biología', 'Biology units'], blurb: ['Monera, Protoctista y Fungi, y las unidades que vengan.', 'Monera, Protoctista and Fungi, plus the units to come.'] }] }] },
 ];
+SECTIONS[0].extras = [{ href: '/geografia', icon: '⛰', title: ['Relieve y aguas', 'Relief and waters'], blurb: ['Lee por apartados y practica: preguntas, V/F, dibujos y orden.', 'Read by section, then practise: questions, true/false, pictures and ordering.'] }];
 for (const y of YEARS) for (const sub of y.subjects) { sub.year = y; if (sub.section) { sub.section.year = y; sub.section.subject = sub; } }
 // Header trail: xoyso > year > subject > unit > topic. Each earlier step is a link; the last is the current page.
 function setCrumbs(trail = []) {
@@ -643,7 +642,7 @@ function renderGroup(group) {
     h('button', { class: 'back', onclick: () => renderYear(group.year) }, '← ', tr(group.year.title)),
     h('h1', {}, tr(group.title)),
     h('p', { class: 'muted lead' }, tr('Elige una unidad.', 'Choose a unit.')),
-    h('div', { class: 'topic-grid' }, ...cards)));
+    h('div', { class: 'topic-grid' }, ...cards, ...(group.extras || []).map((u) => card(textIcon(u.icon), u.title, u.blurb, [], { href: u.href })))));
 }
 function renderSection(section) {
   setUserArea(); document.onkeydown = null; setCrumbs([yearCrumb(section.parent.year), subjectCrumb(section.parent.subject), { t: section.title }]);
