@@ -295,3 +295,15 @@ const ORD = [
   ['Los cursos de un río, de arriba abajo', ['curso alto (valle estrecho)', 'curso medio (meandros)', 'curso bajo (vega y desembocadura)'], '26', 'Del nacimiento a la desembocadura.'],
   ['Las capas de un volcán, de abajo arriba', ['magma', 'chimenea volcánica', 'cráter', 'lava y cenizas'], '15', 'El magma sube por la chimenea, sale por el cráter y se expande como lava y cenizas.'],
 ];
+
+/* ---------- where to look in the textbook (Vicens Vives, Tema 1 «Los cimientos del planeta Tierra», pp. 8-33; Tema 2 «Cada gota cuenta» starts p. 34) ---------- */
+const BOOK = {
+  esquema: ['p. 30: «Resumo lo esencial» y el mapa conceptual (ejercicio 64).', 'Los apartados 5 y 6 (pp. 18-21) tienen todos los agentes internos y externos.'],
+  relieve: ['pp. 16-17: apartado 4, «¿Qué formas tiene la corteza terrestre?». Tiene el dibujo con todos los nombres escritos y las definiciones.', 'Ejercicios 20-25 de la p. 17.'],
+  placas: ['p. 13: mapa de las placas tectónicas y ejercicios 6-9.', 'p. 18: pliegues y fallas.', 'No he encontrado en estas páginas los tres tipos de límite (convergente, divergente, transformante). Pueden venir de otro tema o de la clase.'],
+  volcanes: ['p. 18: los volcanes (magma, lava, cenizas, piroclastos).', 'p. 19: terremotos y maremotos, y el tsunami. Ejercicios 26-31.', 'No he encontrado volcán activo / inactivo / extinto en estas páginas.'],
+  externos: ['pp. 20-21: apartado 6, «¿Cómo se transforma el relieve?»: agua (ríos, delta, estuario, mar, glaciares), viento y seres vivos.', 'Cursos de un río y cómo se forman las olas: están en el Tema 2 (desde la p. 34).', 'No he encontrado en estas páginas el paisaje kárstico, los acantilados ni la temperatura.'],
+  humano: ['pp. 26-27: apartado 9, «¿Quién puede más: el ser humano o la Tierra?».', 'p. 29: «¡Resuelvo el reto!», cómo el relieve condiciona nuestras vidas.', 'No he encontrado la densidad de población ni las terrazas en estas páginas.'],
+  ciclo: ['Tema 2, apartado 1, «¿Es la Tierra un planeta de agua?» (desde la p. 34), con el dibujo «El ciclo del agua».'],
+};
+READ.forEach((r) => { const b = BOOK[r.id]; if (b) r.body += `<div class="def" style="margin-top:6px"><b>📖 Si necesitas ayuda, mira en el libro:</b><ul style="margin:6px 0 0">${b.map((x) => `<li>${x}</li>`).join('')}</ul></div>`; });
