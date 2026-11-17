@@ -565,6 +565,8 @@ const YEARS = [
         { href: '/pi', title: ['Decimales de π', 'Digits of π'], blurb: ['Aprende, enlaza y recita los decimales en grupos.', 'Learn, link and recite the digits in groups.'] }] },
     { id: 'lengua', title: ['Lengua', 'Spanish language'], blurb: ['Ortografía: los acentos', 'Spelling: accents'], icon: 'Ñ',
       units: [{ href: '/acentos?n=1eso', title: ['Los acentos', 'Accents'], blurb: ['Reglas de la tilde, excepciones, diptongos, hiatos y tilde diacrítica.', 'Tilde rules, exceptions, diphthongs, hiatus and the diacritical accent.'] }] },
+    { id: 'georel', title: ['Geografía: relieve', 'Geography: relief'], blurb: ['Relieve y aguas: lectura y ejercicios', 'Relief and waters: reading and exercises'], icon: '⛰',
+      units: [{ href: '/geografia', title: ['Relieve y aguas', 'Relief and waters'], blurb: ['Lee por apartados y practica: preguntas, V/F, dibujos y orden.', 'Read by section, then practise: questions, true/false, pictures and ordering.'] }] },
     { id: 'bio', title: ['Biología', 'Biology'], blurb: ['Unidades de repaso en inglés', 'Revision units in English'], icon: 'Bio',
       units: [{ href: '/biology', title: ['Unidades de Biología', 'Biology units'], blurb: ['Monera, Protoctista y Fungi, y las unidades que vengan.', 'Monera, Protoctista and Fungi, plus the units to come.'] }] }] },
 ];

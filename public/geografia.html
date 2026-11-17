@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Relieve y aguas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@600;700;800&display=swap">
+<style>
+:root{--bg:#eef4f8;--card:#fff;--ink:#13233f;--muted:#56677f;--line:#d3dfeb;--hi:#0a7c86;--hi-soft:#d8f1f3;--warm:#b4540a;--warm-soft:#ffe9dc;--good:#1b7f45;--good-soft:#dcf5e5;--bad:#c2362b;--bad-soft:#fde4e1;--display:'Fredoka','Trebuchet MS',system-ui,sans-serif;--body:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1829;--card:#172540;--ink:#e8eefb;--muted:#9db0cf;--line:#2a3b59;--hi:#4fd1d9;--hi-soft:#0f3a42;--warm:#ff9a5c;--warm-soft:#3a2416;--good:#4cd98a;--good-soft:#12382a;--bad:#ff8a80;--bad-soft:#3d1a1a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;margin:0;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#app{max-width:820px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance;line-height:1.15}
+button{font:inherit;color:inherit;cursor:pointer}button:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.link{background:none;border:0;padding:8px 4px;font-weight:800;color:var(--muted);text-decoration:underline;text-underline-offset:3px}a.link{display:inline-block}
+.hero{display:grid;gap:10px;margin-bottom:8px}.hero h1{font-size:clamp(2.1rem,7vw,3.2rem)}.hero p{margin:0;color:var(--muted);max-width:60ch}
+.sec{font-family:var(--display);font-size:1.25rem;margin:24px 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:14px}
+.act{text-align:left;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:16px 18px;display:grid;gap:6px;min-width:0}.act:hover{border-color:var(--ink)}
+.act .ic{font-family:var(--display);font-size:1.6rem;font-weight:600;color:var(--warm)}.act h3{font-size:1.12rem}.act p{margin:0;color:var(--muted);font-size:.93rem}
+.act .best{font-weight:800;font-size:.9rem;color:var(--muted)}.act .best.good{color:var(--good)}
+.act.read{border-color:var(--hi)}.act.read .ic{color:var(--hi)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.count{font-weight:800;color:var(--muted)}
+.track{height:10px;border-radius:99px;background:var(--line);margin:4px 0 14px;overflow:hidden}.track i{display:block;height:100%;background:var(--hi);border-radius:99px;transition:width .25s}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:clamp(16px,4vw,26px);display:grid;gap:14px;align-content:start;text-align:left}
+.eyebrow{margin:0;font-weight:800;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sent{font-family:var(--display);font-size:clamp(1.25rem,4.4vw,1.75rem);line-height:1.3;margin:0}
+.opts{display:grid;gap:10px;width:100%}
+.opt{min-height:54px;padding:10px 16px;border-radius:16px;border:2px solid var(--line);background:var(--bg);font-family:var(--display);font-size:1.15rem;font-weight:500;text-align:left}
+.opt:hover:not(:disabled){border-color:var(--ink)}.opt:disabled{cursor:default}
+.opt.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+.fb{min-height:1px;font-weight:700}.fb .v{font-family:var(--display);font-size:1.2rem;font-weight:600}.fb.good .v{color:var(--good)}.fb.bad .v{color:var(--bad)}
+.btn{min-height:50px;padding:10px 24px;border-radius:14px;border:2px solid var(--ink);background:var(--card);font-weight:800}.btn.primary{background:var(--ink);color:var(--bg)}.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.miss{display:grid;gap:8px}.miss div{background:var(--bg);border-left:6px solid var(--bad);border-radius:10px;padding:8px 12px}
+/* reading */
+.read h2{font-size:1.6rem;color:var(--hi)}.read h3{font-size:1.2rem;margin-top:8px}.read p{margin:0}.read ul,.read ol{margin:0;padding-left:1.25em;display:grid;gap:6px}
+.read dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:0}.read dt{font-weight:800;color:var(--warm)}.read dd{margin:0}
+@media(max-width:520px){.read dl{grid-template-columns:1fr;gap:0}.read dd{margin-bottom:8px}}
+table.t{border-collapse:collapse;width:100%;font-size:.97rem}.t th,.t td{border:2px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}.t th{background:var(--hi-soft)}
+figure{margin:0;display:grid;gap:6px}figure img{width:100%;height:auto;border-radius:12px;border:2px solid var(--line);background:#fff;display:block;max-height:560px;object-fit:contain}
+figcaption{font-size:.9rem;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:560px){.two{grid-template-columns:1fr}}
+.note{color:var(--muted);font-size:.93rem}.def{background:var(--hi-soft);border:2px solid var(--hi);border-radius:14px;padding:10px 14px}
+.add{color:var(--warm);font-weight:800;cursor:help}
+.steps li::marker{font-weight:800;color:var(--hi)}
+.pic{position:relative;max-width:100%;margin-inline:auto;line-height:0}.pic img{width:100%;max-height:520px;object-fit:contain;border-radius:12px;border:2px solid var(--line);background:#fff}
+.pin{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:4px solid #e11d48;background:rgba(225,29,72,.18);box-shadow:0 0 0 2px #fff;animation:pl 1.2s infinite}
+@keyframes pl{50%{transform:scale(1.25)}}@media(prefers-reduced-motion:reduce){.pin{animation:none}}
+.ord{display:grid;gap:8px}.ord .opt{display:flex;gap:10px;align-items:center}.ord .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);font-weight:800;flex:none;font-size:.95rem}
+.ord .n:empty{background:var(--line)}
+</style>
+<link rel="stylesheet" href="/how.css">
+</head><body>
+<div id="app"></div>
+<script src="/geo/relieve.js"></script>
+<script>
+const $=(s,r=document)=>r.querySelector(s),esc=(s)=>String(s).replace(/[&<>"]/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sample=(a,n)=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[b[i],b[j]]=[b[j],b[i]]}return b.slice(0,n)};
+const shuffle=(a)=>sample(a,a.length);
+const how=(t,h)=>`<div class="how"><b>${t}</b><span>${h}</span></div>`;
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const KEY='geografia.v1',P=()=>store.get(KEY,{best:{},read:{}});
+const session=()=>{const o=store.get('geo.session',null);return o&&o.token?o:null};
+let CFG=null;
+async function rpc(fn,args){CFG=CFG||await import('/config.js');const r=await fetch(`${CFG.SUPABASE_URL}/rest/v1/rpc/${fn}`,{method:'POST',headers:{apikey:CFG.SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify(args)});if(!r.ok)throw new Error(r.status);return r.json()}
+let flushing=false;
+async function flush(){const u=session();if(!u||flushing)return;flushing=true;try{let q=store.get('geografia.q',[]);while(q.length){await rpc('record_answer',{p_token:u.token,p_item_id:q[0].id,p_correct:q[0].c});q.shift();store.set('geografia.q',q)}}catch{}flushing=false}
+const queue=(t,ok)=>{if(!session())return;const q=store.get('geografia.q',[]);q.push({id:`geo1:${t}`,c:!!ok});store.set('geografia.q',q)};
+
+/* ---- question generators: {p: html, o: options, c: index, why, t: topic} ---- */
+const TOPIC_NAMES={rel:'formas del relieve',pla:'placas',def:'pliegues y fallas',vol:'volcanes y tsunamis',ext:'agentes externos',hum:'el ser humano',cic:'ciclo del agua'};
+const qMcq=(x)=>{const o=shuffle([x[1],...x[2]]);return{t:x[4],p:`<p class="sent">${esc(x[0])}</p>`,o,c:o.indexOf(x[1]),why:esc(x[3])+` <span class="note">(diap. ${x[5]})</span>`}};
+const qTf=(x)=>({t:x[3],p:`<p class="sent">${esc(x[0])}</p>`,o:['Verdadero','Falso'],c:x[1]?0:1,why:esc(x[2])+` <span class="note">(diap. ${x[4]})</span>`});
+const qDef=()=>{const g=sample(GLOSS,4),a=g[0],o=shuffle(g.map((x)=>x[0]));return{t:'rel',p:`<p class="sent">¿Qué término es este?<br><span style="color:var(--hi)">${esc(a[1])}.</span></p>`,o,c:o.indexOf(a[0]),why:`<b>${esc(a[0])}</b>: ${esc(a[1])}.`}};
+const qTerm=()=>{const g=sample(GLOSS,4),a=g[0],o=shuffle(g.map((x)=>x[1]));return{t:'rel',p:`<p class="sent">¿Qué significa <span style="color:var(--hi)">${esc(a[0])}</span>?</p>`,o,c:o.indexOf(a[1]),why:`<b>${esc(a[0])}</b>: ${esc(a[1])}.`}};
+const qPic=(k)=>{const pc=PICS[k],pin=sample(pc.pins,1)[0];
+  if(pc.own){const lab=pin[1];const opts=shuffle([lab,...sample(PIC_OPTS[k].filter((x)=>x!==lab),3)]);
+    return{t:pc.topic,p:`<div class="pic"><img src="${pc.img}" alt=""></div><p class="sent">En este dibujo, ¿qué es el número <b style="color:#e11d48">${pin[0]}</b>?</p>`,o:opts,c:opts.indexOf(lab),why:`El número ${pin[0]} es <b>${esc(lab)}</b>. <span class="note">(Mi lectura del dibujo: compruébala con la página 35 del libro.)</span>`}}
+  const lab=pin[0],x=pin[1],y=pin[2],opts=shuffle([lab,...sample([...new Set(PIC_OPTS[k])].filter((o)=>o!==lab),3)]);
+  return{t:pc.topic,p:`<div class="pic"><img src="${pc.img}" alt=""><i class="pin" style="left:${x/pc.w*100}%;top:${y/pc.h*100}%"></i></div><p class="sent">¿Qué señala el círculo rojo?</p>`,o:opts,c:opts.indexOf(lab),why:`Es <b>${esc(lab)}</b>. <span class="note">(diap. ${pc.slide})</span>`}};
+const qOrd=(x)=>({ord:1,t:'ext',title:x[0],items:x[1],why:x[3]+` (diap. ${x[2]})`});
+const mk=(arr,f,n)=>sample(arr,Math.min(n,arr.length)).map(f);
+const picQs=(n)=>Array.from({length:n},()=>qPic(sample(Object.keys(PICS),1)[0]));
+const ACTS={
+  mcq:{n:'Elige la respuesta',ic:'A·B·C',d:'Preguntas de opción múltiple de todos los apartados.',how:'Lee la pregunta y toca la respuesta correcta.',gen:(n)=>mk(MCQ,qMcq,n),len:15},
+  tf:{n:'Verdadero o falso',ic:'V/F',d:'Decide si cada frase es cierta.',how:'Lee la frase y toca Verdadero o Falso.',gen:(n)=>mk(TF,qTf,n),len:15},
+  def:{n:'Palabras y definiciones',ic:'Aa',d:'Une cada definición con su palabra.',how:'Lee la definición y toca la palabra, o al revés.',gen:(n)=>Array.from({length:n},(_,i)=>i%2?qTerm():qDef()),len:15},
+  pic:{n:'Etiqueta el dibujo',ic:'📍',d:'Volcán, valle del río, placas y relieve.',how:'Mira el dibujo y toca el nombre de lo que se señala.',gen:picQs,len:12},
+  ord:{n:'Pon en orden',ic:'1·2·3',d:'Procesos paso a paso.',how:'Toca los pasos en el orden correcto, del primero al último.',gen:(n)=>sample(ORD,Math.min(n,ORD.length)).map(qOrd),len:5},
+  mix:{n:'Reto mixto',ic:'★',d:'20 preguntas de todo lo anterior.',how:'Preguntas de todos los tipos mezcladas, como en un examen.',gen:(n)=>shuffle([...mk(MCQ,qMcq,8),...mk(TF,qTf,5),...picQs(4),...mk(ORD,qOrd,1),qDef(),qTerm()]).slice(0,n),len:20},
+};
+const LIST=Object.keys(ACTS),bestOf=(k)=>P().best[k];
+const app=$('#app');
+
+function home(){
+  const p=P(),read=p.read||{};
+  app.innerHTML=`<a class="link" href="/">← Inicio</a>
+  <div class="hero"><h1>Relieve y aguas</h1><p>Geografía de 1º ESO. Primero lee cada apartado y después practica con los ejercicios. Las diapositivas 42 en adelante todavía no están incluidas.</p></div>
+  ${how('Cómo funciona','Los apartados de lectura siguen el orden de las diapositivas. Los textos con ✎ están añadidos por mí porque la diapositiva solo hace la pregunta: compáralos con tu libro.')}
+  <h2 class="sec">1 · Lee</h2><div class="grid">${READ.map((r,i)=>`<button class="act read" data-r="${i}"><span class="ic">${i+1}</span><h3>${esc(r.title)}</h3><p>Diapositivas ${r.pg}</p><span class="best ${read[r.id]?'good':''}">${read[r.id]?'✓ Leído':'Sin leer'}</span></button>`).join('')}</div>
+  <h2 class="sec">2 · Practica</h2><div class="grid">${LIST.map((k)=>{const b=bestOf(k);return`<button class="act" data-k="${k}"><span class="ic">${ACTS[k].ic}</span><h3>${ACTS[k].n}</h3><p>${ACTS[k].d}</p><span class="best ${b>=85?'good':''}">${b==null?'Sin intentar':'Mejor: '+b+'%'}</span></button>`}).join('')}</div>`;
+  app.querySelectorAll('[data-r]').forEach((b)=>b.onclick=()=>reader(+b.dataset.r));
+  app.querySelectorAll('[data-k]').forEach((b)=>b.onclick=()=>run(b.dataset.k));
+  scrollTo(0,0);
+}
+function reader(i){
+  const r=READ[i],p=P();p.read=p.read||{};p.read[r.id]=1;store.set(KEY,p);
+  app.innerHTML=`<div class="top"><button class="link" id="bk">← Apartados</button><span class="count">${i+1} de ${READ.length}</span></div>
+  <div class="panel read"><p class="eyebrow">Diapositivas ${r.pg}</p><h2>${esc(r.title)}</h2>${r.body}</div>
+  <div class="row" style="margin-top:16px">${i?'<button class="btn" id="pv">← Anterior</button>':''}${i<READ.length-1?'<button class="btn primary" id="nx">Siguiente →</button>':'<button class="btn primary" id="pr">Practicar →</button>'}</div>`;
+  $('#bk').onclick=home;if($('#pv'))$('#pv').onclick=()=>reader(i-1);if($('#nx'))$('#nx').onclick=()=>reader(i+1);if($('#pr'))$('#pr').onclick=home;scrollTo(0,0);
+}
+let RUN=null;
+function run(k){const a=ACTS[k];RUN={k,qs:a.gen(a.len),i:0,ok:0,miss:[]};app.innerHTML=`<a class="link" href="#" id="bk">← Atrás</a><div class="hero"><h1>${a.n}</h1></div>${how('Cómo se hace',a.how)}<div class="row"><button class="btn primary" id="go">Empezar</button></div>`;$('#bk').onclick=(e)=>{e.preventDefault();home()};$('#go').onclick=ask}
+function ask(){
+  const R=RUN,q=R.qs[R.i];if(!q)return done();
+  const head=`<div class="top"><button class="link" id="bk">× Salir</button><span class="count">${R.i+1} / ${R.qs.length}</span></div><div class="track"><i style="width:${R.i/R.qs.length*100}%"></i></div>`;
+  if(q.ord){return askOrd(head,q)}
+  app.innerHTML=`${head}<div class="panel">${q.p}<div class="opts">${q.o.map((o,j)=>`<button class="opt" data-j="${j}">${esc(o)}</button>`).join('')}</div><div class="fb" aria-live="polite"></div></div><div class="row" style="margin-top:14px"><button class="btn primary" id="nx" hidden>Siguiente →</button></div>`;
+  $('#bk').onclick=home;
+  app.querySelectorAll('.opt').forEach((b)=>b.onclick=()=>{const j=+b.dataset.j,ok=j===q.c;
+    app.querySelectorAll('.opt').forEach((x,n)=>{x.disabled=true;if(n===q.c)x.classList.add('ok')});if(!ok)b.classList.add('no');
+    $('.fb').className='fb '+(ok?'good':'bad');$('.fb').innerHTML=`<span class="v">${ok?'¡Correcto!':'Casi'}</span> ${q.why}`;
+    record(q,ok,q.p,q.o[q.c]);$('#nx').hidden=false;$('#nx').focus()});
+  $('#nx').onclick=()=>{R.i++;ask()};
+}
+function askOrd(head,q){
+  const R=RUN;let pick=[];const items=shuffle(q.items);
+  app.innerHTML=`${head}<div class="panel"><p class="sent">${esc(q.title)}</p><p class="note">Toca los pasos en orden, del primero al último.</p><div class="ord">${items.map((o,j)=>`<button class="opt" data-j="${j}"><span class="n"></span>${esc(o)}</button>`).join('')}</div><div class="fb" aria-live="polite"></div></div><div class="row" style="margin-top:14px"><button class="btn" id="rs">Empezar de nuevo</button><button class="btn primary" id="nx" hidden>Siguiente →</button></div>`;
+  $('#bk').onclick=home;
+  const bs=[...app.querySelectorAll('.ord .opt')];
+  $('#rs').onclick=()=>{pick=[];bs.forEach((b)=>{b.disabled=false;b.querySelector('.n').textContent=''})};
+  bs.forEach((b,j)=>b.onclick=()=>{pick.push(j);b.disabled=true;b.querySelector('.n').textContent=pick.length;
+    if(pick.length<items.length)return;
+    const ok=pick.every((x,n)=>items[x]===q.items[n]);$('#rs').hidden=true;
+    bs.forEach((x,n)=>{const pos=q.items.indexOf(items[n]);x.querySelector('.n').textContent=pos+1;x.classList.add(pick.indexOf(n)===pos?'ok':'no')});
+    $('.fb').className='fb '+(ok?'good':'bad');$('.fb').innerHTML=`<span class="v">${ok?'¡Correcto!':'Casi: mira el orden correcto'}</span> ${esc(q.why)}`;
+    record(q,ok,`<p class="sent">${esc(q.title)}</p>`,q.items.join(' → '));$('#nx').hidden=false;$('#nx').focus()});
+  $('#nx').onclick=()=>{R.i++;ask()};
+}
+function record(q,ok,p,ans){const R=RUN;if(ok)R.ok++;else R.miss.push({p,a:ans});queue(q.t||'rel',ok);flush()}
+function done(){
+  const R=RUN,pct=Math.round(R.ok/R.qs.length*100),pr=P(),prev=pr.best[R.k];if(prev==null||pct>prev)pr.best[R.k]=pct;store.set(KEY,pr);
+  const strip=(h)=>h.replace(/<div class="pic">.*?<\/div>/,'[dibujo] ').replace(/<[^>]+>/g,' ');
+  app.innerHTML=`<div class="panel"><p class="eyebrow">${ACTS[R.k].n}</p><h2 style="font-size:2rem">${R.ok} de ${R.qs.length} · ${pct}%</h2><p>${pct>=85?'¡Muy bien! Ya lo dominas.':pct>=60?'Bien. Repasa lo que has fallado y vuelve a intentarlo.':'Vuelve a leer el apartado y prueba otra vez.'}</p>
+  ${R.miss.length?`<h3>Para repasar</h3><div class="miss">${R.miss.map((m)=>`<div>${esc(strip(m.p).trim().slice(0,160))}<br><b>${esc(m.a)}</b></div>`).join('')}</div>`:''}</div>
+  <div class="row" style="margin-top:16px"><button class="btn primary" id="again">Otra vez</button><button class="btn" id="hm">Menú</button></div>`;
+  $('#again').onclick=()=>run(R.k);$('#hm').onclick=home;flush();scrollTo(0,0);
+}
+home();flush();
+</script></body></html>
