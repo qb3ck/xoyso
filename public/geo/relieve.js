@@ -62,7 +62,7 @@ const READ = [
     <table class="t"><tr><th>Agentes internos</th><th>Agentes externos</th></tr>
     <tr><td><ul><li>Volcanes</li><li>Terremotos</li><li>Tsunami</li></ul><p class="note">Tectónica de placas, pliegues y fallas explican por qué ocurren.</p></td>
     <td><ul><li><b>Proceso:</b> erosión → transporte → sedimentación</li><li>Temperatura</li><li>Viento</li><li>Agua</li><li>Seres vivos</li></ul></td></tr></table>
-    <p class="note">Diapositiva 13: «Realizar esquema». Estos son los apartados que pide. Hazlo tú en papel con ejemplos de cada uno.</p>` },
+    <p class="note">Diapositiva 13: «Realizar esquema». Estos son los apartados que pide. Hazlo tú en papel con ejemplos de cada uno; después practica en «Completa el esquema».</p>` },
 
   { id: 'relieve', title: 'Las formas del relieve', pg: '4-5', body: `
     <p>Tienes que saber qué es cada forma del relieve (ejercicio de la página 35 del libro).</p>
@@ -156,7 +156,7 @@ const READ = [
 
   { id: 'ciclo', title: 'El ciclo del agua (esquema)', pg: '41', body: `
     <p>La diapositiva 41 pide: «Realiza un esquema sobre el ciclo del agua. Incluir: temperaturas, estados del agua, acciones…». Lo siguiente es del libro (Tema 1, «El ciclo del agua»).</p>
-    <p class="note">Las diapositivas 42 en adelante todavía no las habéis dado.</p>
+    <p class="note">Las diapositivas 42 en adelante todavía no las habéis dado. Para el esquema, practica en «Completa el esquema».</p>
     <p>El agua no tiene principio ni fin: circula entre los océanos, la atmósfera, los ríos, los lagos, las aguas subterráneas y los seres vivos. Cambia de estado (<b>sólido, líquido y gaseoso</b>) por estos procesos:</p>
     <dl><dt>evaporación</dt><dd>paso de líquido a gas. Por el calor del Sol, el agua de mares, ríos y lagos se evapora.</dd>
     <dt>condensación</dt><dd>paso de gas a líquido. El vapor de agua se enfría y se condensa, formando nubes.</dd>

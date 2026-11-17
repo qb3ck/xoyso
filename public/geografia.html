@@ -47,6 +47,14 @@ figcaption{font-size:.9rem;color:var(--muted)}
 @keyframes pl{50%{transform:scale(1.25)}}@media(prefers-reduced-motion:reduce){.pin{animation:none}}
 .ord{display:grid;gap:8px}.ord .opt{display:flex;gap:10px;align-items:center}.ord .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);font-weight:800;flex:none;font-size:.95rem}
 .ord .n:empty{background:var(--line)}
+.sch{display:grid;gap:10px}.sch .box{border:2px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--bg);display:grid;gap:8px}
+.sch .box>b{font-family:var(--display);font-size:1.05rem;color:var(--hi)}
+.sch .slots{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.slot{min-height:44px;min-width:130px;padding:6px 12px;border-radius:12px;border:2px dashed var(--muted);background:var(--card);font-weight:800}
+.slot.fill{border-style:solid;border-color:var(--ink)}.slot.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}.slot.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.slot.sel{outline:3px solid var(--hi)}
+.bank{display:flex;flex-wrap:wrap;gap:8px;position:sticky;bottom:0;background:var(--card);padding:10px 0;border-top:2px solid var(--line);max-height:34vh;overflow:auto}.chip{padding:8px 14px;border-radius:99px;border:2px solid var(--ink);background:var(--card);font-weight:800}.chip.on{background:var(--ink);color:var(--bg)}.chip:disabled{opacity:.3}
+.cl{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}@media(max-width:520px){.cl{grid-template-columns:1fr}}
 </style>
 <link rel="stylesheet" href="/how.css">
 </head><body>
@@ -78,6 +86,25 @@ const qPic=(k)=>{const pc=PICS[k],pin=sample(pc.pins,1)[0];
   const lab=pin[0],x=pin[1],y=pin[2],opts=shuffle([lab,...sample([...new Set(PIC_OPTS[k])].filter((o)=>o!==lab),3)]);
   return{t:pc.topic,p:`<div class="pic"><img src="${pc.img}" alt=""><i class="pin" style="left:${x/pc.w*100}%;top:${y/pc.h*100}%"></i></div><p class="sent">¿Qué señala el círculo rojo?</p>`,o:opts,c:opts.indexOf(lab),why:`Es <b>${esc(lab)}</b>. <span class="note">(diap. ${pc.slide})</span>`}};
 const qOrd=(x)=>({ord:1,t:'ext',title:x[0],items:x[1],why:x[3]+` (diap. ${x[2]})`});
+/* ---- esquemas (slides 13 and 41): tap a word, then tap its gap ---- */
+const SCH=[
+ {title:'Esquema de la diapositiva 13: cómo cambia el relieve',slide:'13',t:'ext',groups:[
+  {h:'Agentes internos (vienen del interior de la Tierra)',pool:['Volcanes','Terremotos','Tsunami'],n:3},
+  {h:'Agentes externos · Proceso, en orden',ordered:['Erosión','Transporte','Sedimentación']},
+  {h:'Agentes externos · Factores',pool:['Temperatura','Viento','Agua','Seres vivos'],n:4}]},
+ {title:'Esquema de la diapositiva 41: el ciclo del agua',slide:'41',t:'cic',groups:[
+  {h:'¿Cómo se llama el proceso?',clues:[
+   ['Líquido → gas. El calor del Sol calienta el agua de mares, ríos y lagos.','Evaporación'],
+   ['Gas → líquido. El vapor de agua se enfría y forma nubes.','Condensación'],
+   ['El agua cae en forma de lluvia, nieve o granizo.','Precipitación'],
+   ['El agua de los ríos o de la lluvia corre sobre la superficie del terreno.','Escorrentía'],
+   ['Parte del agua entra en el suelo y forma agua subterránea.','Infiltración'],
+   ['Plantas, animales y personas expulsan agua que vuelve a la atmósfera como vapor.','Transpiración'],
+   ['Sólido → gas sin pasar por líquido. La nieve se convierte en vapor.','Sublimación']]},
+  {h:'Estados del agua',clues:[['Hielo y nieve','sólido'],['Agua de ríos y mares','líquido'],['Vapor de agua','gaseoso']]},
+  {h:'Temperatura',clues:[['El calor del Sol hace que el agua…','se evapore'],['El frío hace que el vapor…','se condense']]}]},
+];
+const qSch=(i)=>({sch:1,t:SCH[i].t,d:SCH[i]});
 const mk=(arr,f,n)=>sample(arr,Math.min(n,arr.length)).map(f);
 const picQs=(n)=>Array.from({length:n},()=>qPic(sample(Object.keys(PICS),1)[0]));
 const ACTS={
@@ -86,6 +113,7 @@ const ACTS={
   def:{n:'Palabras y definiciones',ic:'Aa',d:'Une cada definición con su palabra.',how:'Lee la definición y toca la palabra, o al revés.',gen:(n)=>Array.from({length:n},(_,i)=>i%2?qTerm():qDef()),len:15},
   pic:{n:'Etiqueta el dibujo',ic:'📍',d:'Volcán, valle del río, placas y relieve.',how:'Mira el dibujo y toca el nombre de lo que se señala.',gen:picQs,len:12},
   ord:{n:'Pon en orden',ic:'1·2·3',d:'Procesos paso a paso.',how:'Toca los pasos en el orden correcto, del primero al último.',gen:(n)=>sample(ORD,Math.min(n,ORD.length)).map(qOrd),len:5},
+  sch:{n:'Completa el esquema',ic:'🗺',d:'Diapositivas 13 y 41: el esquema del tema y el ciclo del agua.',how:'Toca una palabra y después el hueco donde va. Cuando termines, pulsa Comprobar.',gen:()=>[qSch(0),qSch(1)],len:2},
   mix:{n:'Reto mixto',ic:'★',d:'20 preguntas de todo lo anterior.',how:'Preguntas de todos los tipos mezcladas, como en un examen.',gen:(n)=>shuffle([...mk(MCQ,qMcq,8),...mk(TF,qTf,5),...picQs(4),...mk(ORD,qOrd,1),qDef(),qTerm()]).slice(0,n),len:20},
 };
 const LIST=Object.keys(ACTS),bestOf=(k)=>P().best[k];
@@ -115,6 +143,7 @@ function ask(){
   const R=RUN,q=R.qs[R.i];if(!q)return done();
   const head=`<div class="top"><button class="link" id="bk">× Salir</button><span class="count">${R.i+1} / ${R.qs.length}</span></div><div class="track"><i style="width:${R.i/R.qs.length*100}%"></i></div>`;
   if(q.ord){return askOrd(head,q)}
+  if(q.sch){return askSch(head,q)}
   app.innerHTML=`${head}<div class="panel">${q.p}<div class="opts">${q.o.map((o,j)=>`<button class="opt" data-j="${j}">${esc(o)}</button>`).join('')}</div><div class="fb" aria-live="polite"></div></div><div class="row" style="margin-top:14px"><button class="btn primary" id="nx" hidden>Siguiente →</button></div>`;
   $('#bk').onclick=home;
   app.querySelectorAll('.opt').forEach((b)=>b.onclick=()=>{const j=+b.dataset.j,ok=j===q.c;
@@ -136,6 +165,36 @@ function askOrd(head,q){
     $('.fb').className='fb '+(ok?'good':'bad');$('.fb').innerHTML=`<span class="v">${ok?'¡Correcto!':'Casi: mira el orden correcto'}</span> ${esc(q.why)}`;
     record(q,ok,`<p class="sent">${esc(q.title)}</p>`,q.items.join(' → '));$('#nx').hidden=false;$('#nx').focus()});
   $('#nx').onclick=()=>{R.i++;ask()};
+}
+function askSch(head,q){
+  const R=RUN,d=q.d;let sel=null,id=0;const slots=[],bank=[];
+  const G=d.groups.map((g)=>{
+    if(g.ordered)return{h:g.h,sl:g.ordered.map((a)=>({a,ok:[a],g}))};
+    if(g.pool){return{h:g.h,sl:Array.from({length:g.n},()=>({ok:g.pool,g}))}}
+    return{h:g.h,cl:g.clues.map((c)=>({txt:c[0],sl:{a:c[1],ok:[c[1]]}}))}});
+  const ans=[];G.forEach((g)=>{(g.sl||g.cl.map((c)=>c.sl)).forEach((s)=>{s.i=id++;slots.push(s)});});
+  d.groups.forEach((g)=>{(g.ordered||g.pool||g.clues.map((c)=>c[1])).forEach((a)=>bank.push(a))});
+  const html=G.map((g)=>`<div class="box"><b>${esc(g.h)}</b>${g.sl?`<div class="slots">${g.sl.map((s,k)=>`<button class="slot" data-i="${s.i}">${g.sl.length&&d.groups.find((x)=>x.h===g.h).ordered&&k?'→ ':''}&nbsp;</button>`).join('')}</div>`:g.cl.map((c)=>`<div class="cl"><span>${esc(c.txt)}</span><button class="slot" data-i="${c.sl.i}">&nbsp;</button></div>`).join('')}</div>`).join('');
+  app.innerHTML=`${head}<div class="panel"><p class="sent">${esc(d.title)}</p><div class="sch">${html}</div><p class="note">Palabras:</p><div class="bank">${shuffle(bank).map((w,j)=>`<button class="chip" data-w="${esc(w)}">${esc(w)}</button>`).join('')}</div><div class="fb" aria-live="polite"></div></div><div class="row" style="margin-top:14px"><button class="btn" id="rs">Borrar todo</button><button class="btn primary" id="ck">Comprobar</button><button class="btn primary" id="nx" hidden>Siguiente →</button></div>`;
+  $('#bk').onclick=home;
+  const val={},chips=[...app.querySelectorAll('.chip')],sb=[...app.querySelectorAll('.slot')];
+  const refresh=()=>{sb.forEach((b)=>{const v=val[b.dataset.i];b.textContent=v||'\u00a0';b.classList.toggle('fill',!!v)});
+    const used=Object.values(val);chips.forEach((c)=>{c.disabled=used.includes(c.dataset.w);c.classList.toggle('on',sel===c)})};
+  chips.forEach((c)=>c.onclick=()=>{sel=sel===c?null:c;refresh()});
+  sb.forEach((b)=>b.onclick=()=>{const i=b.dataset.i;if(val[i]&&!sel){delete val[i];refresh();return}
+    if(!sel)return;val[i]=sel.dataset.w;sel=null;refresh()});
+  $('#rs').onclick=()=>{for(const k in val)delete val[k];sel=null;refresh()};
+  $('#ck').onclick=()=>{
+    if(Object.keys(val).length<slots.length){$('.fb').className='fb bad';$('.fb').innerHTML='<span class="v">Faltan huecos.</span> Rellena todos antes de comprobar.';return}
+    let good=0;const used={};
+    slots.forEach((s)=>{const v=val[s.i],b=sb[s.i];const grpUsed=used[s.g?s.g.h:'c']=used[s.g?s.g.h:'c']||[];const ok=s.ok.includes(v)&&!(s.g&&s.g.pool&&grpUsed.includes(v));
+      if(ok){good++;grpUsed.push(v)}b.classList.add(ok?'ok':'no');b.disabled=true;if(!ok)b.innerHTML=`${esc(v)} <small>→ ${esc(s.a||s.ok.join(' / '))}</small>`;queue(q.t,ok)});
+    chips.forEach((c)=>c.disabled=true);const all=good===slots.length;
+    $('.fb').className='fb '+(all?'good':'bad');$('.fb').innerHTML=`<span class="v">${good} de ${slots.length} bien.</span> ${all?'¡Esquema completo!':'Repasa los huecos en rojo.'} <span class="note">(diap. ${d.slide})</span>`;
+    if(good<slots.length)R.miss.push({p:`<p>${esc(d.title)}</p>`,a:`${slots.length-good} huecos fallados`});else R.ok++;
+    flush();$('#ck').hidden=true;$('#rs').hidden=true;$('#nx').hidden=false;$('#nx').focus()};
+  $('#nx').onclick=()=>{R.i++;ask()};
+  refresh();
 }
 function record(q,ok,p,ans){const R=RUN;if(ok)R.ok++;else R.miss.push({p,a:ans});queue(q.t||'rel',ok);flush()}
 function done(){
