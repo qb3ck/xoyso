@@ -155,8 +155,8 @@ const READ = [
     <li>Construimos puertos, túneles, minas, etc.</li></ul>` },
 
   { id: 'ciclo', title: 'El ciclo del agua (esquema)', pg: '41', body: `
-    <p>La diapositiva 41 pide: «Realiza un esquema sobre el ciclo del agua. Incluir: temperaturas, estados del agua, acciones…». Lo siguiente es del libro (Tema 1, «El ciclo del agua»).</p>
-    <p class="note">Las diapositivas 42 en adelante todavía no las habéis dado. Para el esquema, practica en «Completa el esquema».</p>
+    <p>La diapositiva 41 pide: «Realiza un esquema sobre el ciclo del agua. Incluir: temperaturas, estados del agua, acciones…». Lo siguiente es del libro (Tema 2, «El ciclo del agua»).</p>
+    <p class="note">Más detalle en las diapositivas 42-45. Para el esquema, practica en «Completa el esquema».</p>
     <p>El agua no tiene principio ni fin: circula entre los océanos, la atmósfera, los ríos, los lagos, las aguas subterráneas y los seres vivos. Cambia de estado (<b>sólido, líquido y gaseoso</b>) por estos procesos:</p>
     <dl><dt>evaporación</dt><dd>paso de líquido a gas. Por el calor del Sol, el agua de mares, ríos y lagos se evapora.</dd>
     <dt>condensación</dt><dd>paso de gas a líquido. El vapor de agua se enfría y se condensa, formando nubes.</dd>
@@ -306,4 +306,199 @@ const BOOK = {
   humano: ['pp. 26-27: apartado 9, «¿Quién puede más: el ser humano o la Tierra?».', 'p. 29: «¡Resuelvo el reto!», cómo el relieve condiciona nuestras vidas.', 'No he encontrado la densidad de población ni las terrazas en estas páginas.'],
   ciclo: ['Tema 2, apartado 1, «¿Es la Tierra un planeta de agua?» (desde la p. 34), con el dibujo «El ciclo del agua».'],
 };
+
+/* ================= Slides 42-64 ================= */
+GLOSS.push(
+  ['océano', 'gran masa de agua salada'],
+  ['mar', 'prolongación de los océanos en las zonas próximas al continente'],
+  ['corriente marina', 'gran río de agua que discurre por el mar, sin mezclarse con el agua de alrededor por diferencias de temperatura, salinidad y densidad'],
+  ['marea', 'subida y bajada del nivel del agua del mar, provocada por la atracción de la Luna'],
+  ['ola', 'ondulación del agua del mar provocada por el viento, que rompe cuando toca el fondo'],
+  ['cauce', 'canal por donde circula el agua de un río'],
+  ['caudal', 'cantidad de agua que lleva un río'],
+  ['curso de un río', 'recorrido que hace el río desde su nacimiento hasta su desembocadura'],
+  ['cuenca hidrográfica', 'territorio cuyas aguas van a parar todas a un mismo río'],
+  ['acuífero', 'zona subterránea donde se acumula el agua, sobre una roca impermeable'],
+  ['agua subterránea', 'agua de la lluvia que se filtra en el suelo y queda bajo tierra'],
+  ['régimen fluvial', 'cómo cambia el caudal de un río a lo largo del año'],
+  ['vertiente', 'conjunto de ríos que desembocan en un mismo mar u océano'],
+);
+const rsample = (a, n) => [...a].sort(() => Math.random() - 0.5).slice(0, n);
+const RIV = [['Támesis','Europa'],['Rin','Europa'],['Volga','Europa'],['Tíber','Europa'],['Danubio','Europa'],['Sena','Europa'],['Garona','Europa'],['Indo','Asia'],['Yangtsé','Asia'],['Ganges','Asia'],['Huang He','Asia'],['Mekong','Asia'],['Lena','Asia'],['Níger','África'],['Nilo','África'],['Congo','África'],['Amazonas','América del Sur'],['Río de la Plata','América del Sur'],['Misisipi','América del Norte'],['Murray','Oceanía']];
+const VERT = [['Miño','Atlántica'],['Duero','Atlántica'],['Tajo','Atlántica'],['Guadiana','Atlántica'],['Guadalquivir','Atlántica'],['Ebro','Mediterránea'],['Turia','Mediterránea'],['Júcar','Mediterránea'],['Segura','Mediterránea'],['Ter','Mediterránea'],['Llobregat','Mediterránea'],['Nalón','Cantábrica'],['Navia','Cantábrica'],['Bidasoa','Cantábrica']];
+
+READ.push(
+{ id: 'ciclo2', title: 'El ciclo natural del agua y cuánta agua hay', pg: '42-45', body: `
+  <h3>El ciclo del agua (42-43)</h3>
+  ${fig('ciclo.jpg', 'Diapositiva 42. Fíjate en los nombres: precipitación, agua contenida en la atmósfera, agua contenida en la nieve, sublimación, transpiración, condensación, evaporación, filtración, agua contenida en los océanos y agua subterránea almacenada.')}
+  <p>El agua circula siempre entre los océanos, la atmósfera, los ríos, los lagos, las aguas subterráneas y los seres vivos. Cambia de estado (sólido, líquido y gaseoso) por la <b>evaporación, condensación, precipitación, transpiración, escorrentía, infiltración y sublimación</b> (las definiciones están en «El ciclo del agua» de más arriba). Toda el agua continental, subterránea y superficial viene de las precipitaciones.</p>
+  <h3>¿Cuánta agua hay en la Tierra? (44)</h3>
+  ${fig('aguatierra.jpg', 'Diapositiva 44.')}
+  <ul><li>El <b>70,8%</b> del planeta es agua.</li>
+  <li>Del agua del planeta: <b>96,5% es salada</b> (mares y océanos) y <b>2,5% es dulce</b>. ${ADD} <span class="note">(La diapositiva da esas cifras; el resto lo pone en el gráfico. Compruébalas.)</span></li>
+  <li>Volumen de agua en mares y océanos: 1385 millones de km³. Agua dulce: solo 10,6 millones de km³, y de ella solo 93 113 km³ están en ríos y lagos.</li>
+  <li><b>Reparto del agua dulce:</b> 68,7% capas de hielo y glaciares · 30,1% agua subterránea · 1,2% agua dulce superficial y otros.</li></ul>
+  <h3>Aguas oceánicas (45)</h3>
+  <ul><li><b>Océano:</b> gran masa de agua. <b>Mar:</b> prolongación de los océanos cerca del continente.</li>
+  <li>El agua es <b>salada</b> por la disolución de rocas que traen los ríos.</li>
+  <li><b>Salinidad:</b> cuanto más cerrado es el mar y más calor hace, más evaporación y <b>más salinidad</b>.</li>
+  <li>Agua de mar: 96,5% agua + 3,5% sal marina. Las sales: cloro 55% · sodio 30,6% · sulfato 7,7% · magnesio 3,7% · calcio 1,2% · potasio 1,1% · otros 0,7%.</li></ul>
+  <p class="note">La diapositiva 45 dice «97%» en el texto y 96,5% en el gráfico: para el examen usa el gráfico (96,5%).</p>` },
+
+{ id: 'oceanos', title: 'Océanos y mares: corrientes, mareas, olas y usos', pg: '46-50', body: `
+  <h3>Corrientes marinas (46)</h3>
+  ${fig('corrientes.jpg', 'Diapositiva 46. En rojo, corrientes cálidas; en azul, corrientes frías.')}
+  <p>Son <b>grandes ríos que discurren bajo el agua</b>. No se mezclan con el agua de alrededor por diferencias de <b>temperatura, salinidad y densidad</b>. Pueden ser <b>cálidas o frías</b>.</p>
+  <h3>Mareas y olas (47)</h3>
+  <ul><li><b>Mareas:</b> subidas y bajadas del nivel del agua del mar provocadas por la <b>atracción de la Luna</b>. Hay <b>marea alta</b> y <b>marea baja</b>.</li>
+  <li><b>Olas:</b> las provoca el <b>viento</b> al agitar la superficie. El agua se «riza» y empuja a la de alrededor, con un movimiento circular. La ola rompe y se deforma cuando toca el fondo. Las olas modelan la costa.</li></ul>
+  ${fig('olas.jpg', 'Diapositiva 47. Al acercarse a la costa y tocar el fondo, la velocidad de la ola disminuye y su altura aumenta.')}
+  <h3>¿Para qué aprovechamos los océanos? (48-50)</h3>
+  <table class="t"><tr><th>Recurso</th><th>Cómo lo aprovechamos</th></tr>
+  <tr><td>Alimentos</td><td>pesca y piscifactorías</td></tr>
+  <tr><td>Energía</td><td>mareomotriz (también eólica y solar; petróleo y gas)</td></tr>
+  <tr><td>Vía de comunicación</td><td>transporte de mercancías, personas y telecomunicaciones</td></tr>
+  <tr><td>Recurso económico</td><td>turismo y comercio internacional</td></tr>
+  <tr><td>Agua potable</td><td>plantas desalinizadoras</td></tr>
+  <tr><td>Clima y aire</td><td>absorben dióxido de carbono, dan oxígeno, regulan la temperatura del planeta y frenan el calentamiento global</td></tr></table>` },
+
+{ id: 'rios', title: 'Los ríos', pg: '51-59, 64', body: `
+  <h3>Aguas continentales (51)</h3>
+  <ul><li><b>Líquida:</b> ríos, lagos, aguas subterráneas.</li><li><b>Sólida:</b> icebergs y glaciares.</li><li><b>Gaseosa:</b> agua atmosférica (vapor de agua).</li></ul>
+  <h3>Vocabulario de los ríos (52)</h3>
+  <p class="note">La diapositiva solo pone las preguntas. ${ADD} Estas son las definiciones habituales: compáralas con tu libro.</p>
+  <dl><dt>río</dt><dd>corriente continua de agua que va de un lugar alto a otro más bajo. Su agua viene de la lluvia, de la nieve o del deshielo, y de manantiales.</dd>
+  <dt>nacimiento</dt><dd>lugar donde empieza el río</dd>
+  <dt>cauce</dt><dd>canal por donde circula el agua</dd>
+  <dt>caudal</dt><dd>cantidad de agua que lleva el río</dd>
+  <dt>afluente</dt><dd>río que desemboca en otro río más grande</dd>
+  <dt>desembocadura</dt><dd>donde el río termina (en el mar, en un lago o en otro río)</dd>
+  <dt>cuenca hidrográfica</dt><dd>territorio cuyas aguas van todas a un mismo río. Ejemplo: la cuenca del Ebro</dd></dl>
+  <h3>Los cursos de un río (54-55)</h3>
+  ${fig('cursos.jpg', 'Diapositiva 54. Curso alto: nacimiento, divisoria de aguas, lago, torrente, afluente. Curso medio: meandro, margen derecho, margen izquierdo. Curso bajo: desembocadura, delta.')}
+  <p><b>El curso</b> es el recorrido que hace un río desde su nacimiento hasta su desembocadura.</p>
+  <ul><li><b>Curso alto:</b> cerca del nacimiento, con mucha pendiente porque discurre entre montañas.</li>
+  <li><b>Curso medio:</b> en zonas más llanas, con menos pendiente y menos erosión. El río transporta materiales y aumenta el ancho de su cauce.</li>
+  <li><b>Curso bajo:</b> cerca de la desembocadura, que puede ser en forma de <b>delta</b> o <b>estuario</b>.</li></ul>
+  <p>La diapositiva 55 pide completar esta tabla. Lo de <b>acción</b> y <b>relieve</b> sale de las diapositivas 26 y 54; lo demás lo he deducido ${ADD}.</p>
+  <table class="t"><tr><th></th><th>Curso alto</th><th>Curso medio</th><th>Curso bajo</th></tr>
+  <tr><td>Altitud</td><td>alta (montañas) ${ADD}</td><td>media ${ADD}</td><td>baja, cerca del mar ${ADD}</td></tr>
+  <tr><td>Cauce</td><td>estrecho ${ADD}</td><td>más ancho</td><td>muy ancho ${ADD}</td></tr>
+  <tr><td>Caudal</td><td>pequeño ${ADD}</td><td>mayor ${ADD}</td><td>el mayor ${ADD}</td></tr>
+  <tr><td>Acción</td><td>erosión</td><td>transporte</td><td>sedimentación</td></tr>
+  <tr><td>Velocidad</td><td>rápida (mucha pendiente)</td><td>media ${ADD}</td><td>lenta ${ADD}</td></tr>
+  <tr><td>Relieve</td><td>valle estrecho, torrentes</td><td>valle ancho, meandros</td><td>vega, delta, estuario</td></tr></table>
+  <h3>Regímenes fluviales (56)</h3>
+  ${fig('regimenes.jpg', 'Diapositiva 56. Coeficiente de caudal de cada mes, de enero a diciembre.')}
+  <p>Muestra <b>cómo cambia el caudal de un río a lo largo del año</b> (su régimen).</p>
+  <ul><li><b>Segre</b> (afluente del Ebro): más caudal en <b>mayo y junio</b> (deshielo), menos al final del verano y en otoño.</li>
+  <li><b>Miño</b> (desemboca en el Atlántico): más caudal en <b>invierno</b> (diciembre a marzo), menos en <b>verano</b> (julio a septiembre).</li></ul>
+  <p class="note">Los meses los he leído a ojo en el gráfico. Compruébalos en tu libro.</p>
+  <h3>Los ríos de España (57)</h3>
+  ${fig('vertientes.jpg', 'Diapositiva 57. Cada color es una vertiente.')}
+  <table class="t"><tr><th>Vertiente</th><th>Ríos</th></tr>
+  <tr><td><b>Cantábrica</b> (verde)</td><td>ríos cortos del norte: Nalón, Navia, Nervión, Bidasoa</td></tr>
+  <tr><td><b>Atlántica</b> (amarillo)</td><td>Miño, Duero, Tajo, Guadiana, Guadalquivir (y Odiel, Tinto, Guadalete)</td></tr>
+  <tr><td><b>Mediterránea</b> (rosa)</td><td>Ebro, Ter, Llobregat, Turia, Júcar, Segura</td></tr></table>
+  <h3>¿Para qué nos sirven los ríos? (58-59)</h3>
+  <ol><li><b>Delimitan territorios</b> (fronteras naturales).</li><li><b>Energía:</b> el agua de los embalses produce electricidad.</li><li><b>Ocio y deporte:</b> turismo y actividades acuáticas.</li><li><b>Vías de comunicación y transporte</b> de personas y mercancías.</li><li><b>Agua para riego</b> (agrícola).</li><li><b>Agua de uso doméstico</b> (potabilizada).</li><li><b>Agua de uso industrial</b> (por ejemplo, refrigeración).</li></ol>
+  <p class="note">Los ríos no son sitios para tirar residuos sólidos ni líquidos.</p>
+  <h3>Los 27 ríos (64)</h3>
+  <p>La diapositiva 64 da una lista de ríos, sin instrucciones. Son los siete de España <b>(Guadalquivir, Miño, Duero, Guadiana, Turia, Ebro, Tajo)</b> y veinte del resto del mundo. ${ADD} Continentes: <b>Europa</b>: Támesis, Rin, Volga, Tíber, Danubio, Sena, Garona · <b>Asia</b>: Indo, Yangtsé, Ganges, Huang He, Mekong, Lena · <b>África</b>: Níger, Nilo, Congo · <b>América del Sur</b>: Amazonas, Río de la Plata · <b>América del Norte</b>: Misisipi · <b>Oceanía</b>: Murray.</p>
+  <p class="note">El texto de la diapositiva 53 (voluntaria) pide buscar los cinco ríos más caudalosos y los más largos del mundo, y el más largo y el más caudaloso de España. No lo incluyo porque es una búsqueda tuya.</p>` },
+
+{ id: 'subt', title: 'Aguas subterráneas y ahorro de agua', pg: '60-62', body: `
+  <h3>Aguas subterráneas (60-61)</h3>
+  <ul><li>El agua de la lluvia <b>se filtra</b> hasta encontrar una <b>roca impermeable</b>, y ahí se forma un <b>acuífero</b>.</li>
+  <li>Hay ríos y lagos subterráneos.</li>
+  <li>Protegen la <b>humedad del suelo</b> y <b>alimentan ríos y lagos</b>.</li>
+  <li>Son muy <b>vulnerables</b> a la <b>extracción excesiva</b> y a la <b>contaminación</b>.</li></ul>
+  <p class="note">Diapositiva 61: foto de un lago subterráneo en una cueva y mapa del <b>Acuífero Guaraní</b>, bajo Brasil, Paraguay, Argentina y Uruguay.</p>
+  <h3>¿Falta agua o sobra desigualdad? (62)</h3>
+  <p>Hay niños que tienen que caminar para conseguir agua y otros que juegan con ella. Por eso hay que <b>ahorrar</b>. Litros que se ahorran:</p>
+  <table class="t"><tr><th>Gesto</th><th>Litros</th></tr>
+  <tr><td>Usar un vaso de agua para enjuagarse los dientes</td><td>19</td></tr>
+  <tr><td>Ducharse en vez de bañarse</td><td>60</td></tr>
+  <tr><td>Cerrar el grifo al enjabonarse las manos</td><td>12</td></tr>
+  <tr><td>Cisterna inteligente (ahorro por uso)</td><td>6</td></tr>
+  <tr><td>Electrodomésticos con la carga completa</td><td>200</td></tr>
+  <tr><td>Lavar frutas y verduras en un bol</td><td>10</td></tr></table>
+  <p><b>¡Evita el mal uso del agua!</b></p>` },
+);
+READ.find((r) => r.id === 'ciclo').pg = '41';
+const MQ = (q, c, w, why, t, s) => MCQ.push([q, c, w, why, t, s]);
+MQ('¿Qué porcentaje del planeta es agua?', '70,8%', ['29,2%', '96,5%', '50%'], 'Diapositiva 44.', 'agu', '44');
+MQ('Del agua del planeta, ¿qué porcentaje es agua salada?', '96,5%', ['2,5%', '70,8%', '30,1%'], 'El 96,5% es salada y el 2,5% dulce (diapositiva 44).', 'agu', '44');
+MQ('¿Dónde está la mayor parte del agua dulce?', 'en las capas de hielo y los glaciares', ['en los ríos y lagos', 'en el agua subterránea', 'en la atmósfera'], '68,7% hielo y glaciares; 30,1% agua subterránea; 1,2% superficial y otros.', 'agu', '44');
+MQ('¿Qué porcentaje del agua dulce es agua subterránea?', '30,1%', ['68,7%', '1,2%', '96,5%'], 'Diapositiva 44.', 'agu', '44');
+MQ('¿Qué es el mar, según las diapositivas?', 'una prolongación de los océanos cerca del continente', ['una masa de agua dulce', 'un río muy grande', 'un lago salado'], 'Diapositiva 45.', 'agu', '45');
+MQ('¿Por qué el agua del mar es salada?', 'por la disolución de rocas que traen los ríos', ['porque el Sol le echa sal', 'porque llueve poco', 'por las mareas'], 'Diapositiva 45.', 'agu', '45');
+MQ('¿Qué pasa con la salinidad cuando el mar es más cerrado y hace más calor?', 'aumenta, porque hay más evaporación', ['disminuye', 'no cambia', 'se convierte en agua dulce'], 'Más evaporación = más sal en el agua que queda (diapositiva 45).', 'agu', '45');
+MQ('¿Cuál es la sal más abundante en el agua del mar?', 'cloro', ['sodio', 'calcio', 'magnesio'], 'Cloro 55% y sodio 30,6% (diapositiva 45).', 'agu', '45');
+MQ('¿Qué son las corrientes marinas?', 'grandes ríos que discurren bajo el agua del mar', ['olas muy altas', 'subidas del nivel del mar', 'ríos que desembocan en un delta'], 'Diapositiva 46.', 'oce', '46');
+MQ('¿Por qué las corrientes marinas no se mezclan con el agua de alrededor?', 'por diferencias de temperatura, salinidad y densidad', ['por el viento', 'por la Luna', 'por las olas'], 'Diapositiva 46.', 'oce', '46');
+MQ('¿Qué provoca las mareas?', 'la atracción de la Luna', ['el viento', 'los ríos', 'los volcanes'], 'Diapositiva 47.', 'oce', '47');
+MQ('¿Qué provoca las olas?', 'el viento que agita la superficie del agua', ['la atracción de la Luna', 'las corrientes marinas', 'los terremotos'], 'Diapositiva 47. (Los terremotos provocan tsunamis, no las olas normales.)', 'oce', '47');
+MQ('¿Qué le pasa a una ola cuando toca el fondo cerca de la costa?', 'disminuye su velocidad y aumenta su altura, y rompe', ['aumenta su velocidad y baja su altura', 'desaparece', 'se convierte en corriente'], 'Diapositiva 47.', 'oce', '47');
+MQ('«Las plantas desalinizadoras transforman el agua del mar.» ¿Para qué beneficio de los océanos sirve?', 'para proporcionar agua para el uso humano', ['para el turismo', 'para generar energía', 'para el transporte'], 'Es el beneficio 4 de la diapositiva 49.', 'oce', '49');
+MQ('«El mar tiene una gran riqueza pesquera.» ¿A qué beneficio se refiere?', 'a los alimentos', ['a la energía', 'al clima', 'al transporte'], 'Beneficio 7: proporcionan alimentos (pesca y piscifactorías).', 'oce', '49');
+MQ('«Los mares y océanos regulan la temperatura del planeta.» ¿A qué beneficio se refiere?', 'a su influencia en el clima', ['a los recursos energéticos', 'al turismo', 'a las vías de comunicación'], 'Beneficio 2: influyen en el clima y frenan el calentamiento global.', 'oce', '49');
+MQ('¿Qué tipo de energía se obtiene de las mareas?', 'mareomotriz', ['eólica', 'nuclear', 'geotérmica'], 'Diapositiva 50.', 'oce', '50');
+MQ('¿Qué es el cauce de un río?', 'el canal por donde circula el agua', ['la cantidad de agua que lleva', 'el lugar donde termina', 'un río más pequeño'], 'Cauce = canal. Caudal = cantidad de agua. (Definiciones añadidas.)', 'rio', '52');
+MQ('¿Qué es el caudal de un río?', 'la cantidad de agua que lleva', ['el canal por donde va el agua', 'la forma del valle', 'la velocidad del viento'], 'Caudal = cantidad de agua. No lo confundas con cauce. (Definición añadida.)', 'rio', '52');
+MQ('¿Qué es un afluente?', 'un río que desemboca en otro río', ['el lugar donde nace un río', 'el lugar donde un río llega al mar', 'un lago pequeño'], 'Definición añadida; el libro también pone «afluente» en el dibujo de los cursos.', 'rio', '52');
+MQ('¿Qué es la cuenca hidrográfica?', 'el territorio cuyas aguas van a un mismo río', ['la parte más profunda de un lago', 'un tipo de valle de montaña', 'el agua de un acuífero'], 'Por ejemplo, la cuenca del Ebro. (Definición añadida.)', 'rio', '52');
+MQ('¿Qué es el curso de un río?', 'el recorrido desde su nacimiento hasta su desembocadura', ['la cantidad de agua que lleva', 'el canal del río', 'los afluentes'], 'Diapositiva 54.', 'rio', '54');
+MQ('¿Qué pendiente tiene el río en el curso alto?', 'mucha, porque discurre entre montañas', ['muy poca, porque es llano', 'ninguna', 'es lo mismo en todo el río'], 'Diapositiva 54.', 'rio', '54');
+MQ('¿Qué hace el río en el curso medio?', 'transporta materiales y ensancha su cauce', ['solo erosiona', 'solo sedimenta', 'se seca'], 'Diapositiva 54.', 'rio', '54');
+MQ('¿Qué acción predomina en el curso alto?', 'la erosión', ['el transporte', 'la sedimentación', 'la evaporación'], 'Alto = erosión; medio = transporte; bajo = sedimentación.', 'rio', '54');
+MQ('¿Qué acción predomina en el curso bajo?', 'la sedimentación', ['la erosión', 'el transporte', 'la infiltración'], 'Alto = erosión; medio = transporte; bajo = sedimentación.', 'rio', '54');
+MQ('¿Cómo puede ser la desembocadura de un río?', 'en delta o en estuario', ['solo en delta', 'solo en lago', 'en meandro'], 'Diapositiva 54.', 'rio', '54');
+MQ('¿Qué muestra un régimen fluvial?', 'cómo cambia el caudal del río a lo largo del año', ['la longitud del río', 'la altura del nacimiento', 'los afluentes del río'], 'Diapositiva 56.', 'rio', '56');
+MQ('Según la diapositiva 56, ¿cuándo lleva más caudal el Segre?', 'en mayo y junio', ['en diciembre y enero', 'en agosto', 'en octubre'], 'El Segre alcanza su máximo en mayo-junio (lectura del gráfico).', 'rio', '56');
+MQ('Según la diapositiva 56, ¿cuándo lleva menos caudal el Miño?', 'en verano', ['en invierno', 'en marzo', 'en diciembre'], 'El Miño lleva más agua en invierno y menos en verano (lectura del gráfico).', 'rio', '56');
+MQ('¿Qué río de España es afluente del Ebro, según la diapositiva 56?', 'el Segre', ['el Miño', 'el Tajo', 'el Turia'], 'Diapositiva 56: el Segre es afluente del Ebro.', 'rio', '56');
+MQ('¿Cuál de estos NO es un uso de los ríos?', 'recoger vertidos sólidos y líquidos', ['producir electricidad', 'regar los campos', 'transportar mercancías'], 'La diapositiva 59 avisa: los ríos no son espacios para recoger vertidos.', 'rio', '59');
+MQ('¿Cómo producen electricidad los ríos?', 'con el agua de los embalses', ['con las mareas', 'con la lava', 'con el viento del río'], 'Diapositiva 59: recursos energéticos.', 'rio', '59');
+MQ('¿Qué puede ser un río para dos países?', 'una frontera natural', ['un volcán', 'una duna', 'un acuífero'], 'Los ríos delimitan territorios (diapositiva 59).', 'rio', '59');
+MQ('¿Cuántos usos de los ríos hay en la diapositiva 59?', 'siete', ['tres', 'cinco', 'diez'], 'Delimitan territorios, energía, ocio y deporte, comunicación y transporte, riego, uso doméstico y uso industrial.', 'rio', '59');
+MQ('¿Cómo se forma un acuífero?', 'el agua de lluvia se filtra hasta una roca impermeable', ['el agua del mar sube por la tierra', 'el río se seca', 'la nieve se evapora'], 'Diapositiva 60.', 'sub', '60');
+MQ('¿Qué amenaza más a las aguas subterráneas?', 'la extracción excesiva y la contaminación', ['las mareas', 'las olas', 'el delta'], 'Diapositiva 60.', 'sub', '60');
+MQ('¿Qué hacen las aguas subterráneas por el suelo y los ríos?', 'protegen la humedad del suelo y alimentan ríos y lagos', ['destruyen el suelo', 'evaporan los ríos', 'forman los volcanes'], 'Diapositiva 60.', 'sub', '60');
+MQ('¿Qué acuífero se ve en la diapositiva 61?', 'el Acuífero Guaraní', ['el Acuífero Ibérico', 'el Acuífero del Nilo', 'el Acuífero Mediterráneo'], 'Está bajo Brasil, Paraguay, Argentina y Uruguay.', 'sub', '61');
+MQ('¿Qué ahorra más agua de los gestos de la diapositiva 62?', 'usar los electrodomésticos con la carga completa (200 litros)', ['cerrar el grifo al enjabonarse (12 litros)', 'usar un vaso al cepillarse los dientes (19 litros)', 'lavar frutas en un bol (10 litros)'], 'Electrodomésticos llenos: 200 litros.', 'sub', '62');
+MQ('¿Cuántos litros se ahorran al ducharse en vez de bañarse?', '60', ['6', '19', '200'], 'Diapositiva 62.', 'sub', '62');
+for (const [r, v] of VERT) { const w = ['Atlántica', 'Mediterránea', 'Cantábrica'].filter((x) => x !== v); MQ(`¿En qué vertiente está el río ${r}?`, v, w, `El ${r} es de la vertiente ${v} (mapa de la diapositiva 57).`, 'rio', '57'); }
+for (const [r, c] of RIV) { const w = rsample(['Europa', 'Asia', 'África', 'América del Sur', 'América del Norte', 'Oceanía'].filter((x) => x !== c), 3); MQ(`¿En qué continente está el río ${r}?`, c, w, `El ${r} está en ${c}. (Dato añadido: la diapositiva 64 solo da la lista de ríos.)`, 'rio', '64'); }
+const TQ = (s, v, why, t, sl) => TF.push([s, v, why, t, sl]);
+TQ('El 96,5% del agua de la Tierra es agua salada.', true, 'Diapositiva 44.', 'agu', '44');
+TQ('La mayor parte del agua dulce está en los ríos y lagos.', false, 'Está en las capas de hielo y glaciares (68,7%). En ríos y lagos hay muy poco.', 'agu', '44');
+TQ('Cuanto más cerrado es un mar y más calor hace, más salinidad tiene.', true, 'Hay más evaporación y queda más sal.', 'agu', '45');
+TQ('Las corrientes marinas son siempre frías.', false, 'Pueden ser cálidas o frías.', 'oce', '46');
+TQ('Las mareas las provoca el viento.', false, 'Las provoca la atracción de la Luna. El viento provoca las olas.', 'oce', '47');
+TQ('Las olas rompen cuando tocan el fondo.', true, 'Diapositiva 47.', 'oce', '47');
+TQ('Las olas no tienen efecto sobre la costa.', false, 'Modelan la costa.', 'oce', '47');
+TQ('Los océanos absorben dióxido de carbono y proporcionan oxígeno.', true, 'Beneficio 1 de la diapositiva 49.', 'oce', '49');
+TQ('Las desalinizadoras convierten el agua del mar en agua potable.', true, 'Diapositiva 50.', 'oce', '50');
+TQ('El hielo de los glaciares es agua continental sólida.', true, 'Diapositiva 51.', 'rio', '51');
+TQ('El curso alto de un río tiene poca pendiente.', false, 'Tiene mucha pendiente, porque va entre montañas.', 'rio', '54');
+TQ('En el curso bajo hay más sedimentación.', true, 'Diapositiva 54.', 'rio', '54');
+TQ('El Miño pertenece a la vertiente mediterránea.', false, 'Es de la vertiente atlántica.', 'rio', '57');
+TQ('El Ebro desemboca en el mar Mediterráneo.', true, 'Mapa de la diapositiva 57.', 'rio', '57');
+TQ('Los ríos sirven para delimitar territorios.', true, 'Pueden ser fronteras naturales (diapositiva 59).', 'rio', '59');
+TQ('Los ríos son un buen lugar para tirar residuos.', false, 'La diapositiva 59 lo advierte.', 'rio', '59');
+TQ('Los acuíferos se forman sobre una roca impermeable.', true, 'El agua filtrada se detiene en la roca impermeable (diapositiva 60).', 'sub', '60');
+TQ('Las aguas subterráneas no se pueden contaminar.', false, 'Son muy vulnerables a la contaminación.', 'sub', '60');
+TQ('Ducharse gasta menos agua que bañarse.', true, 'Se ahorran unos 60 litros (diapositiva 62).', 'sub', '62');
+ORD.push(
+  ['El ciclo del agua, paso a paso', ['evaporación del agua del mar', 'condensación y formación de nubes', 'precipitación', 'escorrentía e infiltración', 'los ríos devuelven el agua al mar'], '43', 'El agua sube, se enfría, cae y vuelve al mar.'],
+  ['Las acciones del río, de arriba abajo', ['curso alto: erosión', 'curso medio: transporte', 'curso bajo: sedimentación'], '54', 'Alto = erosión; medio = transporte; bajo = sedimentación.'],
+  ['Cómo se forma un acuífero', ['llueve', 'el agua se filtra en el suelo', 'llega a una roca impermeable', 'el agua se acumula en un acuífero'], '60', 'Diapositiva 60.'],
+  ['Qué le pasa a una ola', ['el viento agita la superficie', 'el agua se riza y empuja a la de alrededor', 'la ola se acerca a la costa y toca el fondo', 'disminuye su velocidad y aumenta su altura', 'la ola rompe'], '47', 'Diapositiva 47.'],
+);
+BOOK.rios = ['Tema 2 «Cada gota cuenta» (desde la p. 34): apartado 4, «¿De qué modo conocemos el funcionamiento de los ríos?», y apartados 5 y 6 (ríos del mundo y de Europa).', 'Los ríos de España: según el índice, en la unidad «Entre montañas y humedales. El medio físico de España» (desde la p. 104).'];
+BOOK.ciclo2 = ['Tema 2 (desde la p. 34): apartado 1, «¿Es la Tierra un planeta de agua?», y apartado 7, «¿Es el agua un bien escaso?».'];
+BOOK.oceanos = ['Tema 2: apartado 2, «¿Cómo funcionan los océanos y los mares?», y apartado 3, «¿Cuántos océanos hay en el mundo?».'];
+BOOK.subt = ['Tema 2: apartados 7 y 8, «¿Es el agua un bien escaso?» y «¿Habrá suficiente agua en el futuro?», y el reto «¿Cómo utilizas el agua en tu vida diaria?» del final del tema.'];
+
 READ.forEach((r) => { const b = BOOK[r.id]; if (b) r.body += `<div class="def" style="margin-top:6px"><b>📖 Si necesitas ayuda, mira en el libro:</b><ul style="margin:6px 0 0">${b.map((x) => `<li>${x}</li>`).join('')}</ul></div>`; });
