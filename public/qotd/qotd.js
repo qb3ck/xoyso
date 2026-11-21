@@ -11,6 +11,7 @@ const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate(
 const parse = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
 const dayDiff = (a, b) => Math.round((parse(a) - parse(b)) / 864e5);
 const session = () => { try { const o = JSON.parse(localStorage.getItem('geo.session')); return o && o.token ? o : null; } catch (e) { return null; } };
+const preview = () => { const u = session(); return !!u && String(u.username).toLowerCase() === 'ams'; };   // parent account: may open future days (view only, never marked)
 const load = () => { try { const o = JSON.parse(localStorage.getItem(KEY) || '{}'); return { owner: o.owner || null, d: o.d || {}, q: o.q || [], g: o.g || null }; } catch (e) { return { owner: null, d: {}, q: [], g: null }; } };
 let DB = load();
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) { /* storage unavailable */ } };
@@ -61,7 +62,7 @@ function render() {
   const dates = Array.from({ length: n }, (_, i) => ymd(new Date(parse(DATA.start).getTime() + i * 864e5)));
   const open = dates.filter((d) => d <= t);
   const done = open.filter((d) => mark(group, d)).length, right = open.filter((d) => mark(group, d) === 'r').length, missed = open.length - done;
-  if (!sel || !qFor(group, sel) || sel > t) sel = open.includes(t) ? t : (open.length ? open[open.length - 1] : null);
+  if (!sel || !qFor(group, sel) || (sel > t && !preview())) sel = open.includes(t) ? t : (open.length ? open[open.length - 1] : null);
   const todayOpen = dates.includes(t);
   if (!viewMonth) viewMonth = (sel || t).slice(0, 7);
   const q = sel ? qFor(group, sel) : null, m = q ? mark(group, sel) : null;
@@ -71,7 +72,7 @@ function render() {
   for (let d = 1; d <= dim; d++) {
     const ds = `${vy}-${pad(vm)}-${pad(d)}`, has = !!qFor(group, ds), fut = ds > t, mk = mark(group, ds);
     const cls = ['day', has ? 'q' : 'none-q', has && fut ? 'future' : '', has && !fut && !mk ? 'missed' : '', mk || '', ds === t ? 'today' : '', ds === sel ? 'sel' : ''].join(' ');
-    cells += `<button class="${cls}" data-d="${ds}" ${has && !fut ? '' : 'disabled'} aria-label="${longDate(ds)}${mk ? (mk === 'r' ? ', right' : ', wrong') : has && !fut ? ', not done' : ''}">${d}${mk ? `<small>${mk === 'r' ? '✓' : '✗'}</small>` : ''}</button>`;
+    cells += `<button class="${cls}" data-d="${ds}" ${has && (!fut || preview()) ? '' : 'disabled'} aria-label="${longDate(ds)}${mk ? (mk === 'r' ? ', right' : ', wrong') : has && !fut ? ', not done' : ''}">${d}${mk ? `<small>${mk === 'r' ? '✓' : '✗'}</small>` : ''}</button>`;
   }
   app.innerHTML = `<div class="crumbs"><a class="link" href="/">xoyso</a></div>
    <header class="hero"><h1>Maths question of the day</h1><p>Reto de mates del día. One new question every day. Work it out on paper, then check the answer and the working. Missed a day? Go back and do it from the calendar.</p></header>
@@ -100,6 +101,7 @@ function render() {
   if ($('#pshow')) $('#pshow').onclick = () => { prac.shown = true; render(); };
   if ($('#pnext')) $('#pnext').onclick = () => { prac = newPractice(qFor(group, sel).g, prac); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   if ($('#pback')) $('#pback').onclick = () => { prac = null; render(); };
+  if (sel > t && $('[data-m]')) $('[data-m]').closest('.mark').parentElement.innerHTML = '<p class="eyebrow">Preview of a future day: not marked or saved.</p>';
   app.querySelectorAll('[data-m]').forEach((b) => { b.onclick = () => setMark(group, sel, b.dataset.m); });
   if ($('#pm')) $('#pm').onclick = () => { const d = new Date(vy, vm - 2, 1); viewMonth = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; render(); };
   if ($('#nm')) $('#nm').onclick = () => { const d = new Date(vy, vm, 1); viewMonth = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; render(); };
