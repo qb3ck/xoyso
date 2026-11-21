@@ -55,6 +55,8 @@ const GLOSS = TERMS.map((t) => [t[0], t[1]]).concat([
   ['densidad de población', 'número de habitantes que hay por cada kilómetro cuadrado (hab/km²)'],
 ]);
 
+const NUM = { 'montaña': '1', 'llanura': '3', 'valle': '5', 'playa': '6', 'plataforma continental': '11', 'talud continental': '12', 'llanura abisal': '13', 'dorsal oceánica': '14', 'fosa marina': '15', 'meseta': '4?', 'cabo': '8?', 'isla': '9?', 'archipiélago': '10?' };
+const dt = (t) => `<dt>${t[0]}${NUM[t[0]] ? ` <span class="nn">nº ${NUM[t[0]]}</span>` : ''}</dt><dd>${t[1]}</dd>`;
 /* ---------- reading pages ---------- */
 const READ = [
   { id: 'esquema', title: 'El mapa del tema', pg: '13', body: `
@@ -66,11 +68,13 @@ const READ = [
 
   { id: 'relieve', title: 'Las formas del relieve', pg: '4-5', body: `
     <p>Tienes que saber qué es cada forma del relieve (ejercicio de la página 35 del libro).</p>
-    ${fig('relieve.jpg', 'Diapositiva 4. Los números del dibujo son los del ejercicio del libro. Mi lectura del dibujo, comparado con el del libro: <b>1</b> montaña · <b>3</b> llanura · <b>5</b> valle · <b>6</b> playa · <b>11</b> plataforma continental · <b>12</b> talud continental · <b>13</b> llanura abisal · <b>14</b> dorsal oceánica · <b>15</b> fosa marina. Los números 2, 4, 7, 8, 9 y 10 no los he podido identificar con seguridad (el libro no los numera).')}
+    ${fig('relieve.jpg', 'Diapositiva 4. Los números del dibujo son los del ejercicio de la página 35 del libro.')}
+    <table class="t"><tr><th style="white-space:nowrap">Nº</th><th>Qué es</th></tr><tr><td><b>1</b></td><td>montaña</td></tr><tr><td><b>2</b></td><td>sin identificar</td></tr><tr><td><b>3</b></td><td>llanura</td></tr><tr><td><b>4</b></td><td>meseta (probable)</td></tr><tr><td><b>5</b></td><td>valle</td></tr><tr><td><b>6</b></td><td>playa</td></tr><tr><td><b>7</b></td><td>sin identificar (¿bahía, golfo o península?)</td></tr><tr><td><b>8</b></td><td>cabo (probable)</td></tr><tr><td><b>9</b></td><td>isla (probable)</td></tr><tr><td><b>10</b></td><td>archipiélago (probable)</td></tr><tr><td><b>11</b></td><td>plataforma continental</td></tr><tr><td><b>12</b></td><td>talud continental</td></tr><tr><td><b>13</b></td><td>llanura abisal</td></tr><tr><td><b>14</b></td><td>dorsal oceánica</td></tr><tr><td><b>15</b></td><td>fosa marina</td></tr></table>
+    <p class="note">Esta clave la he deducido yo comparando el dibujo con el del libro (pp. 16-17), que trae los nombres pero no los números. Los números sin «probable» los veo claros. Los «probable» son por la posición en el dibujo. El 2 y el 7 no los he podido identificar. Compruébalo con tu libro o tu cuaderno.</p>
     <p class="note">Las definiciones son las de tu libro (Tema 1, apartado 4, páginas 16-17); las diapositivas solo dan la lista de términos.</p>
-    <h3>En tierra</h3><dl>${TERMS.filter((t) => t[2] === 'tierra').map((t) => `<dt>${t[0]}</dt><dd>${t[1]}</dd>`).join('')}</dl>
-    <h3>En la costa</h3><dl>${TERMS.filter((t) => t[2] === 'costa').map((t) => `<dt>${t[0]}</dt><dd>${t[1]}</dd>`).join('')}</dl>
-    <h3>Bajo el mar</h3><dl>${TERMS.filter((t) => t[2] === 'mar').map((t) => `<dt>${t[0]}</dt><dd>${t[1]}</dd>`).join('')}</dl>` },
+    <h3>En tierra</h3><dl>${TERMS.filter((t) => t[2] === 'tierra').map(dt).join('')}</dl>
+    <h3>En la costa</h3><dl>${TERMS.filter((t) => t[2] === 'costa').map(dt).join('')}</dl>
+    <h3>Bajo el mar</h3><dl>${TERMS.filter((t) => t[2] === 'mar').map(dt).join('')}</dl>` },
 
   { id: 'placas', title: 'Placas tectónicas, pliegues y fallas', pg: '7-8, 10-11', body: `
     <h3>Tectónica de placas (7-8)</h3>
