@@ -79,7 +79,7 @@ const READ = [
   { id: 'placas', title: 'Placas tectónicas, pliegues y fallas', pg: '7-8, 10-11', body: `
     <h3>Tectónica de placas (7-8)</h3>
     <p>La parte rígida de la Tierra está rota en trozos llamados <b>placas tectónicas</b> que se mueven despacio. ${ADD}</p>
-    ${fig('placas.jpg', 'Diapositiva 7. Las placas: Euroasiática, Norteamericana, Pacífica, del Caribe, de Cocos, de Nazca, Sudamericana, Africana, Arábiga, Irania, Filipina, Indoaustraliana y Antártica. Las flechas rojas indican hacia dónde se mueven.')}
+    ${fig('placas.jpg', 'Diapositiva 7. Las flechas rojas indican hacia dónde se mueve cada placa. <b>No hace falta saber los nombres de las placas</b>: solo que la corteza está rota en placas que se mueven.')}
     ${fig('limites.jpg', 'Diapositiva 8. En los bordes de las placas hay dorsales oceánicas, fosas, arcos de islas con volcanes, terremotos y fallas transformantes.')}
     <h3>Tres tipos de límite entre placas (10)</h3>
     ${fig('tipos.jpg', 'Diapositiva 10.')}
@@ -188,8 +188,6 @@ const MCQ = [
   ['¿Qué es una cala?', 'una bahía pequeña', ['un tipo de volcán', 'una montaña muy alta', 'un río corto'], 'Una cala es una bahía pequeña y de poca profundidad.', 'rel', '5'],
   ['En el dibujo de la diapositiva 4, ¿qué es el número 15?', 'fosa marina', ['dorsal oceánica', 'playa', 'llanura'], 'El número 15 señala la zona más honda del fondo del mar. (Mi lectura del dibujo: compruébala con el libro.)', 'rel', '4'],
   ['¿Sobre qué se mueven las placas tectónicas?', 'sobre el manto', ['sobre el núcleo interno', 'sobre el mar', 'sobre la atmósfera'], 'Las placas se desplazan lentamente sobre el manto. (Añadido: no está en las diapositivas.)', 'pla', '7'],
-  ['¿En qué placa tectónica está España, según el mapa?', 'Euroasiática', ['Africana', 'Norteamericana', 'Nazca'], 'La península ibérica está dentro de la placa Euroasiática.', 'pla', '7'],
-  ['¿Cuál de estas es una placa tectónica del mapa?', 'Nazca', ['Mediterránea', 'Atlántica', 'Ibérica'], 'Nazca, junto a Cocos o Caribe, es una de las placas del mapa.', 'pla', '7'],
   ['En un límite convergente, las placas…', 'se acercan y chocan', ['se separan', 'se deslizan una junto a otra', 'no se mueven'], 'Convergente = se acercan.', 'pla', '10'],
   ['En un límite divergente, las placas…', 'se separan y sube magma', ['chocan', 'se deslizan lateralmente', 'se funden'], 'Divergente = se separan.', 'pla', '10'],
   ['En un límite transformante, las placas…', 'se deslizan lateralmente', ['se acercan', 'se separan', 'se hunden'], 'Transformante = se deslizan una junto a otra.', 'pla', '10'],
