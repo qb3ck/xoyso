@@ -26,6 +26,7 @@ button{font:inherit;color:inherit;cursor:pointer}button:focus-visible{outline:3p
 .opts{display:grid;gap:10px;width:100%}
 .opt{min-height:54px;padding:10px 16px;border-radius:16px;border:2px solid var(--line);background:var(--bg);font-family:var(--display);font-size:1.15rem;font-weight:500;text-align:left}
 @media (hover:hover){.opt:hover:not(:disabled){border-color:var(--ink)}}.opt:disabled{cursor:default}
+.opt.sel{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}.mcols{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}.mcols .opt{font-size:1rem;min-height:48px;padding:8px 10px}.mn{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:.8rem;margin-right:4px}
 .opt.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}.opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
 .fb{min-height:1px;font-weight:700}.fb .v{font-family:var(--display);font-size:1.2rem;font-weight:600}.fb.good .v{color:var(--good)}.fb.bad .v{color:var(--bad)}
 .btn{min-height:50px;padding:10px 24px;border-radius:14px;border:2px solid var(--ink);background:var(--card);font-weight:800}.btn.primary{background:var(--ink);color:var(--bg)}.btn:disabled{opacity:.4;cursor:default}
@@ -72,6 +73,7 @@ const $=(s,r=document)=>r.querySelector(s),esc=(s)=>String(s).replace(/[&<>"]/g,
 const sample=(a,n)=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[b[i],b[j]]=[b[j],b[i]]}return b.slice(0,n)};
 const norm=(t)=>String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/%|km3|km³|litros?|metros?|millones( de)?|\bm\b/g,'').replace(/\./g,',').replace(/\s+/g,' ').trim();
 const qInp=(x)=>({t:x[4],inp:1,ans:x[1].map(norm),disp:x[2],p:`<p class="sent">${esc(x[0])}</p>`,why:esc(x[3])+` <span class="note">(diap. ${x[5]})</span>`});
+const qMatch=(x)=>({match:1,t:x[1],title:x[0],sl:x[2],pairs:x[4]});
 const shuffle=(a)=>sample(a,a.length);
 const how=(t,h)=>`<div class="how"><b>${t}</b><span>${h}</span></div>`;
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
@@ -123,10 +125,11 @@ const ACTS={
   pic:{n:'Etiqueta el dibujo',ic:'📍',d:'Volcán, valle del río, placas y relieve.',how:'Mira el dibujo y toca el nombre de lo que se señala.',gen:picQs,len:12},
   ord:{n:'Pon en orden',ic:'1·2·3',d:'Procesos paso a paso.',how:'Toca los pasos en el orden correcto, del primero al último.',gen:(n)=>sample(ORD,Math.min(n,ORD.length)).map(qOrd),len:5},
   sch:{n:'Completa el esquema',ic:'🗺',d:'Diapositivas 13 y 41: el esquema del tema y el ciclo del agua.',how:'Toca una palabra y después el hueco donde va. Cuando termines, pulsa Comprobar.',gen:()=>[qSch(0),qSch(1)],len:2},
+  match:{n:'Une cada dato con su cifra',ic:'↔',d:'Porcentajes, litros y cantidades: une cada dato con su número.',how:'Toca un dato y después la cifra que le corresponde. Cuando todos estén unidos, pulsa Comprobar.',gen:()=>shuffle(MATCH).map(qMatch),len:5},
   inp:{n:'Escribe la respuesta',ic:'✍',d:'Sin opciones: escribe el número o la palabra (porcentajes, litros, procesos del agua).',how:'Escribe la respuesta y pulsa Comprobar. En los números basta con la cifra: 96,5 o 96,5%.',gen:(n)=>mk(INP,qInp,n),len:12},
   mix:{n:'Reto mixto',ic:'★',d:'20 preguntas de todo lo anterior.',how:'Preguntas de todos los tipos mezcladas, como en un examen.',gen:(n)=>shuffle([...mk(MCQ,qMcq,8),...mk(TF,qTf,5),...picQs(4),...mk(ORD,qOrd,1),...mk(INP,qInp,3),qDef(),qTerm()]).slice(0,n),len:20},
 };
-const secPool=(id)=>{const tg=SECTAGS[id]||[];return[...MCQ.filter((x)=>x[6]===id||(!x[6]&&tg.includes(x[4]))).map(qMcq),...TF.filter((x)=>x[5]===id||(!x[5]&&tg.includes(x[3]))).map(qTf),...INP.filter((x)=>x[6]===id).map(qInp)]};
+const secPool=(id)=>{const tg=SECTAGS[id]||[];return[...MCQ.filter((x)=>x[6]===id||(!x[6]&&tg.includes(x[4]))).map(qMcq),...TF.filter((x)=>x[5]===id||(!x[5]&&tg.includes(x[3]))).map(qTf),...INP.filter((x)=>x[6]===id).map(qInp),...MATCH.filter((x)=>x[3]===id).map(qMatch)]};
 READ.forEach((r,i)=>{ACTS['s_'+r.id]={n:'Test: '+r.title,ic:String(i+1),d:'Diapositivas '+r.pg,how:'Preguntas sobre lo que has leído en este apartado. Si fallas alguna, vuelve a leerlo.',gen:(n)=>shuffle(secPool(r.id)).slice(0,n),len:12,sec:1}});
 const LIST=Object.keys(ACTS).filter((k)=>!ACTS[k].sec),bestOf=(k)=>P().best[k];
 const app=$('#app');
@@ -176,6 +179,7 @@ function run(k){const a=ACTS[k];RUN={k,qs:a.gen(a.len),i:0,ok:0,miss:[]};app.inn
 function ask(){
   const R=RUN,q=R.qs[R.i];if(!q)return done();
   const head=`<div class="top"><button class="link" id="bk">× Salir</button><span class="count">${R.i+1} / ${R.qs.length}</span></div><div class="track"><i style="width:${R.i/R.qs.length*100}%"></i></div>`;
+  if(q.match){return askMatch(head,q)}
   if(q.inp){return askInp(head,q)}
   if(q.ord){return askOrd(head,q)}
   if(q.sch){return askSch(head,q)}
@@ -187,13 +191,31 @@ function ask(){
     record(q,ok,q.p,q.o[q.c]);$('#nx').hidden=false;$('#nx').focus()});
   $('#nx').onclick=()=>{R.i++;ask()};
 }
+function askMatch(head,q){
+  const R=RUN,n=q.pairs.length,L=shuffle([...q.pairs.keys()]),V=shuffle([...q.pairs.keys()]),link={};let sel=null,done=false;   // link: left index -> right index
+  const draw=()=>{const num=(l)=>Object.keys(link).indexOf(String(l))+1,rv=(v)=>Object.keys(link).find((l)=>link[l]===v);
+    $('#ml').innerHTML=L.map((i)=>{const on=link[i]!==undefined,st=done?(link[i]===i?'ok':'no'):'';return`<button class="opt ${st} ${sel===i?'sel':''}" data-l="${i}" ${done?'disabled':''}>${on?`<b class="mn">${num(i)}</b> `:''}${esc(q.pairs[i][0])}</button>`}).join('');
+    $('#mr').innerHTML=V.map((v)=>{const l=rv(v),on=l!==undefined,st=done?(+l===v?'ok':'no'):'';return`<button class="opt ${st}" data-v="${v}" ${done?'disabled':''}>${on?`<b class="mn">${num(l)}</b> `:''}${esc(q.pairs[v][1])}</button>`}).join('');
+    $('#ck').disabled=Object.keys(link).length<n;
+    app.querySelectorAll('[data-l]').forEach((b)=>b.onclick=()=>{const i=+b.dataset.l;if(link[i]!==undefined){delete link[i];sel=i}else sel=sel===i?null:i;draw()});
+    app.querySelectorAll('[data-v]').forEach((b)=>b.onclick=()=>{const v=+b.dataset.v,l=Object.keys(link).find((k)=>link[k]===v);if(l!==undefined){delete link[l];draw();return}
+      if(sel===null)return;link[sel]=v;sel=null;draw()})};
+  app.innerHTML=`${head}<div class="panel"><p class="sent">${esc(q.title)}: une cada dato con su cifra.</p><p class="note">Toca un dato de la izquierda y después su cifra de la derecha. Toca uno emparejado para quitarlo.</p><div class="mcols"><div id="ml" class="opts"></div><div id="mr" class="opts"></div></div><div class="fb" aria-live="polite"></div></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ck" disabled>Comprobar</button><button class="btn primary" id="nx" hidden>Siguiente →</button></div>`;
+  $('#bk').onclick=home;draw();
+  $('#ck').onclick=()=>{done=true;sel=null;const right=Object.keys(link).filter((l)=>link[l]===+l).length;
+    q.pairs.forEach((_,i)=>queue(q.t,link[i]===i));
+    if(right===n)R.ok++;else R.miss.push({p:`<p class="sent">${esc(q.title)}</p>`,a:q.pairs.filter((_,i)=>link[i]!==i).map((x)=>x[0]+' = '+x[1]).join('; ')});flush();
+    draw();$('.fb').className='fb '+(right===n?'good':'bad');$('.fb').innerHTML=right===n?'<span class="v">¡Todo correcto!</span>':`<span class="v">${right} de ${n}.</span> Las respuestas correctas están marcadas en verde: <ul>${q.pairs.map((x)=>`<li>${esc(x[0])}: <b>${esc(x[1])}</b></li>`).join('')}</ul>`;
+    $('#ck').hidden=true;$('#nx').hidden=false};
+  $('#nx').onclick=()=>{R.i++;ask()};
+}
 function askInp(head,q){
   const R=RUN;app.innerHTML=`${head}<div class="panel">${q.p}<input id="ai" class="opt" style="width:100%" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Escribe tu respuesta"><div class="fb" aria-live="polite"></div></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ck">Comprobar</button><button class="btn primary" id="nx" hidden>Siguiente →</button></div>`;
   $('#bk').onclick=home;const inp=$('#ai');inp.focus();
   const check=()=>{const v=norm(inp.value);if(!v)return;const ok=q.ans.includes(v);inp.disabled=true;inp.classList.add(ok?'ok':'no');
     $('.fb').className='fb '+(ok?'good':'bad');$('.fb').innerHTML=`<span class="v">${ok?'¡Correcto!':'Casi'}</span> Respuesta: <b>${esc(q.disp)}</b>. ${q.why}`;
-    record(q,ok,q.p,q.disp);$('#ck').hidden=true;$('#nx').hidden=false;$('#nx').focus()};
-  $('#ck').onclick=check;inp.onkeydown=(e)=>{if(e.key==='Enter')check()};$('#nx').onclick=()=>{R.i++;ask()};
+    record(q,ok,q.p,q.disp);$('#ck').hidden=true;$('#nx').hidden=false;inp.blur()};
+  $('#ck').onclick=check;inp.onkeydown=(e)=>{if(e.key==='Enter'){e.preventDefault();check()}};$('#nx').onclick=()=>{R.i++;ask()};
 }
 function askOrd(head,q){
   const R=RUN;let pick=[];const items=shuffle(q.items);

@@ -560,3 +560,12 @@ IQ('Escribe cómo se llama la caída del agua en forma de lluvia, nieve o graniz
 IQ('Escribe el nombre de la roca sobre la que se acumula el agua subterránea, para formar un acuífero (una palabra que acaba en -able).', ['impermeable', 'roca impermeable'], 'impermeable', 'El agua se filtra hasta encontrar una roca impermeable.', 'sub', '60', 'subt');
 IQ('¿Cómo se llaman los agentes que vienen de dentro de la Tierra? (internos o externos)', ['internos', 'agentes internos', 'interno'], 'internos', 'Volcanes, terremotos y tsunamis.', 'rel', '13', 'esquema');
 IQ('Escribe los tres pasos del proceso de los agentes externos: erosión, ... y sedimentación. ¿Cuál falta?', ['transporte'], 'transporte', 'Erosión → transporte → sedimentación.', 'rel', '13', 'esquema');
+
+/* ---------- match-the-numbers sets: [title, topic, slide, section, [[what, figure], ...]] ---------- */
+const MATCH = [
+  ['El agua de la Tierra', 'agu', '44', 'ciclo2', [['Parte del planeta que es agua', '70,8%'], ['Parte del agua del planeta que es salada', '96,5%'], ['Parte del agua del planeta que es dulce', '2,5%'], ['Agua dulce en capas de hielo y glaciares', '68,7%'], ['Agua dulce que es subterránea', '30,1%'], ['Agua dulce superficial y otros', '1,2%']]],
+  ['Las sales del mar', 'agu', '45', 'ciclo2', [['Sal marina en el agua de mar', '3,5%'], ['Cloro (de las sales)', '55%'], ['Sodio (de las sales)', '30,6%'], ['Sulfato (de las sales)', '7,7%'], ['Magnesio (de las sales)', '3,7%'], ['Potasio (de las sales)', '1,1%']]],
+  ['Cuánta agua hay', 'agu', '44', 'ciclo2', [['Agua en mares y océanos', '1385 millones de km³'], ['Agua dulce de toda la Tierra', '10,6 millones de km³'], ['Agua dulce en ríos y lagos', '93 113 km³']]],
+  ['Ahorrar agua: litros que se ahorran', 'sub', '62', 'subt', [['Vaso de agua para enjuagarse los dientes', '19 litros'], ['Ducharse en vez de bañarse', '60 litros'], ['Cerrar el grifo al enjabonarse las manos', '12 litros'], ['Cisterna inteligente (por uso)', '6 litros'], ['Electrodomésticos con la carga completa', '200 litros'], ['Lavar frutas y verduras en un bol', '10 litros']]],
+  ['Personas y mar', 'hum', '36', 'humano', [['Población que vive en la costa', '80%'], ['Altitud a la que vive la mayoría', 'menos de 500 m'], ['Profundidad de la plataforma continental', 'unos 400 m']]],
+];
