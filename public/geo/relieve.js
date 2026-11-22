@@ -530,3 +530,33 @@ SM('subt', '¿Qué ahorra más agua de estos gestos?', 'poner los electrodomést
 SM('subt', '¿Cuántos litros se ahorran duchándose en vez de bañarse?', '60', ['12', '6', '19'], 'Diapositiva 62.', 'sub', '62');
 ST('subt', 'Las aguas subterráneas alimentan ríos y lagos.', true, 'Y protegen la humedad del suelo.', 'sub', '61');
 ST('subt', 'Todas las aguas subterráneas son imposibles de agotar.', false, 'Son vulnerables a la extracción excesiva.', 'sub', '61');
+
+/* ---------- written-answer questions (no choices). [question, accepted answers, shown answer, why, topic, slide, section] ---------- */
+const INP = [];
+const IQ = (q, acc, shown, why, t, s, sec) => INP.push([q, acc, shown, why, t, s, sec]);
+IQ('¿Qué porcentaje del planeta es agua?', ['70,8'], '70,8%', 'Diapositiva 44.', 'agu', '44', 'ciclo2');
+IQ('Del agua del planeta, ¿qué porcentaje es agua salada (mares y océanos)?', ['96,5'], '96,5%', 'Diapositiva 44.', 'agu', '44', 'ciclo2');
+IQ('Del agua del planeta, ¿qué porcentaje es agua dulce?', ['2,5'], '2,5%', 'Diapositiva 44.', 'agu', '44', 'ciclo2');
+IQ('Del agua dulce, ¿qué porcentaje está en capas de hielo y glaciares?', ['68,7'], '68,7%', 'Es la mayor parte del agua dulce.', 'agu', '44', 'ciclo2');
+IQ('Del agua dulce, ¿qué porcentaje es agua subterránea?', ['30,1'], '30,1%', 'Diapositiva 44.', 'agu', '44', 'ciclo2');
+IQ('Del agua dulce, ¿qué porcentaje es agua superficial y otros (ríos, lagos...)?', ['1,2'], '1,2%', 'Muy poca: la mayor parte está en hielo y bajo tierra.', 'agu', '44', 'ciclo2');
+IQ('El agua de mar tiene un 96,5% de agua. ¿Qué porcentaje es sal marina?', ['3,5'], '3,5%', '96,5% + 3,5% = 100%.', 'agu', '45', 'ciclo2');
+IQ('¿Qué porcentaje de las sales del mar es cloro? (la sal más abundante)', ['55'], '55%', 'Después viene el sodio (30,6%).', 'agu', '45', 'ciclo2');
+IQ('¿Qué porcentaje de las sales del mar es sodio?', ['30,6'], '30,6%', 'Cloro 55% y sodio 30,6%.', 'agu', '45', 'ciclo2');
+IQ('¿Cuántos millones de km³ de agua dulce hay en la Tierra?', ['10,6'], '10,6 millones de km³', 'Frente a 1385 millones de km³ en mares y océanos.', 'agu', '44', 'ciclo2');
+IQ('¿Cuántos millones de km³ de agua hay en mares y océanos?', ['1385'], '1385 millones de km³', 'Diapositiva 44.', 'agu', '44', 'ciclo2');
+IQ('¿Qué porcentaje de la población vive en la costa?', ['80'], '80%', 'Diapositiva 36.', 'hum', '36', 'humano');
+IQ('¿A menos de cuántos metros de altitud vive la mayoría de la gente?', ['500'], '500 m', 'Diapositiva 36.', 'hum', '36', 'humano');
+IQ('¿Hasta unos cuántos metros de profundidad llega la plataforma continental?', ['400'], 'unos 400 m', 'Definición del libro (p. 16-17).', 'rel', '5', 'relieve');
+IQ('¿Cuántos litros se ahorran ducharse en vez de bañarse?', ['60'], '60 litros', 'Diapositiva 62.', 'sub', '62', 'subt');
+IQ('¿Cuántos litros se ahorran al poner los electrodomésticos con la carga completa?', ['200'], '200 litros', 'Es el gesto que más ahorra.', 'sub', '62', 'subt');
+IQ('¿Cuántos litros se ahorran al usar un vaso de agua para enjuagarse los dientes?', ['19'], '19 litros', 'Diapositiva 62.', 'sub', '62', 'subt');
+IQ('¿Cuántos litros se ahorran al cerrar el grifo mientras te enjabonas las manos?', ['12'], '12 litros', 'Diapositiva 62.', 'sub', '62', 'subt');
+IQ('Escribe cómo se llama el paso de líquido a gas.', ['evaporacion'], 'evaporación', 'El calor del Sol evapora el agua.', 'cic', '41', 'ciclo');
+IQ('Escribe cómo se llama el paso de gas a líquido que forma las nubes.', ['condensacion'], 'condensación', 'El vapor se enfría y se condensa.', 'cic', '41', 'ciclo');
+IQ('Escribe cómo se llama el paso de sólido a gas sin pasar por líquido.', ['sublimacion'], 'sublimación', 'Ejemplo: los copos de nieve.', 'cic', '41', 'ciclo');
+IQ('Escribe cómo se llama el agua que penetra en el suelo y se hace subterránea (el proceso).', ['infiltracion'], 'infiltración', 'Se almacena en acuíferos.', 'cic', '41', 'ciclo');
+IQ('Escribe cómo se llama la caída del agua en forma de lluvia, nieve o granizo.', ['precipitacion'], 'precipitación', 'Diapositiva 41.', 'cic', '41', 'ciclo');
+IQ('Escribe el nombre de la roca sobre la que se acumula el agua subterránea, para formar un acuífero (una palabra que acaba en -able).', ['impermeable', 'roca impermeable'], 'impermeable', 'El agua se filtra hasta encontrar una roca impermeable.', 'sub', '60', 'subt');
+IQ('¿Cómo se llaman los agentes que vienen de dentro de la Tierra? (internos o externos)', ['internos', 'agentes internos', 'interno'], 'internos', 'Volcanes, terremotos y tsunamis.', 'rel', '13', 'esquema');
+IQ('Escribe los tres pasos del proceso de los agentes externos: erosión, ... y sedimentación. ¿Cuál falta?', ['transporte'], 'transporte', 'Erosión → transporte → sedimentación.', 'rel', '13', 'esquema');

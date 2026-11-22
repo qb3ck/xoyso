@@ -70,6 +70,8 @@ figcaption{font-size:.9rem;color:var(--muted)}
 <script>
 const $=(s,r=document)=>r.querySelector(s),esc=(s)=>String(s).replace(/[&<>"]/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const sample=(a,n)=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[b[i],b[j]]=[b[j],b[i]]}return b.slice(0,n)};
+const norm=(t)=>String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/%|km3|km³|litros?|metros?|millones( de)?|\bm\b/g,'').replace(/\./g,',').replace(/\s+/g,' ').trim();
+const qInp=(x)=>({t:x[4],inp:1,ans:x[1].map(norm),disp:x[2],p:`<p class="sent">${esc(x[0])}</p>`,why:esc(x[3])+` <span class="note">(diap. ${x[5]})</span>`});
 const shuffle=(a)=>sample(a,a.length);
 const how=(t,h)=>`<div class="how"><b>${t}</b><span>${h}</span></div>`;
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
@@ -121,9 +123,10 @@ const ACTS={
   pic:{n:'Etiqueta el dibujo',ic:'📍',d:'Volcán, valle del río, placas y relieve.',how:'Mira el dibujo y toca el nombre de lo que se señala.',gen:picQs,len:12},
   ord:{n:'Pon en orden',ic:'1·2·3',d:'Procesos paso a paso.',how:'Toca los pasos en el orden correcto, del primero al último.',gen:(n)=>sample(ORD,Math.min(n,ORD.length)).map(qOrd),len:5},
   sch:{n:'Completa el esquema',ic:'🗺',d:'Diapositivas 13 y 41: el esquema del tema y el ciclo del agua.',how:'Toca una palabra y después el hueco donde va. Cuando termines, pulsa Comprobar.',gen:()=>[qSch(0),qSch(1)],len:2},
-  mix:{n:'Reto mixto',ic:'★',d:'20 preguntas de todo lo anterior.',how:'Preguntas de todos los tipos mezcladas, como en un examen.',gen:(n)=>shuffle([...mk(MCQ,qMcq,8),...mk(TF,qTf,5),...picQs(4),...mk(ORD,qOrd,1),qDef(),qTerm()]).slice(0,n),len:20},
+  inp:{n:'Escribe la respuesta',ic:'✍',d:'Sin opciones: escribe el número o la palabra (porcentajes, litros, procesos del agua).',how:'Escribe la respuesta y pulsa Comprobar. En los números basta con la cifra: 96,5 o 96,5%.',gen:(n)=>mk(INP,qInp,n),len:12},
+  mix:{n:'Reto mixto',ic:'★',d:'20 preguntas de todo lo anterior.',how:'Preguntas de todos los tipos mezcladas, como en un examen.',gen:(n)=>shuffle([...mk(MCQ,qMcq,8),...mk(TF,qTf,5),...picQs(4),...mk(ORD,qOrd,1),...mk(INP,qInp,3),qDef(),qTerm()]).slice(0,n),len:20},
 };
-const secPool=(id)=>{const tg=SECTAGS[id]||[];return[...MCQ.filter((x)=>x[6]===id||(!x[6]&&tg.includes(x[4]))).map(qMcq),...TF.filter((x)=>x[5]===id||(!x[5]&&tg.includes(x[3]))).map(qTf)]};
+const secPool=(id)=>{const tg=SECTAGS[id]||[];return[...MCQ.filter((x)=>x[6]===id||(!x[6]&&tg.includes(x[4]))).map(qMcq),...TF.filter((x)=>x[5]===id||(!x[5]&&tg.includes(x[3]))).map(qTf),...INP.filter((x)=>x[6]===id).map(qInp)]};
 READ.forEach((r,i)=>{ACTS['s_'+r.id]={n:'Test: '+r.title,ic:String(i+1),d:'Diapositivas '+r.pg,how:'Preguntas sobre lo que has leído en este apartado. Si fallas alguna, vuelve a leerlo.',gen:(n)=>shuffle(secPool(r.id)).slice(0,n),len:12,sec:1}});
 const LIST=Object.keys(ACTS).filter((k)=>!ACTS[k].sec),bestOf=(k)=>P().best[k];
 const app=$('#app');
@@ -173,6 +176,7 @@ function run(k){const a=ACTS[k];RUN={k,qs:a.gen(a.len),i:0,ok:0,miss:[]};app.inn
 function ask(){
   const R=RUN,q=R.qs[R.i];if(!q)return done();
   const head=`<div class="top"><button class="link" id="bk">× Salir</button><span class="count">${R.i+1} / ${R.qs.length}</span></div><div class="track"><i style="width:${R.i/R.qs.length*100}%"></i></div>`;
+  if(q.inp){return askInp(head,q)}
   if(q.ord){return askOrd(head,q)}
   if(q.sch){return askSch(head,q)}
   app.innerHTML=`${head}<div class="panel">${q.p}<div class="opts">${q.o.map((o,j)=>`<button class="opt" data-j="${j}">${esc(o)}</button>`).join('')}</div><div class="fb" aria-live="polite"></div></div><div class="row" style="margin-top:14px"><button class="btn primary" id="nx" hidden>Siguiente →</button></div>`;
@@ -182,6 +186,14 @@ function ask(){
     $('.fb').className='fb '+(ok?'good':'bad');$('.fb').innerHTML=`<span class="v">${ok?'¡Correcto!':'Casi'}</span> ${q.why}`;
     record(q,ok,q.p,q.o[q.c]);$('#nx').hidden=false;$('#nx').focus()});
   $('#nx').onclick=()=>{R.i++;ask()};
+}
+function askInp(head,q){
+  const R=RUN;app.innerHTML=`${head}<div class="panel">${q.p}<input id="ai" class="opt" style="width:100%" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Escribe tu respuesta"><div class="fb" aria-live="polite"></div></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ck">Comprobar</button><button class="btn primary" id="nx" hidden>Siguiente →</button></div>`;
+  $('#bk').onclick=home;const inp=$('#ai');inp.focus();
+  const check=()=>{const v=norm(inp.value);if(!v)return;const ok=q.ans.includes(v);inp.disabled=true;inp.classList.add(ok?'ok':'no');
+    $('.fb').className='fb '+(ok?'good':'bad');$('.fb').innerHTML=`<span class="v">${ok?'¡Correcto!':'Casi'}</span> Respuesta: <b>${esc(q.disp)}</b>. ${q.why}`;
+    record(q,ok,q.p,q.disp);$('#ck').hidden=true;$('#nx').hidden=false;$('#nx').focus()};
+  $('#ck').onclick=check;inp.onkeydown=(e)=>{if(e.key==='Enter')check()};$('#nx').onclick=()=>{R.i++;ask()};
 }
 function askOrd(head,q){
   const R=RUN;let pick=[];const items=shuffle(q.items);
