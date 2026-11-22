@@ -56,6 +56,11 @@ figcaption{font-size:.9rem;color:var(--muted)}
 .slot.sel{outline:3px solid var(--hi)}
 .bank{display:flex;flex-wrap:wrap;gap:8px;position:sticky;bottom:0;background:var(--card);padding:10px 0;border-top:2px solid var(--line);max-height:34vh;overflow:auto}.chip{padding:8px 14px;border-radius:99px;border:2px solid var(--ink);background:var(--card);font-weight:800}.chip.on{background:var(--ink);color:var(--bg)}.chip:disabled{opacity:.3}
 .cl{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}@media(max-width:520px){.cl{grid-template-columns:1fr}}
+.fbk{display:grid;gap:10px}.fbk .it{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:10px 14px}
+.fbk .bar{grid-column:1/-1;height:8px;border-radius:99px;background:var(--line);overflow:hidden}.fbk .bar i{display:block;height:100%;border-radius:99px;background:var(--good)}
+.fbk .it.mid .bar i{background:var(--warm)}.fbk .it.low .bar i{background:var(--bad)}.fbk .it.few .bar i{background:var(--muted)}
+.fbk .lab{font-weight:800;font-size:.9rem;color:var(--muted)}.fbk .it.low .lab{color:var(--bad)}.fbk .it.mid .lab{color:var(--warm)}.fbk .it.ok .lab{color:var(--good)}
+.fbk button.go{justify-self:end;font-weight:800;font-size:.85rem;padding:4px 12px;border-radius:99px;border:2px solid var(--ink);background:var(--card)}
 .panel>*,.read>*{min-width:0;max-width:100%}.t th,.t td{overflow-wrap:anywhere}.read{overflow-wrap:break-word}
 </style>
 <link rel="stylesheet" href="/how.css">
@@ -126,11 +131,32 @@ function home(){
   app.innerHTML=`<a class="link" href="/">← Inicio</a>
   <div class="hero"><h1>Relieve y aguas</h1><p>Geografía de 1º ESO. Primero lee cada apartado y después practica con los ejercicios. Cubre las diapositivas 4 a 64 que tenéis que estudiar.</p></div>
   ${how('Cómo funciona','Los apartados de lectura siguen el orden de las diapositivas. Los textos con ✎ están añadidos por mí porque la diapositiva solo hace la pregunta: compáralos con tu libro.')}
+  <div id="fbk"></div>
   <h2 class="sec">1 · Lee</h2><div class="grid">${READ.map((r,i)=>`<button class="act read" data-r="${i}"><span class="ic">${i+1}</span><h3>${esc(r.title)}</h3><p>Diapositivas ${r.pg}</p><span class="best ${read[r.id]?'good':''}">${read[r.id]?'✓ Leído':'Sin leer'}</span></button>`).join('')}</div>
   <h2 class="sec">2 · Practica</h2><div class="grid">${LIST.map((k)=>{const b=bestOf(k);return`<button class="act" data-k="${k}"><span class="ic">${ACTS[k].ic}</span><h3>${ACTS[k].n}</h3><p>${ACTS[k].d}</p><span class="best ${b>=85?'good':''}">${b==null?'Sin intentar':'Mejor: '+b+'%'}</span></button>`}).join('')}</div>`;
+  feedback();
   app.querySelectorAll('[data-r]').forEach((b)=>b.onclick=()=>reader(+b.dataset.r));
   app.querySelectorAll('[data-k]').forEach((b)=>b.onclick=()=>run(b.dataset.k));
   scrollTo(0,0);
+}
+/* ---- cómo vas: per-topic results from his account ---- */
+const FB=[['rel','Formas del relieve','relieve'],['pla','Placas tectónicas','placas'],['def','Pliegues y fallas','placas'],['vol','Volcanes y tsunamis','volcanes'],['ext','Agentes externos','externos'],['hum','El ser humano y el relieve','humano'],['agu','Agua en la Tierra','ciclo2'],['oce','Océanos y mares','oceanos'],['rio','Ríos','rios'],['sub','Aguas subterráneas','subt'],['cic','Ciclo del agua','ciclo']];
+async function feedback(){
+  const box=$('#fbk');if(!box)return;const u=session();await flush();
+  if(!u){box.innerHTML='<p class="note">Entra con tu nombre en la página principal de xoyso y aquí verás cómo vas en cada apartado.</p>';return}
+  try{
+    const r=await rpc('get_progress',{p_token:u.token}),m={};
+    r.items.filter((i)=>i.item_id.startsWith('geo1:')).forEach((i)=>{m[i.item_id.slice(5)]={c:i.correct,w:i.wrong}});
+    const rows=FB.map(([t,name,rd])=>{const x=m[t]||{c:0,w:0},n=x.c+x.w,pct=n?Math.round(x.c/n*100):0;
+      const st=n<5?'few':pct>=85?'ok':pct>=60?'mid':'low';
+      const lab={few:n?'Poco practicado':'Sin empezar',ok:'¡Muy bien!',mid:'Casi: repasa los fallos',low:'Repasa este apartado'}[st];
+      return{t,name,rd,n,pct,st,lab}});
+    const tried=rows.filter((x)=>x.n);if(!tried.length){box.innerHTML='';return}
+    const weak=rows.filter((x)=>x.n>=5&&x.pct<85).sort((a,b)=>a.pct-b.pct),few=rows.filter((x)=>x.n<5);
+    const tip=weak.length?`Empieza por <b>${esc(weak[0].name)}</b> (${weak[0].pct}%): lee el apartado y vuelve a practicar.`:few.length?`Todo lo que has practicado va bien. Te falta practicar <b>${esc(few[0].name)}</b>.`:'¡Todo por encima del 85%! Prueba el reto mixto.';
+    box.innerHTML=`<h2 class="sec">Cómo vas</h2><div class="def" style="margin-bottom:10px">${tip}</div><div class="fbk">${rows.map((x)=>`<div class="it ${x.st}"><div><b>${esc(x.name)}</b><br><span class="lab">${x.n?x.pct+'% · '+x.n+' respuestas · ':''}${x.lab}</span></div>${x.st==='ok'?'':`<button class="go" data-go="${x.rd}">Leer</button>`}<div class="bar"><i style="width:${x.pct}%"></i></div></div>`).join('')}</div>`;
+    box.querySelectorAll('[data-go]').forEach((b)=>b.onclick=()=>reader(READ.findIndex((z)=>z.id===b.dataset.go)));
+  }catch(e){box.innerHTML=''}
 }
 function reader(i){
   const r=READ[i],p=P();p.read=p.read||{};p.read[r.id]=1;store.set(KEY,p);
