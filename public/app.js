@@ -624,8 +624,7 @@ function unitProgress(href, yearId) {
   }
   const col = pct >= 85 ? '' : pct >= 60 ? 'background:#b4540a' : 'background:#c2362b';
   return [h('div', { class: 'meter' }, h('span', { style: `width:${pct}%;${col}` })),
-    h('p', { class: 'small' }, tr(`${pct}% bien · ${c + w} respuestas`, `${pct}% right · ${c + w} answers`)),
-    weak.length ? h('p', { class: 'small muted' }, tr('A repasar: ', 'To review: '), weak.join(' · ')) : null];
+    h('p', { class: 'small' }, tr(`${pct}% bien · ${c + w} resp.`, `${pct}% right · ${c + w} answers`), weak.length ? h('span', { class: 'muted' }, ' · ', tr('Repasar: ', 'Review: '), weak.join(', ')) : null)];
 }
 let live = null, lastWatch = null;
 async function watch(render) {   // re-draw the current screen once the account results are fresh

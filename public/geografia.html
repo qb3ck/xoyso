@@ -123,7 +123,9 @@ const ACTS={
   sch:{n:'Completa el esquema',ic:'🗺',d:'Diapositivas 13 y 41: el esquema del tema y el ciclo del agua.',how:'Toca una palabra y después el hueco donde va. Cuando termines, pulsa Comprobar.',gen:()=>[qSch(0),qSch(1)],len:2},
   mix:{n:'Reto mixto',ic:'★',d:'20 preguntas de todo lo anterior.',how:'Preguntas de todos los tipos mezcladas, como en un examen.',gen:(n)=>shuffle([...mk(MCQ,qMcq,8),...mk(TF,qTf,5),...picQs(4),...mk(ORD,qOrd,1),qDef(),qTerm()]).slice(0,n),len:20},
 };
-const LIST=Object.keys(ACTS),bestOf=(k)=>P().best[k];
+const secPool=(id)=>{const tg=SECTAGS[id]||[];return[...MCQ.filter((x)=>x[6]===id||(!x[6]&&tg.includes(x[4]))).map(qMcq),...TF.filter((x)=>x[5]===id||(!x[5]&&tg.includes(x[3]))).map(qTf)]};
+READ.forEach((r,i)=>{ACTS['s_'+r.id]={n:'Test: '+r.title,ic:String(i+1),d:'Diapositivas '+r.pg,how:'Preguntas sobre lo que has leído en este apartado. Si fallas alguna, vuelve a leerlo.',gen:(n)=>shuffle(secPool(r.id)).slice(0,n),len:12,sec:1}});
+const LIST=Object.keys(ACTS).filter((k)=>!ACTS[k].sec),bestOf=(k)=>P().best[k];
 const app=$('#app');
 
 function home(){
@@ -133,7 +135,8 @@ function home(){
   ${how('Cómo funciona','Los apartados de lectura siguen el orden de las diapositivas. Los textos con ✎ están añadidos por mí porque la diapositiva solo hace la pregunta: compáralos con tu libro.')}
   <div id="fbk"></div>
   <h2 class="sec">1 · Lee</h2><div class="grid">${READ.map((r,i)=>`<button class="act read" data-r="${i}"><span class="ic">${i+1}</span><h3>${esc(r.title)}</h3><p>Diapositivas ${r.pg}</p><span class="best ${read[r.id]?'good':''}">${read[r.id]?'✓ Leído':'Sin leer'}</span></button>`).join('')}</div>
-  <h2 class="sec">2 · Practica</h2><div class="grid">${LIST.map((k)=>{const b=bestOf(k);return`<button class="act" data-k="${k}"><span class="ic">${ACTS[k].ic}</span><h3>${ACTS[k].n}</h3><p>${ACTS[k].d}</p><span class="best ${b>=85?'good':''}">${b==null?'Sin intentar':'Mejor: '+b+'%'}</span></button>`}).join('')}</div>`;
+  <h2 class="sec">2 · Test de cada apartado</h2><div class="grid">${READ.map((r,i)=>{const k='s_'+r.id,b=bestOf(k);return`<button class="act" data-k="${k}"><span class="ic">${i+1}</span><h3>${esc(r.title)}</h3><p>${secPool(r.id).length} preguntas</p><span class="best ${b>=85?'good':''}">${b==null?'Sin intentar':'Mejor: '+b+'%'}</span></button>`}).join('')}</div>
+  <h2 class="sec">3 · Practica</h2><div class="grid">${LIST.map((k)=>{const b=bestOf(k);return`<button class="act" data-k="${k}"><span class="ic">${ACTS[k].ic}</span><h3>${ACTS[k].n}</h3><p>${ACTS[k].d}</p><span class="best ${b>=85?'good':''}">${b==null?'Sin intentar':'Mejor: '+b+'%'}</span></button>`}).join('')}</div>`;
   feedback();
   app.querySelectorAll('[data-r]').forEach((b)=>b.onclick=()=>reader(+b.dataset.r));
   app.querySelectorAll('[data-k]').forEach((b)=>b.onclick=()=>run(b.dataset.k));
@@ -162,8 +165,8 @@ function reader(i){
   const r=READ[i],p=P();p.read=p.read||{};p.read[r.id]=1;store.set(KEY,p);
   app.innerHTML=`<div class="top"><button class="link" id="bk">← Apartados</button><span class="count">${i+1} de ${READ.length}</span></div>
   <div class="panel read"><p class="eyebrow">Diapositivas ${r.pg}</p><h2>${esc(r.title)}</h2>${r.body}</div>
-  <div class="row" style="margin-top:16px">${i?'<button class="btn" id="pv">← Anterior</button>':''}${i<READ.length-1?'<button class="btn primary" id="nx">Siguiente →</button>':'<button class="btn primary" id="pr">Practicar →</button>'}</div>`;
-  $('#bk').onclick=home;if($('#pv'))$('#pv').onclick=()=>reader(i-1);if($('#nx'))$('#nx').onclick=()=>reader(i+1);if($('#pr'))$('#pr').onclick=home;scrollTo(0,0);
+  <div class="row" style="margin-top:16px"><button class="btn" id="qz">Hacer el test de este apartado</button></div><div class="row" style="margin-top:10px">${i?'<button class="btn" id="pv">← Anterior</button>':''}${i<READ.length-1?'<button class="btn primary" id="nx">Siguiente →</button>':'<button class="btn primary" id="pr">Practicar →</button>'}</div>`;
+  $('#bk').onclick=home;$('#qz').onclick=()=>run('s_'+r.id);if($('#pv'))$('#pv').onclick=()=>reader(i-1);if($('#nx'))$('#nx').onclick=()=>reader(i+1);if($('#pr'))$('#pr').onclick=home;scrollTo(0,0);
 }
 let RUN=null;
 function run(k){const a=ACTS[k];RUN={k,qs:a.gen(a.len),i:0,ok:0,miss:[]};app.innerHTML=`<a class="link" href="#" id="bk">← Atrás</a><div class="hero"><h1>${a.n}</h1></div>${how('Cómo se hace',a.how)}<div class="row"><button class="btn primary" id="go">Empezar</button></div>`;$('#bk').onclick=(e)=>{e.preventDefault();home()};$('#go').onclick=ask}

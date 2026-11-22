@@ -337,3 +337,6 @@ button.crumb:hover { opacity: 1; }
 
 button.user-chip { border: 0; color: inherit; font: inherit; cursor: pointer; }
 button.user-chip:hover { filter: brightness(1.15); }
+
+.topic-text .meter{height:6px;margin-top:6px}
+.topic-text .meter+.small{margin:.2em 0 0;font-size:.8rem;line-height:1.3}

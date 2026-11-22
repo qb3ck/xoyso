@@ -499,3 +499,34 @@ BOOK.oceanos = ['Tema 2: apartado 2, «¿Cómo funcionan los océanos y los mare
 BOOK.subt = ['Tema 2: apartados 7 y 8, «¿Es el agua un bien escaso?» y «¿Habrá suficiente agua en el futuro?», y el reto «¿Cómo utilizas el agua en tu vida diaria?» del final del tema.'];
 
 READ.forEach((r) => { const b = BOOK[r.id]; if (b) r.body += `<div class="def" style="margin-top:6px"><b>📖 Si necesitas ayuda, mira en el libro:</b><ul style="margin:6px 0 0">${b.map((x) => `<li>${x}</li>`).join('')}</ul></div>`; });
+
+/* ---------- extra questions for the per-section tests (7th item = section id) ---------- */
+const SM = (sec, q, c, w, why, t, s) => MCQ.push([q, c, w, why, t, s, sec]);
+const ST = (sec, s, v, why, t, sl) => TF.push([s, v, why, t, sl, sec]);
+// sections whose tests use the existing question bank (by topic tag); new items above are added via the 7th field
+const SECTAGS = { esquema: [], relieve: ['rel'], placas: ['pla', 'def'], volcanes: ['vol'], externos: ['ext'], humano: ['hum'], ciclo: ['cic'], ciclo2: ['agu'], oceanos: ['oce'], rios: ['rio'], subt: ['sub'] };
+SM('esquema', '¿De dónde vienen los agentes internos que cambian el relieve?', 'de dentro de la Tierra', ['del viento y la lluvia', 'del Sol', 'de los seres vivos'], 'Los internos vienen del interior de la Tierra; los externos actúan sobre la superficie.', 'rel', '13');
+SM('esquema', '¿Cuál de estos es un agente interno?', 'los volcanes', ['el viento', 'el agua', 'los seres vivos'], 'Volcanes, terremotos y tsunamis son internos.', 'rel', '13');
+SM('esquema', '¿Cuál de estos es un agente externo?', 'el viento', ['los terremotos', 'los volcanes', 'el tsunami'], 'Externos: temperatura, viento, agua y seres vivos.', 'rel', '13');
+SM('esquema', '¿Cuál es el orden del proceso de los agentes externos?', 'erosión, transporte y sedimentación', ['sedimentación, erosión y transporte', 'transporte, sedimentación y erosión', 'erosión, sedimentación y transporte'], 'Primero se desgasta la roca, luego se lleva el material y por último se deposita.', 'rel', '13');
+SM('esquema', '¿Qué explican la tectónica de placas, los pliegues y las fallas?', 'por qué ocurren los volcanes, terremotos y tsunamis', ['por qué llueve', 'por qué sopla el viento', 'por qué hay mareas'], 'Son la explicación de los agentes internos.', 'rel', '13');
+ST('esquema', 'La erosión es un agente interno.', false, 'La erosión es un proceso de los agentes externos.', 'rel', '13');
+ST('esquema', 'Los seres vivos pueden cambiar el relieve.', true, 'Son uno de los agentes externos.', 'rel', '13');
+ST('esquema', 'Los terremotos son un agente externo.', false, 'Son un agente interno.', 'rel', '13');
+SM('ciclo', '¿Cómo se llama el paso de agua líquida a gas?', 'evaporación', ['condensación', 'precipitación', 'infiltración'], 'El calor del Sol evapora el agua de mares, ríos y lagos.', 'cic', '41');
+SM('ciclo', '¿Cómo se llama el paso de vapor de agua a líquido, que forma las nubes?', 'condensación', ['evaporación', 'sublimación', 'escorrentía'], 'El vapor se enfría y se condensa.', 'cic', '41');
+SM('ciclo', '¿Cómo se llama la caída del agua en forma de lluvia, nieve o granizo?', 'precipitación', ['transpiración', 'infiltración', 'condensación'], 'Precipitación.', 'cic', '41');
+SM('ciclo', '¿Qué es la infiltración?', 'el agua que penetra en el suelo y se hace subterránea', ['el agua que corre sobre el terreno', 'el paso de líquido a gas', 'el agua que expulsan las plantas'], 'Se almacena bajo tierra o en acuíferos.', 'cic', '41');
+SM('ciclo', '¿Qué es la escorrentía?', 'el agua que circula libremente sobre la superficie del terreno', ['el agua que entra en el suelo', 'el paso de sólido a gas', 'el vapor de las nubes'], 'Escorrentía: sobre la superficie.', 'cic', '41');
+SM('ciclo', '¿Qué es la transpiración?', 'el agua que expulsan animales, personas y plantas y vuelve al aire como vapor', ['el agua que cae de las nubes', 'el agua que se congela', 'el agua que baja por los ríos'], 'Vuelve a la atmósfera como vapor.', 'cic', '41');
+SM('ciclo', '¿Qué es la sublimación?', 'el paso de sólido a gas sin pasar por líquido', ['el paso de gas a líquido', 'el paso de líquido a sólido', 'el paso de líquido a gas'], 'Los copos de nieve también se convierten en vapor.', 'cic', '41');
+SM('ciclo', '¿Cuáles son los tres estados del agua?', 'sólido, líquido y gaseoso', ['frío, templado y caliente', 'lluvia, nieve y granizo', 'dulce, salado y mineral'], 'Sólido (hielo), líquido y gas (vapor).', 'cic', '41');
+ST('ciclo', 'El calor del Sol evapora el agua de mares, ríos y lagos.', true, 'Así empieza el ciclo.', 'cic', '41');
+ST('ciclo', 'El agua del ciclo solo está en los océanos.', false, 'Circula entre océanos, atmósfera, ríos, lagos, aguas subterráneas y seres vivos.', 'cic', '41');
+SM('subt', '¿Cómo se forma un acuífero?', 'el agua de lluvia se filtra hasta encontrar una roca impermeable', ['el agua del mar sube por la costa', 'el agua de un río se congela', 'el agua se evapora bajo tierra'], 'Se acumula sobre la roca impermeable.', 'sub', '60');
+SM('subt', '¿Cuáles son los dos peligros principales para las aguas subterráneas?', 'la extracción excesiva y la contaminación', ['el frío y la nieve', 'las mareas y las olas', 'el viento y el sol'], 'Son muy vulnerables a ambas.', 'sub', '61');
+SM('subt', '¿Qué es el Acuífero Guaraní?', 'un gran acuífero bajo Brasil, Paraguay, Argentina y Uruguay', ['un río de Europa', 'un lago de montaña', 'un mar cerrado'], 'Diapositiva 61.', 'sub', '61');
+SM('subt', '¿Qué ahorra más agua de estos gestos?', 'poner los electrodomésticos con la carga completa (200 litros)', ['cerrar el grifo al enjabonarse (12 litros)', 'usar un vaso al lavarse los dientes (19 litros)', 'lavar la fruta en un bol (10 litros)'], '200 litros, frente a 60 de ducharse en vez de bañarse.', 'sub', '62');
+SM('subt', '¿Cuántos litros se ahorran duchándose en vez de bañarse?', '60', ['12', '6', '19'], 'Diapositiva 62.', 'sub', '62');
+ST('subt', 'Las aguas subterráneas alimentan ríos y lagos.', true, 'Y protegen la humedad del suelo.', 'sub', '61');
+ST('subt', 'Todas las aguas subterráneas son imposibles de agotar.', false, 'Son vulnerables a la extracción excesiva.', 'sub', '61');
