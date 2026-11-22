@@ -80,11 +80,10 @@ const READ = [
     <h3>Tectónica de placas (7-8)</h3>
     <p>La parte rígida de la Tierra está rota en trozos llamados <b>placas tectónicas</b> que se mueven despacio. ${ADD}</p>
     ${fig('placas.jpg', 'Diapositiva 7. Las flechas rojas indican hacia dónde se mueve cada placa. <b>No hace falta saber los nombres de las placas</b>: solo que la corteza está rota en placas que se mueven.')}
-    ${fig('limites.jpg', 'Diapositiva 8. En los bordes de las placas hay dorsales oceánicas, fosas, arcos de islas con volcanes, terremotos y fallas transformantes.')}
     <h3>Tres tipos de límite entre placas (10)</h3>
-    ${fig('tipos.jpg', 'Diapositiva 10.')}
+    <p class="note">No hace falta saber los dibujos complicados de las placas moviéndose unas bajo otras (diapositivas 8 y 10): solo qué hacen las placas en cada tipo de límite.</p>
     <table class="t"><tr><th>Límite</th><th>Qué pasa</th><th>Qué se forma</th></tr>
-    <tr><td><b>Convergente</b></td><td>las placas se <b>acercan</b> y chocan; si una se hunde bajo la otra hay <b>subducción</b></td><td>cordilleras (el choque de la India con Asia formó el Himalaya), fosas y volcanes</td></tr>
+    <tr><td><b>Convergente</b></td><td>las placas se <b>acercan</b> y chocan</td><td>cordilleras (el choque de la India con Asia formó el Himalaya), fosas y volcanes</td></tr>
     <tr><td><b>Divergente</b></td><td>las placas se <b>separan</b> y sube magma</td><td>dorsales oceánicas y valles de rift</td></tr>
     <tr><td><b>Transformante</b></td><td>las placas se <b>deslizan</b> una junto a otra, en sentidos contrarios</td><td>fallas transformantes y terremotos</td></tr></table>
     <h3>Deformaciones (11)</h3>
@@ -192,7 +191,6 @@ const MCQ = [
   ['En un límite divergente, las placas…', 'se separan y sube magma', ['chocan', 'se deslizan lateralmente', 'se funden'], 'Divergente = se separan.', 'pla', '10'],
   ['En un límite transformante, las placas…', 'se deslizan lateralmente', ['se acercan', 'se separan', 'se hunden'], 'Transformante = se deslizan una junto a otra.', 'pla', '10'],
   ['¿Qué se formó cuando la placa de la India chocó con Asia?', 'el Himalaya', ['una fosa oceánica', 'una dorsal', 'un delta'], 'El choque de dos placas levanta cordilleras.', 'pla', '9'],
-  ['Si una placa se hunde bajo otra, el proceso se llama…', 'subducción', ['erosión', 'sedimentación', 'dilatación'], 'En la subducción se forman fosas y volcanes.', 'pla', '10'],
   ['¿Qué pasa si los materiales que se deforman son blandos?', 'se forma un pliegue', ['se forma una falla', 'se forma un volcán', 'no pasa nada'], 'Blandos ⇒ pliegue. Duros ⇒ falla.', 'def', '11'],
   ['¿Qué pasa si los materiales que se deforman son duros?', 'se forma una falla', ['se forma un pliegue', 'se forma un delta', 'se disuelven'], 'Duros ⇒ falla (se rompen).', 'def', '11'],
   ['En una falla, ¿cómo se llaman las dos partes de la roca rota?', 'labio levantado y labio hundido', ['plano y cumbre', 'cráter y cono', 'cauce y vega'], 'Hay un labio de falla levantado y otro hundido.', 'def', '11'],
@@ -281,13 +279,10 @@ const PICS = {
     pins: [['cráter', 288, 178], ['piroclastos', 346, 136], ['cono volcánico', 354, 236], ['chimenea volcánica', 285, 352], ['lava', 524, 382], ['cenizas', 612, 264], ['magma', 282, 520]] },
   valle: { img: '/geo/valle-q.jpg', w: 500, h: 1194, slide: '26', topic: 'ext', title: 'Un río y su valle (diapositiva 26)',
     pins: [['valle estrecho', 165, 180], ['valle ancho', 225, 500], ['meandro', 195, 700], ['vega', 215, 870], ['desembocadura', 330, 985]] },
-  tipos: { img: '/geo/tipos-q.jpg', w: 960, h: 556, slide: '10', topic: 'pla', title: 'Límites entre placas (diapositiva 10)',
-    pins: [['convergente', 230, 135], ['divergente', 710, 150], ['transformante', 730, 420], ['convergente', 250, 440]] },
 };
 const PIC_OPTS = { relieve: ['montaña', 'meseta', 'llanura', 'valle', 'playa', 'plataforma continental', 'talud continental', 'llanura abisal', 'dorsal oceánica', 'fosa marina', 'acantilado', 'cabo', 'istmo'],
   volcan: ['cráter', 'piroclastos', 'cono volcánico', 'chimenea volcánica', 'lava', 'cenizas', 'magma'],
-  valle: ['valle estrecho', 'valle ancho', 'meandro', 'vega', 'desembocadura', 'delta', 'nacimiento'],
-  tipos: ['convergente', 'divergente', 'transformante'] };
+  valle: ['valle estrecho', 'valle ancho', 'meandro', 'vega', 'desembocadura', 'delta', 'nacimiento'] };
 
 /* put in order: [title, items in the right order, slide, why] */
 const ORD = [
