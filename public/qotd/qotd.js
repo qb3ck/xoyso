@@ -2,6 +2,7 @@
    Marks (right / wrong) are kept on the device and synced to the account like the other pages. */
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const wi = (w) => typeof w === 'string' ? `<li>${esc(w)}</li>` : `<li>${esc(w.t)}${w.svg ? `<div class="fig">${w.svg}</div>` : ''}</li>`;
 const app = $('#app');
 const KEY = 'qotd-progress';
 const GROUPS = [['3primaria', '3º Primaria'], ['1eso', '1º ESO']];
@@ -80,11 +81,11 @@ function render() {
    <div class="stats"><div class="stat hi"><b>${done}/${open.length}</b><span>questions done</span></div><div class="stat"><b>${right}</b><span>got right</span></div><div class="stat"><b>${missed}</b><span>still to do</span></div></div>
    ${prac ? `<div class="panel qbox"><div class="qhead"><p class="eyebrow">Practice ${prac.n} · same style as ${longDate(sel)}</p></div>
      <p class="qtext">${esc(prac.q)}</p>
-     ${prac.shown ? `<div><p class="eyebrow">Answer</p><p class="answer">${esc(prac.a)}</p></div><div><p class="eyebrow">Working</p><ol class="work">${prac.work.map((w) => `<li>${esc(w)}</li>`).join('')}</ol></div><div class="mark"><button class="btn primary" id="pnext">Another one like this</button><button class="btn" id="pback">Back to the question of the day</button></div>`
+     ${prac.shown ? `<div><p class="eyebrow">Answer</p><p class="answer">${esc(prac.a)}</p></div><div><p class="eyebrow">Working</p><ol class="work">${prac.work.map(wi).join('')}</ol></div><div class="mark"><button class="btn primary" id="pnext">Another one like this</button><button class="btn" id="pback">Back to the question of the day</button></div>`
      : `<div class="how"><b>Do this</b><span>Work it out on paper first. Then check. Practice questions are not marked or saved.</span></div><button class="btn primary" id="pshow">Show the answer and working</button><button class="link" id="pback">Back to the question of the day</button>`}</div>`
    : q ? `<div class="panel qbox"><div class="qhead"><p class="eyebrow">${sel === t ? 'Today · ' : ''}${longDate(sel)}</p>${stars(q.d)}</div>
      <p class="qtext">${esc(q.q)}</p>
-     ${shown ? `<div><p class="eyebrow">Answer</p><p class="answer">${esc(q.a)}</p></div><div><p class="eyebrow">Working</p><ol class="work">${q.work.map((w) => `<li>${esc(w)}</li>`).join('')}</ol></div>
+     ${shown ? `<div><p class="eyebrow">Answer</p><p class="answer">${esc(q.a)}</p></div><div><p class="eyebrow">Working</p><ol class="work">${q.work.map(wi).join('')}</ol></div>
        <div><p class="eyebrow">${m ? 'Marked: ' + (m === 'r' ? 'right' : 'wrong') + '. Tap to change.' : 'How did you do? Be honest.'}</p><div class="mark"><button class="btn ${m === 'r' ? 'on r' : ''}" data-m="r">✓ I got it right</button><button class="btn ${m === 'w' ? 'on w' : ''}" data-m="w">✗ I got it wrong</button></div></div>
        <div><p class="eyebrow">Want more?</p><button class="btn" id="prac">Practise more questions like this</button></div>`
      : `<div class="how"><b>Do this</b><span>Work it out on paper first. Only then tap the button to see the answer and the working.</span></div><button class="btn primary" id="show">Show the answer and working</button>`}
