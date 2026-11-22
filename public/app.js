@@ -572,6 +572,7 @@ SECTIONS[0].extras = [{ href: '/geografia', icon: '⛰', title: ['Relieve y agua
 for (const y of YEARS) for (const sub of y.subjects) { sub.year = y; if (sub.section) { sub.section.year = y; sub.section.subject = sub; } }
 // Header trail: xoyso > year > subject > unit > topic. Each earlier step is a link; the last is the current page.
 function setCrumbs(trail = []) {
+  live = null; lastWatch = null;
   const nav = $('#crumbs'); nav.replaceChildren();
   const all = [{ plain: 'xoyso', fn: () => (state.session ? renderHome() : renderLogin()) }, ...trail];
   all.forEach((c, i) => {
@@ -594,71 +595,47 @@ async function chooseYear(db) {
   try { await api('set_year', { p_token: state.session.token, p_year: db }); } catch { state.session.year = prev; store.set('geo.session', state.session); toast(L('No se pudo guardar el curso. Inténtalo otra vez.', 'Could not save the year. Try again.'), 3000); renderHome(); }
 }
 
-/* ---- "Cómo vas": results across every unit, read from the account and refreshed whenever the screen opens or the tab comes back ---- */
+/* ---- progress shown on each unit card (like the geography maps), refreshed from the account as the screen opens and when the tab returns ---- */
 const ACT_NAMES = { ton: 'La sílaba fuerte', cls: 'Agudas, llanas y esdrújulas', til: '¿Lleva tilde?', dip: 'Diptongo, triptongo o hiato', dia: 'Tilde diacrítica', exc: 'Excepciones', voc: 'Vocabulario', mix: 'Reto mixto' };
 const GEO_NAMES = { rel: 'Formas del relieve', pla: 'Placas tectónicas', def: 'Pliegues y fallas', vol: 'Volcanes y tsunamis', ext: 'Agentes externos', hum: 'El ser humano y el relieve', agu: 'Agua en la Tierra', oce: 'Océanos y mares', rio: 'Ríos', sub: 'Aguas subterráneas', cic: 'Ciclo del agua' };
 const BIO_NAMES = { m: 'Monera', p: 'Protozoa', a: 'Algae', f: 'Fungi', v: 'Vocabulary' };
-const RESULT_UNITS = {
-  '3primaria': [
-    { name: ['Inglés: re- e inter-', 'English: re- and inter-'], pre: 'spell:', href: '/prefix', words: true },
-    { name: ['Inglés: sub- y super-', 'English: sub- and super-'], pre: 'subsuper:', href: '/subsuper', words: true },
-    { name: ['Inglés: anti- y auto-', 'English: anti- and auto-'], pre: 'antiauto:', href: '/antiauto', words: true },
-    { name: ['Lengua: los acentos', 'Spanish: accents'], pre: 'acentos:3prim:', href: '/acentos?n=3prim', topics: ACT_NAMES }],
-  '1eso': [
-    { name: ['Geografía: Relieve y aguas', 'Geography: Relief and waters'], pre: 'geo1:', href: '/geografia', topics: GEO_NAMES },
-    { name: ['Biología', 'Biology'], pre: 'bio:', href: '/biology', topics: BIO_NAMES },
-    { name: ['Lengua: los acentos', 'Spanish: accents'], pre: 'acentos:1eso:', href: '/acentos?n=1eso', topics: ACT_NAMES }],
+const UNIT_STATS = {
+  '/prefix': { pre: 'spell:', words: true }, '/subsuper': { pre: 'subsuper:', words: true }, '/antiauto': { pre: 'antiauto:', words: true },
+  '/acentos?n=3prim': { pre: 'acentos:3prim:', topics: ACT_NAMES }, '/acentos?n=1eso': { pre: 'acentos:1eso:', topics: ACT_NAMES },
+  '/geografia': { pre: 'geo1:', topics: GEO_NAMES }, '/biology': { pre: 'bio:', topics: BIO_NAMES }, '/maths-day': { qotd: true },
 };
-function resultRows(yearId) {
-  const out = [];
-  for (const u of RESULT_UNITS[yearId] || []) {
-    const items = [...state.progress.values()].filter((r) => r.item_id.startsWith(u.pre) && r.correct + r.wrong > 0);
-    const c = items.reduce((a, r) => a + r.correct, 0), w = items.reduce((a, r) => a + r.wrong, 0), n = c + w;
-    if (!n) continue;
-    let weak = [];
-    if (u.words) weak = items.filter((r) => r.wrong > 0 && r.streak < 2).sort((a, b) => a.correct / (a.correct + a.wrong) - b.correct / (b.correct + b.wrong)).slice(0, 3).map((r) => r.item_id.slice(u.pre.length));
-    else if (u.topics) {
-      const by = {};
-      items.forEach((r) => { const k = r.item_id.split(':').pop(); (by[k] = by[k] || { c: 0, w: 0 }); by[k].c += r.correct; by[k].w += r.wrong; });
-      weak = Object.entries(by).filter(([, v]) => v.c + v.w >= 3 && v.c / (v.c + v.w) < 0.75).sort((a, b) => a[1].c / (a[1].c + a[1].w) - b[1].c / (b[1].c + b[1].w)).slice(0, 2).map(([k]) => u.topics[k] || k);
-    }
-    out.push({ u, n, pct: Math.round((100 * c) / n), weak, words: items.length });
+const dbYear = (id) => (id === '3prim' ? '3primaria' : id);
+function unitProgress(href, yearId) {
+  const u = UNIT_STATS[href]; if (!u) return [];
+  const all = [...state.progress.values()], seen = (r) => r.correct + r.wrong > 0;
+  if (u.qotd) {
+    const q = all.filter((r) => r.item_id.startsWith(`qotd:${dbYear(yearId)}:`) && seen(r)); if (!q.length) return [];
+    const right = q.filter((r) => r.streak > 0).length, pct = Math.round((100 * right) / q.length);
+    return [h('div', { class: 'meter' }, h('span', { style: `width:${pct}%` })), h('p', { class: 'small' }, tr(`${q.length} ${q.length === 1 ? 'día hecho' : 'días hechos'} · ${pct}% bien`, `${q.length} ${q.length === 1 ? 'day' : 'days'} done · ${pct}% right`))];
   }
-  const qs = [...state.progress.values()].filter((r) => r.item_id.startsWith(`qotd:${yearId}:`) && r.correct + r.wrong > 0);
-  if (qs.length) out.push({ u: { name: ['Reto de mates del día', 'Maths question of the day'], href: '/maths-day', qotd: true }, n: qs.length, pct: Math.round((100 * qs.filter((r) => r.streak > 0).length) / qs.length), weak: [] });
-  return out;
+  const items = all.filter((r) => r.item_id.startsWith(u.pre) && seen(r)); if (!items.length) return [];
+  const c = items.reduce((a, r) => a + r.correct, 0), w = items.reduce((a, r) => a + r.wrong, 0), pct = Math.round((100 * c) / (c + w));
+  let weak = [];
+  if (u.words) weak = items.filter((r) => r.wrong > 0 && r.streak < 2).sort((a, b) => a.correct / (a.correct + a.wrong) - b.correct / (b.correct + b.wrong)).slice(0, 3).map((r) => r.item_id.slice(u.pre.length));
+  else {
+    const by = {};
+    items.forEach((r) => { const k = r.item_id.split(':').pop(); by[k] = by[k] || { c: 0, w: 0 }; by[k].c += r.correct; by[k].w += r.wrong; });
+    weak = Object.entries(by).filter(([, v]) => v.c + v.w >= 3 && v.c / (v.c + v.w) < 0.75).sort((a, b) => a[1].c / (a[1].c + a[1].w) - b[1].c / (b[1].c + b[1].w)).slice(0, 2).map(([k]) => u.topics[k] || k);
+  }
+  const col = pct >= 85 ? '' : pct >= 60 ? 'background:#b4540a' : 'background:#c2362b';
+  return [h('div', { class: 'meter' }, h('span', { style: `width:${pct}%;${col}` })),
+    h('p', { class: 'small' }, tr(`${pct}% bien · ${c + w} respuestas`, `${pct}% right · ${c + w} answers`)),
+    weak.length ? h('p', { class: 'small muted' }, tr('A repasar: ', 'To review: '), weak.join(' · ')) : null];
 }
-function fillResults(box, yearId) {
-  const rows = resultRows(yearId);
-  box.replaceChildren();
-  if (!rows.length) return;
-  box.append(h('h2', {}, tr('Cómo vas', 'How you are doing')),
-    ...rows.map((r) => {
-      const st = r.pct >= 85 ? 'good' : r.pct >= 60 ? 'mid' : 'low';
-      const label = r.u.qotd ? tr(`${r.n} ${r.n === 1 ? 'día hecho' : 'días hechos'} · ${r.pct}% bien`, `${r.n} ${r.n === 1 ? 'day' : 'days'} done · ${r.pct}% right`) : tr(`${r.pct}% bien · ${r.n} respuestas`, `${r.pct}% right · ${r.n} answers`);
-      return h('a', { class: 'result-row', href: r.u.href, style: 'display:block;text-decoration:none;color:inherit;margin:12px 0;width:100%' },
-        h('b', {}, tr(...r.u.name)), h('span', { class: 'muted small', style: 'margin-left:8px' }, label),
-        h('div', { class: 'meter' }, h('span', { style: `width:${r.pct}%;${st === 'low' ? 'background:#c2362b' : st === 'mid' ? 'background:#b4540a' : ''}` })),
-        r.weak.length ? h('div', { class: 'muted small' }, tr('A repasar: ', 'To review: '), r.weak.join(' · ')) : null);
-    }));
+let live = null, lastWatch = null;
+async function watch(render) {   // re-draw the current screen once the account results are fresh
+  live = lastWatch = render;
+  if (!state.session) return;
+  try { await flushPending(); await loadProgress(); } catch { return; }
+  if (live === render) { render(true); live = lastWatch = render; }
 }
-const resultBoxes = new Set();
-function resultsCard(yearId) {
-  const box = h('div', { class: 'card results', style: 'text-align:left;margin:0 0 14px' });
-  box.dataset.year = yearId; resultBoxes.add(box);
-  fillResults(box, yearId);
-  refreshResults();
-  return box;
-}
-let refreshing = false;
-async function refreshResults() {
-  if (refreshing || !state.session) return; refreshing = true;
-  try { await flushPending(); await loadProgress(); } catch { /* offline: keep what we have */ }
-  refreshing = false;
-  resultBoxes.forEach((b) => { if (b.isConnected) fillResults(b, b.dataset.year); else resultBoxes.delete(b); });
-}
-document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshResults(); });
-window.addEventListener('pageshow', (e) => { if (e.persisted) refreshResults(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && lastWatch) watch(lastWatch); });
+window.addEventListener('pageshow', (e) => { if (e.persisted && lastWatch) watch(lastWatch); });
 function renderHome() {
   setUserArea(); document.onkeydown = null; setCrumbs();
   const mine = YEAR_OF[state.session.year];
@@ -670,7 +647,6 @@ function renderHome() {
   screen(h('section', { class: 'home' },
     h('h1', {}, tr(`¡Hola, ${state.session.username}!`, `Hi ${state.session.username}!`)),
     ...(mine ? [] : [pickYear]),
-    ...(mine ? [resultsCard(mine === '3prim' ? '3primaria' : '1eso')] : []),
     h('a', { class: 'card topic-card', href: '/maths-day', style: 'text-decoration:none;color:inherit;display:block;margin:0 0 14px' }, h('h2', {}, tr('Reto de mates del día', 'Maths question of the day')), h('p', { class: 'muted' }, tr('Una pregunta nueva cada día. ¿La has hecho hoy?', 'A new question every day. Have you done today’s?'))),
     h('p', { class: 'muted lead' }, tr(mine ? 'Empieza por tu curso o elige otro.' : '¿De qué curso quieres repasar?', mine ? 'Start with your year, or pick another.' : 'Which year do you want to revise?')),
     h('div', { class: 'topic-grid' }, ...cards),
@@ -684,19 +660,19 @@ function renderYear(year) {
     h('button', { class: 'back', onclick: renderHome }, '← ', tr('Inicio', 'Home')),
     h('h1', {}, tr(year.title)),
     h('p', { class: 'muted lead' }, tr('Elige una asignatura.', 'Choose a subject.')),
-    resultsCard(year.id === '3prim' ? '3primaria' : year.id),
     h('div', { class: 'topic-grid' }, ...cards)));
 }
-function renderSubject(sub) {   // a subject whose units are separate pages
+function renderSubject(sub, fresh) {   // a subject whose units are separate pages
   setUserArea(); document.onkeydown = null; setCrumbs([yearCrumb(sub.year), { t: sub.title }]);
-  const cards = sub.units.map((u) => card(textIcon(sub.icon), u.title, u.blurb, [], { href: u.href }));
+  const cards = sub.units.map((u) => card(textIcon(sub.icon), u.title, u.blurb, unitProgress(u.href, sub.year.id), { href: u.href }));
   screen(h('section', { class: 'home' },
     h('button', { class: 'back', onclick: () => renderYear(sub.year) }, '← ', tr(sub.year.title)),
     h('h1', {}, tr(sub.title)),
     h('p', { class: 'muted lead' }, tr('Elige una unidad.', 'Choose a unit.')),
     h('div', { class: 'topic-grid' }, ...cards)));
+  if (!fresh) watch((f) => renderSubject(sub, f));
 }
-function renderGroup(group) {
+function renderGroup(group, fresh) {
   setUserArea(); document.onkeydown = null; setCrumbs([yearCrumb(group.year), { t: group.subject.title }]);
   const cards = group.children.map((c) => {
     const { mastered, total } = sectionSummary(c);
@@ -710,7 +686,8 @@ function renderGroup(group) {
     h('button', { class: 'back', onclick: () => renderYear(group.year) }, '← ', tr(group.year.title)),
     h('h1', {}, tr(group.title)),
     h('p', { class: 'muted lead' }, tr('Elige una unidad.', 'Choose a unit.')),
-    h('div', { class: 'topic-grid' }, ...cards, ...(group.extras || []).map((u) => card(textIcon(u.icon), u.title, u.blurb, [], { href: u.href })))));
+    h('div', { class: 'topic-grid' }, ...cards, ...(group.extras || []).map((u) => card(textIcon(u.icon), u.title, u.blurb, unitProgress(u.href, group.year.id), { href: u.href })))));
+  if (!fresh) watch((f) => renderGroup(group, f));
 }
 function renderSection(section) {
   setUserArea(); document.onkeydown = null; setCrumbs([yearCrumb(section.parent.year), subjectCrumb(section.parent.subject), { t: section.title }]);
