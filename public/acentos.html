@@ -42,7 +42,7 @@ a.link{display:inline-block}
 .sent{font-family:var(--display);font-size:clamp(1.3rem,4.6vw,1.9rem);line-height:1.3} .gap{display:inline-block;min-width:3.2ch;border-bottom:3px solid var(--warm);text-align:center;color:var(--warm)}
 .opts{display:grid;gap:10px;width:100%} .opts.row{grid-template-columns:repeat(auto-fit,minmax(110px,1fr))}
 .opt{min-height:54px;padding:10px 16px;border-radius:16px;border:2px solid var(--line);background:var(--bg);font-family:var(--display);font-size:1.3rem;font-weight:500}
-.opt:hover:not(:disabled){border-color:var(--ink)} .opt:disabled{cursor:default}
+@media (hover:hover){.opt:hover:not(:disabled){border-color:var(--ink)}} .opt:disabled{cursor:default}
 .opt.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)} .opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
 .fb{min-height:1px;width:100%;text-align:left;font-weight:700} .fb .v{font-family:var(--display);font-size:1.2rem;font-weight:600} .fb.good .v{color:var(--good)} .fb.bad .v{color:var(--bad)}
 .btn{min-height:50px;padding:10px 24px;border-radius:14px;border:2px solid var(--ink);background:var(--card);font-weight:800}

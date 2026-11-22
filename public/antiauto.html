@@ -80,7 +80,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--auto);outline-o
 .opt{min-height:56px;padding:10px 22px;border-radius:16px;border:2px solid var(--line);background:var(--bg);font-family:var(--display);font-size:1.5rem;font-weight:500;min-width:130px}
 .opt.anti{color:var(--anti);border-color:var(--anti);background:var(--anti-soft)}
 .opt.auto{color:var(--auto);border-color:var(--auto);background:var(--auto-soft)}
-.opt:hover:not(:disabled){border-color:var(--ink)}
+@media (hover:hover){.opt:hover:not(:disabled){border-color:var(--ink)}}
 .opt.ok{background:var(--good-soft);border-color:var(--good);color:var(--good)}
 .opt.no{background:var(--bad-soft);border-color:var(--bad);color:var(--bad);text-decoration:line-through}
 .opt:disabled{cursor:default}
