@@ -130,7 +130,7 @@ const ACTS={
   mix:{n:'Reto mixto',ic:'★',d:'20 preguntas de todo lo anterior.',how:'Preguntas de todos los tipos mezcladas, como en un examen.',gen:(n)=>shuffle([...mk(MCQ,qMcq,8),...mk(TF,qTf,5),...picQs(4),...mk(ORD,qOrd,1),...mk(INP,qInp,3),qDef(),qTerm()]).slice(0,n),len:20},
 };
 const secPool=(id)=>{const tg=SECTAGS[id]||[];return[...MCQ.filter((x)=>x[6]===id||(!x[6]&&tg.includes(x[4]))).map(qMcq),...TF.filter((x)=>x[5]===id||(!x[5]&&tg.includes(x[3]))).map(qTf),...INP.filter((x)=>x[6]===id).map(qInp),...MATCH.filter((x)=>x[3]===id).map(qMatch)]};
-READ.forEach((r,i)=>{ACTS['s_'+r.id]={n:'Test: '+r.title,ic:String(i+1),d:'Diapositivas '+r.pg,how:'Preguntas sobre lo que has leído en este apartado. Si fallas alguna, vuelve a leerlo.',gen:(n)=>shuffle(secPool(r.id)).slice(0,n),len:12,sec:1}});
+READ.forEach((r,i)=>{ACTS['s_'+r.id]={n:'Test: '+r.title,ic:String(i+1),d:'Diapositivas '+r.pg,how:'Preguntas sobre lo que has leído en este apartado. Si fallas alguna, vuelve a leerlo.',gen:(n)=>{const m=MATCH.filter((x)=>x[3]===r.id).map(qMatch),o=shuffle([...MCQ.filter((x)=>x[6]===r.id||(!x[6]&&(SECTAGS[r.id]||[]).includes(x[4]))).map(qMcq),...TF.filter((x)=>x[5]===r.id||(!x[5]&&(SECTAGS[r.id]||[]).includes(x[3]))).map(qTf),...INP.filter((x)=>x[6]===r.id).map(qInp)]).slice(0,Math.max(0,n-m.length));return shuffle([...m,...o])},len:12,sec:1}});
 const LIST=Object.keys(ACTS).filter((k)=>!ACTS[k].sec),bestOf=(k)=>P().best[k];
 const app=$('#app');
 
