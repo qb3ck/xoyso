@@ -3,7 +3,7 @@
 const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 const shuf = (a) => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = rnd(0, i); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-const NAMES = ['Ana', 'Leo', 'Marta', 'Pablo', 'Lola', 'Sam', 'Nora', 'Hugo', 'Carla', 'Iker', 'Julia', 'Dani'];
+const NAMES = ['Ana', 'Leo', 'Marta', 'Oscar', 'Lola', 'Sam', 'Nora', 'Hugo', 'Carla', 'Iker', 'Julia', 'Dani'];
 const WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const gcd = (a, b) => (b ? gcd(b, a % b) : a);
 const frac = (n, d) => { const g = gcd(n, d); return d / g === 1 ? `${n / g}` : `${n / g}/${d / g}`; };
@@ -55,7 +55,7 @@ G.pRect = () => { const w = rnd(2, 9), r = pick([2, 3]), l = r * w, p = 2 * (l +
   return { q: `A rectangle has a perimeter of ${p} cm. Its length is ${r === 2 ? 'twice' : '3 times'} its width. What is its area?`, a: `${l * w} cm²`, work: [`The perimeter is 2 lengths + 2 widths = ${p}, so one length + one width = ${p / 2} cm.`, `Length is ${r} widths, so ${r + 1} widths = ${p / 2} and the width is ${w} cm. The length is ${l} cm.`, `Area = ${l} × ${w} = ${l * w} cm².`] }; };
 G.pSweets = () => { const n = pick([12, 24, 36, 48]), a = pick([2, 3, 4, 6]), b = pick([2, 3, 4, 6].filter((x) => x !== a)), ea = n / a, eb = n / b, left = n - ea - eb;
   if (left <= 0) return G.pSweets(); const w = (d) => ({ 2: 'a half', 3: 'a third', 4: 'a quarter', 6: 'a sixth' }[d]);
-  return { q: `Pablo has ${n} sweets. He eats ${w(a)} of them and gives ${w(b)} of them to his sister. How many sweets does he have left?`, a: `${left}`, work: [`${cap(w(a))} of ${n} is ${ea} sweets.`, `${cap(w(b))} of ${n} is ${eb} sweets.`, `${ea} + ${eb} = ${ea + eb} sweets gone, and ${n} − ${ea + eb} = ${left} left.`] }; };
+  return { q: `Oscar has ${n} sweets. He eats ${w(a)} of them and gives ${w(b)} of them to his sister. How many sweets does he have left?`, a: `${left}`, work: [`${cap(w(a))} of ${n} is ${ea} sweets.`, `${cap(w(b))} of ${n} is ${eb} sweets.`, `${ea} + ${eb} = ${ea + eb} sweets gone, and ${n} − ${ea + eb} = ${left} left.`] }; };
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 G.pQueue = () => { const f = rnd(2, 8), b = rnd(2, 8), n = f + b - 1, nm = pick(NAMES);
   return { q: `${nm} is ${f}${['th', 'st', 'nd', 'rd'][f % 10 < 4 && ![11, 12, 13].includes(f) ? f % 10 : 0]} from the front of a queue and ${b}${['th', 'st', 'nd', 'rd'][b % 10 < 4 && ![11, 12, 13].includes(b) ? b % 10 : 0]} from the back. How many children are in the queue?`.replace('1th', '1st'), a: `${n}`, work: [`${nm} has ${f - 1} children in front of her and ${b - 1} behind her.`, `Count those children and ${nm} herself: ${f - 1} + ${b - 1} + 1 = ${n}.`, `(Be careful not to add ${f} + ${b} = ${f + b}, because that counts ${nm} twice.)`] }; };

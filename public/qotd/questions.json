@@ -1041,11 +1041,11 @@
    },
    {
     "d": 3,
-    "q": "Pablo is 7 years old and Pablo's mum is 35 years old. How old will Pablo's mum be when Pablo is 13?",
+    "q": "Oscar is 7 years old and Oscar's mum is 35 years old. How old will Oscar's mum be when Oscar is 13?",
     "a": "41",
     "work": [
      "Both ages go up by 1 every year, so the gap between them never changes. The gap is 35 − 7 = 28 years.",
-     "When Pablo is 13, mum will be 28 years older.",
+     "When Oscar is 13, mum will be 28 years older.",
      "13 + 28 = 41.",
      "(Or: 6 years pass, so mum is 35 + 6 = 41.)"
     ],
