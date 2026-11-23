@@ -448,7 +448,7 @@ function renderLogin(mode = 'signin', message = null) {
   const dots = h('div', { class: 'pin-dots', 'aria-label': 'PIN' });
   const err = h('p', { class: 'form-error', role: 'alert' }, message ? tr(message) : '');
   let year = null;
-  const yearBtns = [['3primaria', ['3º Primaria', '3rd Primary']], ['1eso', ['1º ESO', '1st ESO']]].map(([id, t]) => h('button', { type: 'button', class: 'btn option', 'aria-pressed': 'false', onclick: (e) => { year = id; yearBtns.forEach((b) => b.setAttribute('aria-pressed', String(b === e.currentTarget))); err.replaceChildren(); } }, tr(t)));
+  const yearBtns = [['3primaria', ['3º Primaria', '3rd Primary']], ['5primaria', ['5º Primaria', '5th Primary']], ['1eso', ['1º ESO', '1st ESO']]].map(([id, t]) => h('button', { type: 'button', class: 'btn option', 'aria-pressed': 'false', onclick: (e) => { year = id; yearBtns.forEach((b) => b.setAttribute('aria-pressed', String(b === e.currentTarget))); err.replaceChildren(); } }, tr(t)));
   const yearRow = h('div', { class: 'row', role: 'group' }, ...yearBtns);
   const btnText = signin ? ['Entrar', 'Sign in'] : ['Crear jugador', 'Create player'];
   const submit = h('button', { class: 'btn primary wide', type: 'submit' }, tr(btnText));
@@ -558,6 +558,9 @@ const YEARS = [
       units: [{ href: '/maths-day', title: ['Reto de mates del día', 'Maths question of the day'], blurb: ['Una pregunta nueva cada día, con calendario.', 'A new question every day, with a calendar.'] }] },
     { id: 'pe', title: ['Educación Física', 'Physical Education'], blurb: ['El cuerpo humano', 'The human body'], icon: 'EF',
       units: [{ href: '/huesos', title: ['Los huesos', 'The bones'], blurb: ['14 huesos del esqueleto: arrastrar, encontrar y escribir.', '14 skeleton bones: drag, find and spell.'] }] }] },
+  { id: '5prim', title: ['5º Primaria', '5th Primary'], subjects: [
+    { id: 'math5', title: ['Matemáticas', 'Maths'], blurb: ['Un reto cada día', 'A challenge every day'], icon: '+×',
+      units: [{ href: '/maths-day', title: ['Reto de mates del día', 'Maths question of the day'], blurb: ['Una pregunta nueva cada día, con calendario.', 'A new question every day, with a calendar.'] }] }] },
   { id: '1eso', title: ['1º ESO', '1st ESO'], subjects: [
     { id: 'geo', title: ['Geografía', 'Geography'], blurb: ['Mapa físico y comunidades autónomas', 'Physical map and autonomous communities'], section: SECTIONS[0] },
     { id: 'math', title: ['Matemáticas', 'Maths'], blurb: ['Concurso de decimales de π', 'The π digits competition'], icon: 'π',
@@ -589,7 +592,7 @@ const card = (icon, title, blurb, extra = [], opts = {}) => h(opts.href ? 'a' : 
 const meterBits = ({ mastered, total }) => [h('div', { class: 'meter' }, h('span', { style: `width:${(100 * mastered) / total}%` })),
   h('p', { class: 'small' }, tr(`${mastered} de ${total} dominados`, `${mastered} of ${total} mastered`))];
 const textIcon = (t) => `<span style="font:700 1.5rem var(--font,inherit)">${t}</span>`;
-const YEAR_OF = { '3primaria': '3prim', '1eso': '1eso' };
+const YEAR_OF = { '3primaria': '3prim', '5primaria': '5prim', '1eso': '1eso' };
 async function chooseYear(db) {
   const prev = state.session.year; state.session.year = db; store.set('geo.session', state.session); renderHome();
   try { await api('set_year', { p_token: state.session.token, p_year: db }); } catch { state.session.year = prev; store.set('geo.session', state.session); toast(L('No se pudo guardar el curso. Inténtalo otra vez.', 'Could not save the year. Try again.'), 3000); renderHome(); }
@@ -604,7 +607,7 @@ const UNIT_STATS = {
   '/acentos?n=3prim': { pre: 'acentos:3prim:', topics: ACT_NAMES }, '/acentos?n=1eso': { pre: 'acentos:1eso:', topics: ACT_NAMES },
   '/geografia': { pre: 'geo1:', topics: GEO_NAMES }, '/biology': { pre: 'bio:', topics: BIO_NAMES }, '/maths-day': { qotd: true },
 };
-const dbYear = (id) => (id === '3prim' ? '3primaria' : id);
+const dbYear = (id) => (id === '3prim' ? '3primaria' : id === '5prim' ? '5primaria' : id);
 function unitProgress(href, yearId) {
   const u = UNIT_STATS[href]; if (!u) return [];
   const all = [...state.progress.values()], seen = (r) => r.correct + r.wrong > 0;
@@ -639,10 +642,10 @@ function renderHome() {
   setUserArea(); document.onkeydown = null; setCrumbs();
   const mine = YEAR_OF[state.session.year];
   const ordered = [...YEARS].sort((a, b) => (b.id === mine) - (a.id === mine));
-  const cards = ordered.map((y) => card(textIcon(y.id === '1eso' ? '1º' : '3º'), y.title, [(y.id === mine ? '★ Tu curso · ' : '') + y.subjects.map((x) => x.title[0]).join(' · '), (y.id === mine ? '★ Your year · ' : '') + y.subjects.map((x) => x.title[1]).join(' · ')], [], { onclick: () => renderYear(y), ...(y.id === mine ? { class: 'mine' } : {}) }));
+  const cards = ordered.map((y) => card(textIcon(y.id === '1eso' ? '1º' : y.id === '5prim' ? '5º' : '3º'), y.title, [(y.id === mine ? '★ Tu curso · ' : '') + y.subjects.map((x) => x.title[0]).join(' · '), (y.id === mine ? '★ Your year · ' : '') + y.subjects.map((x) => x.title[1]).join(' · ')], [], { onclick: () => renderYear(y), ...(y.id === mine ? { class: 'mine' } : {}) }));
   const pickYear = h('div', { class: 'card' }, h('h2', {}, tr(mine ? 'Cambiar de curso' : '¿En qué curso estás?', mine ? 'Change your year' : 'Which year are you in?')),
     h('p', { class: 'muted' }, tr('Te mostraremos primero tu curso. Los demás cursos siguen disponibles.', 'We will show your year first. The other years are still available.')),
-    h('div', { class: 'row' }, ...[['3primaria', ['3º Primaria', '3rd Primary']], ['1eso', ['1º ESO', '1st ESO']]].map(([id, t]) => h('button', { class: `btn option ${state.session.year === id ? 'primary' : ''}`, onclick: () => chooseYear(id) }, tr(t)))));
+    h('div', { class: 'row' }, ...[['3primaria', ['3º Primaria', '3rd Primary']], ['5primaria', ['5º Primaria', '5th Primary']], ['1eso', ['1º ESO', '1st ESO']]].map(([id, t]) => h('button', { class: `btn option ${state.session.year === id ? 'primary' : ''}`, onclick: () => chooseYear(id) }, tr(t)))));
   screen(h('section', { class: 'home' },
     h('h1', {}, tr(`¡Hola, ${state.session.username}!`, `Hi ${state.session.username}!`)),
     ...(mine ? [] : [pickYear]),

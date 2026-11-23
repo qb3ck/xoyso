@@ -5,7 +5,7 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 const wi = (w) => typeof w === 'string' ? `<li>${esc(w)}</li>` : `<li>${esc(w.t)}${w.svg ? `<div class="fig">${w.svg}</div>` : ''}</li>`;
 const app = $('#app');
 const KEY = 'qotd-progress';
-const GROUPS = [['3primaria', '3º Primaria'], ['1eso', '1º ESO']];
+const GROUPS = [['3primaria', '3º Primaria'], ['5primaria', '5º Primaria'], ['1eso', '1º ESO']];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const pad = (n) => String(n).padStart(2, '0');
 const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;

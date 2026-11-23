@@ -832,6 +832,387 @@
     ],
     "g": "eConsecInt"
    }
+  ],
+  "5primaria": [
+   {
+    "d": 1,
+    "q": "Pencils are sold in packs of 6. Marta buys 7 packs and then gives away 9 of them. How many pencils does Marta have left?",
+    "a": "33",
+    "work": [
+     "Each pack has 6 pencils and Marta buys 7 packs. 'Packs of 6' means we add 6 again and again, which is multiplication: 7 × 6.",
+     "7 × 6 = 42. So Marta starts with 42 pencils.",
+     "Giving away means taking away: 42 − 9.",
+     "42 − 9 = 33.",
+     "Marta has 33 pencils left."
+    ],
+    "g": "p5Packs"
+   },
+   {
+    "d": 1,
+    "q": "A snack costs £2.50, a drink costs £1.20 and an apple costs £1.25. You pay with £10. How much change do you get?",
+    "a": "£5.05",
+    "work": [
+     "First find the total cost. Add the three prices, lining up the decimal points so that pence are added to pence and pounds to pounds.",
+     "£2.50 + £1.20 = £3.70.",
+     "£3.70 + £1.25 = £4.95. That is the total.",
+     "Change is what is left of the money you paid: £10.00 − £4.95.",
+     "You can count up from £4.95 to the next pound and then to £10. Or subtract: £10.00 − £4.95 = £5.05.",
+     "Change: £5.05."
+    ],
+    "g": "p5Change"
+   },
+   {
+    "d": 1,
+    "q": "A tank holds 28 litres. 3/4 of the water is used. How many litres are left?",
+    "a": "7 litres",
+    "work": [
+     "The fraction 3/4 has a bottom number (denominator) 4: it means the tank is cut into 4 equal parts. The top number 3 says how many of those parts were used.",
+     "One part is 28 ÷ 4 = 7 litres.",
+     "3 parts used is 3 × 7 = 21 litres.",
+     "What is left is 28 − 21 = 7 litres.",
+     "(Or: 1 parts are left, and 1 × 7 = 7.)"
+    ],
+    "g": "p5FracOf"
+   },
+   {
+    "d": 1,
+    "q": "A train leaves at 09:48 and the journey takes 2 hours 37 minutes. What time does it arrive? (24-hour clock, like 14:05)",
+    "a": "12:25",
+    "work": [
+     "Add the hours first: 09:48 + 2 hours = 11:48.",
+     "Now add the 37 minutes. There are 60 minutes in an hour, so when the minutes pass 60 we carry 1 hour.",
+     "48 + 37 = 85 minutes.",
+     "85 minutes = 1 hour 25 minutes, so we go up one more hour.",
+     "The train arrives at 12:25."
+    ],
+    "g": "p5Time"
+   },
+   {
+    "d": 1,
+    "q": "Which is the biggest of these numbers: 0.45, 0.405, 0.5, 0.054?",
+    "a": "0.5",
+    "work": [
+     "To compare decimals, write them all with the same number of digits after the decimal point. Adding zeros on the end doesn't change a number.",
+     "0.45 = 0.450, 0.405 = 0.405, 0.5 = 0.500, 0.054 = 0.054.",
+     "Now think of them as whole thousandths and compare as normal whole numbers: 450, 405, 500, 54.",
+     "The biggest is 500, which is 0.5.",
+     "(A longer decimal is NOT bigger because it has more digits: 0.054 is smaller than 0.5.)"
+    ],
+    "g": "p5Order"
+   },
+   {
+    "d": 1,
+    "q": "A rectangle is 3 times as long as it is wide. Its width is 6 cm. What is its perimeter?",
+    "a": "48 cm",
+    "work": [
+     "The perimeter is the distance all the way round a shape. A rectangle has 2 long sides and 2 short sides.",
+     "The width (short side) is 6 cm. The length is 3 times that: 3 × 6 = 18 cm.",
+     "Walk round: 18 + 6 + 18 + 6.",
+     "18 + 6 = 24, and we do that twice: 24 × 2 = 48.",
+     "The perimeter is 48 cm."
+    ],
+    "g": "p5Perim"
+   },
+   {
+    "d": 2,
+    "q": "A bike costs £60. In a sale it is 20% off. What is the sale price?",
+    "a": "£48",
+    "work": [
+     "'Per cent' means 'out of 100'. 20% means 20 out of every 100, or 20/100.",
+     "20% is a fifth. A fifth of 60 is 60 ÷ 5 = 12.",
+     "That is how much is taken off: £12.",
+     "Sale price = £60 − £12 = £48."
+    ],
+    "g": "p5Pct"
+   },
+   {
+    "d": 1,
+    "q": "Two angles of a triangle are 50° and 60°. How big is the third angle?",
+    "a": "70°",
+    "work": [
+     "The three angles inside any triangle always add up to 180°. (You can check this by tearing off the three corners of a paper triangle and putting them side by side: they make a straight line, which is 180°.)",
+     "The two angles we know add up to 50 + 60 = 110°.",
+     "The third angle is what is left of 180°: 180 − 110 = 70°."
+    ],
+    "g": "p5Angle"
+   },
+   {
+    "d": 1,
+    "q": "Today is Wednesday. What day of the week will it be in 45 days?",
+    "a": "Saturday",
+    "work": [
+     "There are 7 days in a week, so after 7 days (or 14, 21, ...) it is the same day again.",
+     "Divide 45 by 7: 45 ÷ 7 = 6 with 3 left over. (6 × 7 = 42.)",
+     "6 whole weeks bring us back to Wednesday.",
+     "Then count on 3 more days from Wednesday: Thursday, Friday, Saturday.",
+     "Answer: Saturday."
+    ],
+    "g": "p5Day"
+   },
+   {
+    "d": 2,
+    "q": "I think of a number. I multiply it by 6 and then add 5. The answer is 53. What was my number?",
+    "a": "8",
+    "work": [
+     "Work backwards. Undo the last thing I did first.",
+     "Last I added 5, so subtract 5: 53 − 5 = 48.",
+     "Before that I multiplied by 6, so divide by 6: 48 ÷ 6 = 8.",
+     "Check: 8 × 6 = 48, and 48 + 5 = 53. ✓"
+    ],
+    "g": "p5Missing"
+   },
+   {
+    "d": 2,
+    "q": "How many different numbers divide exactly into 24? (These are called factors of 24.)",
+    "a": "8",
+    "work": [
+     "A factor of 24 is a whole number that goes into 24 with nothing left over. They come in pairs that multiply to 24.",
+     "Start at 1 and work up, finding pairs: 1 × 24, 2 × 12, 3 × 8, 4 × 6.",
+     "The factors are 1, 2, 3, 4, 6, 8, 12, 24.",
+     "Count them: 8."
+    ],
+    "g": "p5Factors"
+   },
+   {
+    "d": 2,
+    "q": "Ana and Leo share £30 in the ratio 2 : 3. (For every £2 Ana gets, Leo gets £3.) How much does Leo get?",
+    "a": "£18",
+    "work": [
+     "The ratio 2 : 3 means we cut the money into equal parts: Ana gets 2 parts and Leo gets 3 parts.",
+     "Altogether there are 2 + 3 = 5 parts.",
+     "5 parts are £30, so 1 part is 30 ÷ 5 = £6.",
+     "Leo gets 3 parts: 3 × £6 = £18.",
+     "Check: Ana gets 2 × 6 = £12, and 12 + 18 = 30. ✓"
+    ],
+    "g": "p5Share"
+   },
+   {
+    "d": 2,
+    "q": "A square has a perimeter of 28 cm. What is its area?",
+    "a": "49 cm²",
+    "work": [
+     "A square has 4 equal sides, so the perimeter is 4 × one side.",
+     "One side = 28 ÷ 4 = 7 cm.",
+     "The area of a square is side × side: how many 1 cm squares fit inside.",
+     "7 × 7 = 49.",
+     "The area is 49 cm²."
+    ],
+    "g": "p5SquareArea"
+   },
+   {
+    "d": 2,
+    "q": "A car travels at 60 km each hour (60 km/h) for 2.5 hours. How far does it go?",
+    "a": "150 km",
+    "work": [
+     "Speed tells us how far we go in 1 hour. So distance = speed × time.",
+     "Do the whole hours first: 2 × 60 = 120 km.",
+     "Then the half hour: half of 60 is 30 km.",
+     "Add them: 120 + 30 = 150 km."
+    ],
+    "g": "p5Speed"
+   },
+   {
+    "d": 2,
+    "q": "170 children go on a trip. Each coach holds 40 children. How many coaches are needed?",
+    "a": "5",
+    "work": [
+     "Divide the children by the seats on each coach: 170 ÷ 40.",
+     "40 × 4 = 160, which is not quite 170. 170 ÷ 40 = 4 with 10 left over.",
+     "The 10 children left over still need a seat, so we need one more coach.",
+     "4 + 1 = 5 coaches.",
+     "(Always round UP for this kind of question: you can't leave children behind.)"
+    ],
+    "g": "p5Buses"
+   },
+   {
+    "d": 2,
+    "q": "Bus A comes every 4 minutes and bus B every 6 minutes. They both arrive together at 9:00. After how many minutes will they next arrive together?",
+    "a": "12 minutes",
+    "work": [
+     "Bus A arrives at 4, 8, 12, ... minutes after 9:00, the 4 times table (these are multiples of 4).",
+     "Bus B arrives at 6, 12, 18, ... (the multiples of 6).",
+     "We need the first number that is in BOTH lists.",
+     "Multiples of 4: 4, 8, 12.",
+     "Multiples of 6: 6, 12.",
+     "The first number in both is 12. They meet again after 12 minutes."
+    ],
+    "g": "p5Multiple"
+   },
+   {
+    "d": 2,
+    "q": "What is the next number in this pattern? 1, 3, 6, 10, 15, ...",
+    "a": "21",
+    "work": [
+     "Look at the jumps: 1 → 3 is +2, 3 → 6 is +3, 6 → 10 is +4, 10 → 15 is +5.",
+     "The jumps go up by 1 each time, so the next jump is +6.",
+     "15 + 6 = 21.",
+     "(These are triangle numbers: you can make triangles of dots with 1, 3, 6, 10, 15, 21 dots.)"
+    ],
+    "g": "p5Seq"
+   },
+   {
+    "d": 2,
+    "q": "What is 1/2 + 1/3? Give your answer as a fraction.",
+    "a": "5/6",
+    "work": [
+     "We can only add fractions when the bottom numbers (denominators) are the same, because then the pieces are the same size.",
+     "Find a number that both 2 and 3 go into: 6.",
+     "1/2 = 3/6 (multiply top and bottom by 3).",
+     "1/3 = 2/6 (multiply top and bottom by 2).",
+     "Add the tops and keep the bottom: 3/6 + 2/6 = 5/6.",
+     "It cannot be simplified: 5/6."
+    ],
+    "g": "p5FracAdd"
+   },
+   {
+    "d": 2,
+    "q": "At 6 a.m. the temperature is −4°C. By midday it has risen by 9°C, and by evening it has fallen by 7°C. What is the evening temperature?",
+    "a": "−2°C",
+    "work": [
+     "Use a number line. Moving up (rising) goes to the right; moving down (falling) goes to the left. Zero is in the middle and negative numbers are to the left of zero.",
+     "Start at −4. Rise by 9: −4 + 9. First go up 4 to reach 0, then up the remaining 5, so we get to 5°C.",
+     "Then fall by 7: 5 − 7 = -2.",
+     "That passes below zero, so the answer is negative."
+    ],
+    "g": "p5Temp"
+   },
+   {
+    "d": 2,
+    "q": "The mean of 5 numbers is 8. Four of them are 8, 12, 6, 9. What is the fifth number?",
+    "a": "5",
+    "work": [
+     "The mean is the total shared out equally, so total = mean × how many numbers.",
+     "5 numbers with mean 8 have a total of 5 × 8 = 40.",
+     "The four we know add up to 8 + 12 + 6 + 9 = 35.",
+     "The fifth is what is missing: 40 − 35 = 5.",
+     "Check: the five numbers add to 40, and 40 ÷ 5 = 8. ✓"
+    ],
+    "g": "p5Mean"
+   },
+   {
+    "d": 2,
+    "q": "A box is 5 cm long, 4 cm wide and 3 cm tall. It is filled with 1 cm cubes. How many cubes fit in?",
+    "a": "60",
+    "work": [
+     "Fill the bottom layer first. The bottom is 5 cm by 4 cm, so 4 rows of 5 cubes: 5 × 4 = 20 cubes.",
+     "The box is 3 cm tall, so there are 3 layers like that.",
+     "20 × 3 = 60.",
+     "(This is the volume: length × width × height.)"
+    ],
+    "g": "p5Volume"
+   },
+   {
+    "d": 2,
+    "q": "How many prime numbers are there between 20 and 30?",
+    "a": "2",
+    "work": [
+     "A prime number has exactly two factors: 1 and itself (like 7). Numbers such as 9 = 3 × 3 are not prime.",
+     "Check each number between 20 and 30: 21 no, 22 no, 23 prime, 24 no, 25 no, 26 no, 27 no, 28 no, 29 prime.",
+     "Even numbers (except 2) can be halved, so are not prime. Numbers ending in 5 are in the 5 times table. Test the rest by trying 3, 7, ...",
+     "The primes are 23, 29: 2 numbers."
+    ],
+    "g": "p5Primes"
+   },
+   {
+    "d": 2,
+    "q": "Pablo is 7 years old and Pablo's mum is 35 years old. How old will Pablo's mum be when Pablo is 13?",
+    "a": "41",
+    "work": [
+     "Both ages go up by 1 every year, so the gap between them never changes. The gap is 35 − 7 = 28 years.",
+     "When Pablo is 13, mum will be 28 years older.",
+     "13 + 28 = 41.",
+     "(Or: 6 years pass, so mum is 35 + 6 = 41.)"
+    ],
+    "g": "p5Ages"
+   },
+   {
+    "d": 2,
+    "q": "What is the biggest 4-digit number whose digits add up to 16?",
+    "a": "9700",
+    "work": [
+     "A 4-digit number is biggest when its first digit (thousands) is biggest, then the next (hundreds), and so on.",
+     "The biggest digit is 9, so try 9 in the thousands place. Then 16 − 9 = 7 is left to share between the other digits.",
+     "Next, put as much as possible in the hundreds place (up to 9), then the tens, then the units.",
+     "The digits are 9, 7, 0, 0, which add to 16 ✓.",
+     "The number is 9700."
+    ],
+    "g": "p5Digits"
+   },
+   {
+    "d": 2,
+    "q": "Round 4786 to the nearest 100, then multiply by 7. What do you get?",
+    "a": "33600",
+    "work": [
+     "To round to the nearest 100 look at the tens digit: if it is 5 or more we round up, otherwise we round down.",
+     "4786 is between 4700 and 4800. The tens digit is 8, so we round up to 4800.",
+     "Now 4800 × 7: 48 × 7 = 336, then add the two zeros: 33600."
+    ],
+    "g": "p5Round"
+   },
+   {
+    "d": 3,
+    "q": "What is 1 + 2 + 3 + ... + 20? (all the whole numbers from 1 to 20)",
+    "a": "210",
+    "work": [
+     "Adding one by one is slow. Pair up the numbers: the first with the last, the second with the second last, and so on.",
+     "1 + 20 = 21, 2 + 19 = 21, 3 + 18 = 21, ... every pair makes 21.",
+     "There are 20 numbers, so 10 pairs.",
+     "10 pairs of 21 is 10 × 21 = 210."
+    ],
+    "g": "p5SumRow"
+   },
+   {
+    "d": 3,
+    "q": "6 friends each shake hands once with every other friend. How many handshakes are there in total?",
+    "a": "15",
+    "work": [
+     "Each friend shakes hands with the other 5 friends.",
+     "That makes 6 × 5 = 30 if we count 'from each person'.",
+     "But a handshake involves two people, so we counted every handshake twice (once from each person).",
+     "30 ÷ 2 = 15 handshakes.",
+     "(Check with 4 friends: A–B, A–C, A–D, B–C, B–D, C–D = 6, and 4 × 3 ÷ 2 = 6.)"
+    ],
+    "g": "p5Hand"
+   },
+   {
+    "d": 3,
+    "q": "What is the sum of the first 10 odd numbers? (1 + 3 + 5 + ...)",
+    "a": "100",
+    "work": [
+     "Try small cases and look for a pattern. 1 = 1. 1 + 3 = 4. 1 + 3 + 5 = 9. 1 + 3 + 5 + 7 = 16.",
+     "The answers 1, 4, 9, 16 are square numbers: 1 × 1, 2 × 2, 3 × 3, 4 × 4.",
+     "Why? Each new odd number adds an L-shaped layer of dots to a square, making the next bigger square.",
+     "So the first 10 odd numbers add up to 10 × 10 = 100."
+    ],
+    "g": "p5Odd"
+   },
+   {
+    "d": 3,
+    "q": "Using only 5p, 10p and 20p coins, in how many different ways can you make 30p? (The order of coins doesn't matter.)",
+    "a": "6",
+    "work": [
+     "List the ways in an organised way, starting with the biggest coin.",
+     "With a 20p coin there is 10p left: 20 + 10, and 20 + 5 + 5. (2 ways)",
+     "No 20p, using 10p coins: 10 + 10 + 10, then 10 + 10 + 5 + 5, then 10 + 5 + 5 + 5 + 5. (3 ways)",
+     "Only 5p coins: 5 + 5 + 5 + 5 + 5 + 5. (1 way)",
+     "2 + 3 + 1 = 6 ways."
+    ],
+    "g": "p5Coins"
+   },
+   {
+    "d": 3,
+    "q": "How many squares of any size are there in a 4 by 4 grid of small squares?",
+    "a": "30",
+    "work": [
+     "Count the squares size by size so that we do not miss any.",
+     "Size 1 × 1: it can start in 4 places across and 4 places down, so 4 × 4 = 16.",
+     "Size 2 × 2: it can start in 3 places across and 3 places down, so 3 × 3 = 9.",
+     "Size 3 × 3: it can start in 2 places across and 2 places down, so 2 × 2 = 4.",
+     "Size 4 × 4: it can start in 1 places across and 1 places down, so 1 × 1 = 1.",
+     "Add them all: 16 + 9 + 4 + 1 = 30."
+    ],
+    "g": "p5Grid"
+   }
   ]
  }
 }
