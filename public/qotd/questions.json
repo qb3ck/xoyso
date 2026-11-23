@@ -955,7 +955,7 @@
      "We want the biggest number to be as large as possible. To do that, the other two must be as SMALL as possible, so that as much of the total as possible is left for the big one.",
      "The numbers must be whole, different from each other, and bigger than 2. The smallest allowed is 3, then the next smallest different one is 4.",
      "So the other two are 3 and 4, which add up to 7. That leaves 21 − 7 = 14 for the largest number.",
-     "Check: 3 + 4 + 14 = 21 and 21 ÷ 3 = 7 ✓. Could 15 work? Then the other two would add up to 6, and the only way with different numbers bigger than 2 is... the smallest possible pair adds up to 7, so no."
+     "Check: 3 + 4 + 14 = 21 and 21 ÷ 3 = 7 ✓. Could the largest be 15? Then the other two would add up to 6, but two different whole numbers that are both at least 3 add up to at least 3 + 4 = 7. So 15 is impossible and 14 is the biggest."
     ]
    },
    {
