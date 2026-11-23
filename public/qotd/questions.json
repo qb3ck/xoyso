@@ -230,31 +230,70 @@
     "g": "pHalf"
    },
    {
-    "d": 2,
-    "q": "I am a 2-digit number. My two digits add up to 9. I am in the 4 times table. My tens digit is bigger than my units digit. What number am I?",
-    "a": "72",
+    "d": 1,
+    "q": "How many different 3-digit numbers can you make using the digits 1, 2 and 3 once each?",
+    "a": "6",
     "work": [
-     "Use the clues one at a time to cross out numbers.",
-     "Clue 1: the digits add up to 9. The 2-digit numbers like this are 18, 27, 36, 45, 54, 63, 72, 81 and 90.",
-     "Clue 2: it is in the 4 times table (4, 8, 12, 16, 20, ...). Check each number: 18 ÷ 4 is not whole, 27 no, 36 = 4 × 9 yes, 45 no, 54 no, 63 no, 72 = 4 × 18 yes, 81 no, 90 no. We have 36 and 72 left.",
-     "Clue 3: the tens digit is bigger than the units digit. For 36, the tens digit 3 is smaller than 6, so no. For 72, 7 is bigger than 2, so yes.",
-     "I am 72."
+     "We make 3-digit numbers from 1, 2 and 3, using each digit once.",
+     "For the first (hundreds) digit we can choose any of 3 digits: 1, 2 or 3.",
+     "After we have used one, 2 digits are left, so the second digit has 2 choices.",
+     "Then 1 digit is left for the last place.",
+     "3 × 2 × 1 = 6 numbers.",
+     "List them to check, starting with 1: 123, 132. Starting with 2: 213, 231. Starting with 3: 312, 321. That is 6 ✓."
     ],
-    "g": "pClues"
+    "g": "pPerm"
+   },
+   {
+    "d": 1,
+    "q": "A square has an area of 36 cm². What is its perimeter?",
+    "a": "24 cm",
+    "work": [
+     "The area of a square is side × side. A square of area 36 cm² is made of 36 little 1 cm squares.",
+     "We need a number that multiplied by itself gives 36. Try: 5 × 5 = 25 (too small), 6 × 6 = 36 ✓.",
+     "So each side is 6 cm.",
+     "The perimeter is the distance all the way round: a square has 4 equal sides, so 4 × 6 = 24 cm."
+    ],
+    "g": "pSquareArea"
    },
    {
     "d": 2,
-    "q": "A rectangle has a perimeter of 24 cm. Its length is twice its width. What is its area?",
-    "a": "32 cm²",
+    "q": "What is the last digit (the units digit) of 7 × 7 × 7 × 7?",
+    "a": "1",
     "work": [
-     "The perimeter is the distance all the way around a shape. A rectangle has 2 long sides and 2 short sides.",
-     "Perimeter = length + width + length + width = 24 cm. Half of that is length + width = 12 cm.",
-     "The length is twice the width. Draw it: width = [■], length = [■][■]. Together that is 3 boxes = 12 cm, so 1 box = 12 ÷ 3 = 4 cm.",
-     "Width = 4 cm and length = 2 × 4 = 8 cm.",
-     "Area is how much flat space is inside: length × width = 8 × 4 = 32 cm².",
-     "Check the perimeter: 8 + 4 + 8 + 4 = 24 ✓."
+     "7 × 7 × 7 × 7 means 7 multiplied by itself, 4 sevens in total.",
+     "7 × 7 = 49. It ends in 9.",
+     "49 × 7 = 343 (49 × 7 = 40 × 7 + 9 × 7 = 280 + 63). It ends in 3.",
+     "343 × 7 = 2401 (300 × 7 = 2100, 40 × 7 = 280, 3 × 7 = 21; 2100 + 280 + 21 = 2401). It ends in 1.",
+     "The last digit is 1. (A shortcut: the last digit only depends on the last digits, so 9 × 7 = 63 → 3, then 3 × 7 = 21 → 1.)"
     ],
-    "g": "pRect"
+    "g": "pLast"
+   },
+   {
+    "d": 2,
+    "q": "A star ★ and a diamond ◆ each stand for a number. ★ + ★ + ◆ = 17 and ★ + ◆ + ◆ = 16. What number is ★?",
+    "a": "6",
+    "work": [
+     "The shapes ★ and ◆ stand for hidden numbers. We have two facts: ★ + ★ + ◆ = 17 and ★ + ◆ + ◆ = 16.",
+     "Put the two facts together by adding them: 3 stars and 3 diamonds make 17 + 16 = 33.",
+     "If 3 stars and 3 diamonds make 33, then 1 star and 1 diamond make 33 ÷ 3 = 11.",
+     "Look at the first fact again: ★ + ★ + ◆ is one star plus (star + diamond). So ★ + 11 = 17, which means ★ = 17 − 11 = 6.",
+     "Then ◆ = 11 − 6 = 5.",
+     "Check: 6 + 6 + 5 = 17 ✓ and 6 + 5 + 5 = 16 ✓."
+    ],
+    "g": "pSymbols"
+   },
+   {
+    "d": 2,
+    "q": "Lola writes down all the numbers from 1 to 30. How many times does she write the digit 2?",
+    "a": "13",
+    "work": [
+     "The numbers are 1, 2, 3, ..., 30. We count each time the digit 2 is written anywhere, in the units place or in the tens place.",
+     "2 in the units place (the last digit): 2, 12, 22. That is 3 times.",
+     "2 in the tens place (the first digit of a 2-digit number): 20, 21, 22, 23, 24, 25, 26, 27, 28, 29. That is 10 times.",
+     "The number 22 has two 2s: it is in both lists, and that is right, because it has two 2s written.",
+     "3 + 10 = 13 times."
+    ],
+    "g": "pDigitCount"
    },
    {
     "d": 1,
@@ -282,82 +321,30 @@
    },
    {
     "d": 2,
-    "q": "What is the last digit (the units digit) of 7 × 7 × 7 × 7?",
-    "a": "1",
+    "q": "I am a 2-digit number. My two digits add up to 9. I am in the 4 times table. My tens digit is bigger than my units digit. What number am I?",
+    "a": "72",
     "work": [
-     "7 × 7 × 7 × 7 means 7 multiplied by itself, 4 sevens in total.",
-     "7 × 7 = 49. It ends in 9.",
-     "49 × 7 = 343 (49 × 7 = 40 × 7 + 9 × 7 = 280 + 63). It ends in 3.",
-     "343 × 7 = 2401 (300 × 7 = 2100, 40 × 7 = 280, 3 × 7 = 21; 2100 + 280 + 21 = 2401). It ends in 1.",
-     "The last digit is 1. (A shortcut: the last digit only depends on the last digits, so 9 × 7 = 63 → 3, then 3 × 7 = 21 → 1.)"
+     "Use the clues one at a time to cross out numbers.",
+     "Clue 1: the digits add up to 9. The 2-digit numbers like this are 18, 27, 36, 45, 54, 63, 72, 81 and 90.",
+     "Clue 2: it is in the 4 times table (4, 8, 12, 16, 20, ...). Check each number: 18 ÷ 4 is not whole, 27 no, 36 = 4 × 9 yes, 45 no, 54 no, 63 no, 72 = 4 × 18 yes, 81 no, 90 no. We have 36 and 72 left.",
+     "Clue 3: the tens digit is bigger than the units digit. For 36, the tens digit 3 is smaller than 6, so no. For 72, 7 is bigger than 2, so yes.",
+     "I am 72."
     ],
-    "g": "pLast"
-   },
-   {
-    "d": 1,
-    "q": "A ribbon is 1 metre long. It is cut into pieces of 15 cm each. How many whole pieces can be cut, and how much ribbon is left over?",
-    "a": "6 pieces and 10 cm left",
-    "work": [
-     "Centimetres and metres: 1 metre = 100 centimetres. So the ribbon is 100 cm.",
-     "How many 15s fit into 100? Count up in 15s: 15, 30, 45, 60, 75, 90, 105. 90 is 6 lots of 15. 105 is too much (more than 100).",
-     "So 6 whole pieces can be cut.",
-     "They use 6 × 15 = 90 cm. The rest of the ribbon is 100 − 90 = 10 cm.",
-     "Answer: 6 pieces and 10 cm left over."
-    ],
-    "g": "pRibbon"
+    "g": "pClues"
    },
    {
     "d": 2,
-    "q": "A star ★ and a diamond ◆ each stand for a number. ★ + ★ + ◆ = 17 and ★ + ◆ + ◆ = 16. What number is ★?",
-    "a": "6",
+    "q": "A rectangle has a perimeter of 24 cm. Its length is twice its width. What is its area?",
+    "a": "32 cm²",
     "work": [
-     "The shapes ★ and ◆ stand for hidden numbers. We have two facts: ★ + ★ + ◆ = 17 and ★ + ◆ + ◆ = 16.",
-     "Put the two facts together by adding them: 3 stars and 3 diamonds make 17 + 16 = 33.",
-     "If 3 stars and 3 diamonds make 33, then 1 star and 1 diamond make 33 ÷ 3 = 11.",
-     "Look at the first fact again: ★ + ★ + ◆ is one star plus (star + diamond). So ★ + 11 = 17, which means ★ = 17 − 11 = 6.",
-     "Then ◆ = 11 − 6 = 5.",
-     "Check: 6 + 6 + 5 = 17 ✓ and 6 + 5 + 5 = 16 ✓."
+     "The perimeter is the distance all the way around a shape. A rectangle has 2 long sides and 2 short sides.",
+     "Perimeter = length + width + length + width = 24 cm. Half of that is length + width = 12 cm.",
+     "The length is twice the width. Draw it: width = [■], length = [■][■]. Together that is 3 boxes = 12 cm, so 1 box = 12 ÷ 3 = 4 cm.",
+     "Width = 4 cm and length = 2 × 4 = 8 cm.",
+     "Area is how much flat space is inside: length × width = 8 × 4 = 32 cm².",
+     "Check the perimeter: 8 + 4 + 8 + 4 = 24 ✓."
     ],
-    "g": "pSymbols"
-   },
-   {
-    "d": 1,
-    "q": "How many different 3-digit numbers can you make using the digits 1, 2 and 3 once each?",
-    "a": "6",
-    "work": [
-     "We make 3-digit numbers from 1, 2 and 3, using each digit once.",
-     "For the first (hundreds) digit we can choose any of 3 digits: 1, 2 or 3.",
-     "After we have used one, 2 digits are left, so the second digit has 2 choices.",
-     "Then 1 digit is left for the last place.",
-     "3 × 2 × 1 = 6 numbers.",
-     "List them to check, starting with 1: 123, 132. Starting with 2: 213, 231. Starting with 3: 312, 321. That is 6 ✓."
-    ],
-    "g": "pPerm"
-   },
-   {
-    "d": 2,
-    "q": "Lola writes down all the numbers from 1 to 30. How many times does she write the digit 2?",
-    "a": "13",
-    "work": [
-     "The numbers are 1, 2, 3, ..., 30. We count each time the digit 2 is written anywhere, in the units place or in the tens place.",
-     "2 in the units place (the last digit): 2, 12, 22. That is 3 times.",
-     "2 in the tens place (the first digit of a 2-digit number): 20, 21, 22, 23, 24, 25, 26, 27, 28, 29. That is 10 times.",
-     "The number 22 has two 2s: it is in both lists, and that is right, because it has two 2s written.",
-     "3 + 10 = 13 times."
-    ],
-    "g": "pDigitCount"
-   },
-   {
-    "d": 1,
-    "q": "A square has an area of 36 cm². What is its perimeter?",
-    "a": "24 cm",
-    "work": [
-     "The area of a square is side × side. A square of area 36 cm² is made of 36 little 1 cm squares.",
-     "We need a number that multiplied by itself gives 36. Try: 5 × 5 = 25 (too small), 6 × 6 = 36 ✓.",
-     "So each side is 6 cm.",
-     "The perimeter is the distance all the way round: a square has 4 equal sides, so 4 × 6 = 24 cm."
-    ],
-    "g": "pSquareArea"
+    "g": "pRect"
    },
    {
     "d": 2,
@@ -401,6 +388,19 @@
      "5 × 22 = 110 words."
     ],
     "g": "pParrot"
+   },
+   {
+    "d": 1,
+    "q": "A ribbon is 1 metre long. It is cut into pieces of 15 cm each. How many whole pieces can be cut, and how much ribbon is left over?",
+    "a": "6 pieces and 10 cm left",
+    "work": [
+     "Centimetres and metres: 1 metre = 100 centimetres. So the ribbon is 100 cm.",
+     "How many 15s fit into 100? Count up in 15s: 15, 30, 45, 60, 75, 90, 105. 90 is 6 lots of 15. 105 is too much (more than 100).",
+     "So 6 whole pieces can be cut.",
+     "They use 6 × 15 = 90 cm. The rest of the ribbon is 100 − 90 = 10 cm.",
+     "Answer: 6 pieces and 10 cm left over."
+    ],
+    "g": "pRibbon"
    }
   ],
   "1eso": [
@@ -642,62 +642,17 @@
     "g": "eTelescope"
    },
    {
-    "d": 2,
-    "q": "Work out (2⁵ × 4³) ÷ 8².",
-    "a": "32",
+    "d": 1,
+    "q": "The 3-digit number 6A4 is divisible by 9, where A is a single digit. What is the digit A?",
+    "a": "8",
     "work": [
-     "The little number is a power: 2⁵ means 2 × 2 × 2 × 2 × 2 = 32. Powers are easiest to work with when they all have the same base, here 2.",
-     "4 = 2 × 2 = 2². So 4³ = (2²)³ = 2² × 2² × 2² = 2⁶ (when you raise a power to a power, you multiply the little numbers: 2 × 3 = 6).",
-     "8 = 2 × 2 × 2 = 2³. So 8² = (2³)² = 2⁶ (3 × 2 = 6).",
-     "Rewrite: (2⁵ × 2⁶) ÷ 2⁶. Multiplying powers of the same base adds the little numbers: 2⁵ × 2⁶ = 2¹¹ (5 + 6 = 11). Dividing subtracts them: 2¹¹ ÷ 2⁶ = 2⁵ (11 − 6 = 5).",
-     "A quicker way: the 2⁶ on top and bottom cancel, leaving 2⁵.",
-     "2⁵ = 2 × 2 × 2 × 2 × 2 = 32.",
-     "Check: 2⁵ = 32, 4³ = 64, 8² = 64: (32 × 64) ÷ 64 = 32. ✓"
+     "There is a quick test for the 9 times table: a number is divisible by 9 exactly when its digits add up to a multiple of 9 (9, 18, 27, ...). For example 729: 7 + 2 + 9 = 18, and 729 = 9 × 81.",
+     "The number is 6A4, so the digits add up to 6 + A + 4 = 10 + A.",
+     "A is a single digit, 0 to 9, so 10 + A is between 10 and 19. The only multiple of 9 in that range is 18.",
+     "10 + A = 18, so A = 8.",
+     "Check: 684 ÷ 9 = 76 exactly (9 × 76 = 684). ✓"
     ],
-    "g": "eIndices"
-   },
-   {
-    "d": 2,
-    "q": "The digits of a 2-digit number add up to 11. When the digits are swapped, the new number is 27 more than the original. What is the original number?",
-    "a": "47",
-    "work": [
-     "Write the number using its digits. If the tens digit is a and the units digit is b, the number is 10a + b (for example 47 is 4 tens and 7 units: 10 × 4 + 7).",
-     "Swapping the digits makes the number 10b + a (for 47 it becomes 74).",
-     "The new number is 27 more: (10b + a) − (10a + b) = 27. Simplify the left: 10b − b = 9b and a − 10a = −9a, so 9b − 9a = 27.",
-     "Divide by 9: b − a = 3. The units digit is 3 bigger than the tens digit.",
-     "We are also told the digits add up to 11: a + b = 11.",
-     "Now we have two facts: b = a + 3 and a + b = 11. Put the first into the second: a + (a + 3) = 11, so 2a + 3 = 11, 2a = 8, a = 4. Then b = 7.",
-     "The number is 47. Check: swapped is 74, and 74 − 47 = 27 ✓, and 4 + 7 = 11 ✓."
-    ],
-    "g": "eReverse"
-   },
-   {
-    "d": 3,
-    "q": "In how many ways can 2 identical rooks be placed on a 4 × 4 chessboard so that they are not in the same row or the same column?",
-    "a": "72",
-    "work": [
-     "A rook in chess attacks every square in its row and its column. We want to place two rooks so they don't attack each other, so they can't share a row or a column.",
-     "Place the first rook. The board has 4 × 4 = 16 squares, and it can go on any of them: 16 choices.",
-     "That rook blocks its whole row (4 squares) and its whole column (4 squares). Its own square is in both, so the blocked squares are 4 + 4 − 1 = 7. That leaves 16 − 7 = 9 squares for the second rook.",
-     "16 × 9 = 144 ways to place 'a first rook' and then 'a second rook'.",
-     "But the rooks are identical. Putting rook A on b2 and rook B on c3 is the same arrangement as A on c3 and B on b2. Every arrangement has been counted twice (once for each order).",
-     "So divide by 2: 144 ÷ 2 = 72."
-    ],
-    "g": "eRooks"
-   },
-   {
-    "d": 2,
-    "q": "How many diagonals does a polygon with 10 sides have?",
-    "a": "35",
-    "work": [
-     "A polygon is a flat shape with straight sides, and the sides meet at corners (vertices). A diagonal is a straight line joining two corners that are NOT next to each other (those lines would just be the sides).",
-     "Take one corner of the 10-sided shape. It can be joined to 9 other corners. But two of those are its neighbours (joined by sides, not diagonals), so 9 − 2 = 7 diagonals leave this corner. (That is 10 − 3 = 7: take away itself and its two neighbours.)",
-     "There are 10 corners, each with 7 diagonals: 10 × 7 = 70.",
-     "But each diagonal has two ends, so we counted each diagonal twice: once from each of its two corners. In the picture the diagonal from A to D is also the diagonal from D to A.",
-     "So divide by 2: 70 ÷ 2 = 35 diagonals.",
-     "(The same idea gives n × (n − 3) ÷ 2 for any polygon with n sides.)"
-    ],
-    "g": "eDiagonals"
+    "g": "eDivNine"
    },
    {
     "d": 2,
@@ -714,20 +669,6 @@
     "g": "eTaps"
    },
    {
-    "d": 3,
-    "q": "Three people, Ana, Bea and Cris, each make a statement. Ana: \"Bea is lying.\" Bea: \"Cris is lying.\" Cris: \"Ana and Bea are both lying.\" Each person either always tells the truth or always lies. Who is telling the truth?",
-    "a": "Bea",
-    "work": [
-     "Each person always tells the truth or always lies. We test an idea (a guess) and see whether it leads to a contradiction, a statement that can't be true.",
-     "Guess 1: Ana tells the truth. Then what she says is true: Bea is lying. If Bea is lying, then what Bea says is false: so Cris is NOT lying, Cris tells the truth. But Cris says 'Ana and Bea are both lying', and Ana is telling the truth in our guess. So Cris would be telling a lie, which contradicts Cris telling the truth. The guess fails.",
-     "So Ana must be lying. Ana says 'Bea is lying', which is false, so Bea tells the truth.",
-     "Bea tells the truth, so what she says is true: Cris is lying.",
-     "Check Cris: he says 'Ana and Bea are both lying'. Ana lies but Bea tells the truth, so this is false. A liar says false things. ✓",
-     "Everything fits together if only Bea tells the truth."
-    ],
-    "g": "eLiars"
-   },
-   {
     "d": 2,
     "q": "Two numbers add up to 20 and multiply to 91. What is the difference between them?",
     "a": "6",
@@ -737,61 +678,6 @@
      "The numbers are 7 and 13. The difference is the big one take away the small one: 13 − 7 = 6."
     ],
     "g": "eSumProd"
-   },
-   {
-    "d": 3,
-    "q": "A cyclist rides a route at 10 km/h and rides back the same way at 15 km/h. What is the average speed for the whole round trip?",
-    "a": "12 km/h",
-    "work": [
-     "It is tempting to say the average is (10 + 15) ÷ 2 = 12.5. But that is wrong, because the cyclist spends more TIME at the slow speed. Average speed is always total distance ÷ total time.",
-     "We don't know the length of the route, so pick one that makes the sums easy, a number that both 10 and 15 divide into: 30 km. (Any number gives the same answer.)",
-     "Going: time = distance ÷ speed = 30 ÷ 10 = 3 hours.",
-     "Coming back: 30 ÷ 15 = 2 hours.",
-     "Total distance = 30 + 30 = 60 km. Total time = 3 + 2 = 5 hours.",
-     "Average speed = 60 ÷ 5 = 12 km/h."
-    ],
-    "g": "eAvgSpeed"
-   },
-   {
-    "d": 2,
-    "q": "How many multiples of 7 are there between 100 and 200?",
-    "a": "14",
-    "work": [
-     "A multiple of 7 is a number in the 7 times table: 7, 14, 21, ... , so it is 7 × a whole number.",
-     "Find the first multiple of 7 that is above 100. 7 × 14 = 98 (not above 100), 7 × 15 = 105 ✓. So the first one is 105.",
-     "Find the last one below 200. 7 × 28 = 196 ✓ and 7 × 29 = 203 (too big). So the last is 196.",
-     "So the multiples are 7 × 15, 7 × 16, ..., 7 × 28. We need to count the numbers from 15 to 28.",
-     "28 − 15 = 13, but that misses one end: count both ends, so 13 + 1 = 14.",
-     "(Check with a small example: the numbers from 3 to 5 are 3, 4, 5, which is 5 − 3 + 1 = 3 numbers.)"
-    ],
-    "g": "eMultiples"
-   },
-   {
-    "d": 2,
-    "q": "A number is increased by 20%, and then the new number is decreased by 20%. What is the overall change?",
-    "a": "It decreases by 4%",
-    "work": [
-     "Let the starting number be 100: any number works, and 100 makes percentages easy.",
-     "Increase by 20%: 20% of 100 is 20, so the new number is 100 + 20 = 120.",
-     "Now decrease THIS number by 20%. 20% of 120 is 120 ÷ 5 = 24 (20% is one fifth). So we get 120 − 24 = 96.",
-     "We started with 100 and finished on 96, which is 4 less, a 4% decrease.",
-     "The reason it isn't 0%: the second 20% was taken from the bigger number 120, so it took away more (24) than the first added (20).",
-     "Another way to see it: increasing by 20% means multiplying by 1.2, and decreasing by 20% means multiplying by 0.8. 1.2 × 0.8 = 0.96, so the result is 96% of the start, a 4% decrease."
-    ],
-    "g": "ePercentUpDown"
-   },
-   {
-    "d": 1,
-    "q": "The 3-digit number 6A4 is divisible by 9, where A is a single digit. What is the digit A?",
-    "a": "8",
-    "work": [
-     "There is a quick test for the 9 times table: a number is divisible by 9 exactly when its digits add up to a multiple of 9 (9, 18, 27, ...). For example 729: 7 + 2 + 9 = 18, and 729 = 9 × 81.",
-     "The number is 6A4, so the digits add up to 6 + A + 4 = 10 + A.",
-     "A is a single digit, 0 to 9, so 10 + A is between 10 and 19. The only multiple of 9 in that range is 18.",
-     "10 + A = 18, so A = 8.",
-     "Check: 684 ÷ 9 = 76 exactly (9 × 76 = 684). ✓"
-    ],
-    "g": "eDivNine"
    },
    {
     "d": 2,
@@ -831,9 +717,136 @@
      "Check: 403 + 404 + 405 + 406 + 407 = 2025 ✓ (5 × 405 = 2025)."
     ],
     "g": "eConsecInt"
+   },
+   {
+    "d": 2,
+    "q": "Work out (2⁵ × 4³) ÷ 8².",
+    "a": "32",
+    "work": [
+     "The little number is a power: 2⁵ means 2 × 2 × 2 × 2 × 2 = 32. Powers are easiest to work with when they all have the same base, here 2.",
+     "4 = 2 × 2 = 2². So 4³ = (2²)³ = 2² × 2² × 2² = 2⁶ (when you raise a power to a power, you multiply the little numbers: 2 × 3 = 6).",
+     "8 = 2 × 2 × 2 = 2³. So 8² = (2³)² = 2⁶ (3 × 2 = 6).",
+     "Rewrite: (2⁵ × 2⁶) ÷ 2⁶. Multiplying powers of the same base adds the little numbers: 2⁵ × 2⁶ = 2¹¹ (5 + 6 = 11). Dividing subtracts them: 2¹¹ ÷ 2⁶ = 2⁵ (11 − 6 = 5).",
+     "A quicker way: the 2⁶ on top and bottom cancel, leaving 2⁵.",
+     "2⁵ = 2 × 2 × 2 × 2 × 2 = 32.",
+     "Check: 2⁵ = 32, 4³ = 64, 8² = 64: (32 × 64) ÷ 64 = 32. ✓"
+    ],
+    "g": "eIndices"
+   },
+   {
+    "d": 2,
+    "q": "The digits of a 2-digit number add up to 11. When the digits are swapped, the new number is 27 more than the original. What is the original number?",
+    "a": "47",
+    "work": [
+     "Write the number using its digits. If the tens digit is a and the units digit is b, the number is 10a + b (for example 47 is 4 tens and 7 units: 10 × 4 + 7).",
+     "Swapping the digits makes the number 10b + a (for 47 it becomes 74).",
+     "The new number is 27 more: (10b + a) − (10a + b) = 27. Simplify the left: 10b − b = 9b and a − 10a = −9a, so 9b − 9a = 27.",
+     "Divide by 9: b − a = 3. The units digit is 3 bigger than the tens digit.",
+     "We are also told the digits add up to 11: a + b = 11.",
+     "Now we have two facts: b = a + 3 and a + b = 11. Put the first into the second: a + (a + 3) = 11, so 2a + 3 = 11, 2a = 8, a = 4. Then b = 7.",
+     "The number is 47. Check: swapped is 74, and 74 − 47 = 27 ✓, and 4 + 7 = 11 ✓."
+    ],
+    "g": "eReverse"
+   },
+   {
+    "d": 2,
+    "q": "How many multiples of 7 are there between 100 and 200?",
+    "a": "14",
+    "work": [
+     "A multiple of 7 is a number in the 7 times table: 7, 14, 21, ... , so it is 7 × a whole number.",
+     "Find the first multiple of 7 that is above 100. 7 × 14 = 98 (not above 100), 7 × 15 = 105 ✓. So the first one is 105.",
+     "Find the last one below 200. 7 × 28 = 196 ✓ and 7 × 29 = 203 (too big). So the last is 196.",
+     "So the multiples are 7 × 15, 7 × 16, ..., 7 × 28. We need to count the numbers from 15 to 28.",
+     "28 − 15 = 13, but that misses one end: count both ends, so 13 + 1 = 14.",
+     "(Check with a small example: the numbers from 3 to 5 are 3, 4, 5, which is 5 − 3 + 1 = 3 numbers.)"
+    ],
+    "g": "eMultiples"
+   },
+   {
+    "d": 2,
+    "q": "A number is increased by 20%, and then the new number is decreased by 20%. What is the overall change?",
+    "a": "It decreases by 4%",
+    "work": [
+     "Let the starting number be 100: any number works, and 100 makes percentages easy.",
+     "Increase by 20%: 20% of 100 is 20, so the new number is 100 + 20 = 120.",
+     "Now decrease THIS number by 20%. 20% of 120 is 120 ÷ 5 = 24 (20% is one fifth). So we get 120 − 24 = 96.",
+     "We started with 100 and finished on 96, which is 4 less, a 4% decrease.",
+     "The reason it isn't 0%: the second 20% was taken from the bigger number 120, so it took away more (24) than the first added (20).",
+     "Another way to see it: increasing by 20% means multiplying by 1.2, and decreasing by 20% means multiplying by 0.8. 1.2 × 0.8 = 0.96, so the result is 96% of the start, a 4% decrease."
+    ],
+    "g": "ePercentUpDown"
+   },
+   {
+    "d": 3,
+    "q": "In how many ways can 2 identical rooks be placed on a 4 × 4 chessboard so that they are not in the same row or the same column?",
+    "a": "72",
+    "work": [
+     "A rook in chess attacks every square in its row and its column. We want to place two rooks so they don't attack each other, so they can't share a row or a column.",
+     "Place the first rook. The board has 4 × 4 = 16 squares, and it can go on any of them: 16 choices.",
+     "That rook blocks its whole row (4 squares) and its whole column (4 squares). Its own square is in both, so the blocked squares are 4 + 4 − 1 = 7. That leaves 16 − 7 = 9 squares for the second rook.",
+     "16 × 9 = 144 ways to place 'a first rook' and then 'a second rook'.",
+     "But the rooks are identical. Putting rook A on b2 and rook B on c3 is the same arrangement as A on c3 and B on b2. Every arrangement has been counted twice (once for each order).",
+     "So divide by 2: 144 ÷ 2 = 72."
+    ],
+    "g": "eRooks"
+   },
+   {
+    "d": 3,
+    "q": "Three people, Ana, Bea and Cris, each make a statement. Ana: \"Bea is lying.\" Bea: \"Cris is lying.\" Cris: \"Ana and Bea are both lying.\" Each person either always tells the truth or always lies. Who is telling the truth?",
+    "a": "Bea",
+    "work": [
+     "Each person always tells the truth or always lies. We test an idea (a guess) and see whether it leads to a contradiction, a statement that can't be true.",
+     "Guess 1: Ana tells the truth. Then what she says is true: Bea is lying. If Bea is lying, then what Bea says is false: so Cris is NOT lying, Cris tells the truth. But Cris says 'Ana and Bea are both lying', and Ana is telling the truth in our guess. So Cris would be telling a lie, which contradicts Cris telling the truth. The guess fails.",
+     "So Ana must be lying. Ana says 'Bea is lying', which is false, so Bea tells the truth.",
+     "Bea tells the truth, so what she says is true: Cris is lying.",
+     "Check Cris: he says 'Ana and Bea are both lying'. Ana lies but Bea tells the truth, so this is false. A liar says false things. ✓",
+     "Everything fits together if only Bea tells the truth."
+    ],
+    "g": "eLiars"
+   },
+   {
+    "d": 3,
+    "q": "A cyclist rides a route at 10 km/h and rides back the same way at 15 km/h. What is the average speed for the whole round trip?",
+    "a": "12 km/h",
+    "work": [
+     "It is tempting to say the average is (10 + 15) ÷ 2 = 12.5. But that is wrong, because the cyclist spends more TIME at the slow speed. Average speed is always total distance ÷ total time.",
+     "We don't know the length of the route, so pick one that makes the sums easy, a number that both 10 and 15 divide into: 30 km. (Any number gives the same answer.)",
+     "Going: time = distance ÷ speed = 30 ÷ 10 = 3 hours.",
+     "Coming back: 30 ÷ 15 = 2 hours.",
+     "Total distance = 30 + 30 = 60 km. Total time = 3 + 2 = 5 hours.",
+     "Average speed = 60 ÷ 5 = 12 km/h."
+    ],
+    "g": "eAvgSpeed"
+   },
+   {
+    "d": 2,
+    "q": "How many diagonals does a polygon with 10 sides have?",
+    "a": "35",
+    "work": [
+     "A polygon is a flat shape with straight sides, and the sides meet at corners (vertices). A diagonal is a straight line joining two corners that are NOT next to each other (those lines would just be the sides).",
+     "Take one corner of the 10-sided shape. It can be joined to 9 other corners. But two of those are its neighbours (joined by sides, not diagonals), so 9 − 2 = 7 diagonals leave this corner. (That is 10 − 3 = 7: take away itself and its two neighbours.)",
+     "There are 10 corners, each with 7 diagonals: 10 × 7 = 70.",
+     "But each diagonal has two ends, so we counted each diagonal twice: once from each of its two corners. In the picture the diagonal from A to D is also the diagonal from D to A.",
+     "So divide by 2: 70 ÷ 2 = 35 diagonals.",
+     "(The same idea gives n × (n − 3) ÷ 2 for any polygon with n sides.)"
+    ],
+    "g": "eDiagonals"
    }
   ],
   "5primaria": [
+   {
+    "d": 3,
+    "q": "6 friends each shake hands once with every other friend. How many handshakes are there in total?",
+    "a": "15",
+    "work": [
+     "Each friend shakes hands with the other 5 friends.",
+     "That makes 6 × 5 = 30 if we count 'from each person'.",
+     "But a handshake involves two people, so we counted every handshake twice (once from each person).",
+     "30 ÷ 2 = 15 handshakes.",
+     "(Check with 4 friends: A–B, A–C, A–D, B–C, B–D, C–D = 6, and 4 × 3 ÷ 2 = 6.)"
+    ],
+    "g": "p5Hand"
+   },
    {
     "d": 1,
     "q": "Pencils are sold in packs of 6. Marta buys 7 packs and then gives away 9 of them. How many pencils does Marta have left?",
@@ -862,6 +875,66 @@
     "g": "p5Change"
    },
    {
+    "d": 2,
+    "q": "A bike costs £60. In a sale it is 20% off. What is the sale price?",
+    "a": "£48",
+    "work": [
+     "'Per cent' means 'out of 100'. 20% means 20 out of every 100, or 20/100.",
+     "20% is a fifth. A fifth of 60 is 60 ÷ 5 = 12.",
+     "That is how much is taken off: £12.",
+     "Sale price = £60 − £12 = £48."
+    ],
+    "g": "p5Pct"
+   },
+   {
+    "d": 2,
+    "q": "I think of a number. I multiply it by 6 and then add 5. The answer is 53. What was my number?",
+    "a": "8",
+    "work": [
+     "Work backwards. Undo the last thing I did first.",
+     "Last I added 5, so subtract 5: 53 − 5 = 48.",
+     "Before that I multiplied by 6, so divide by 6: 48 ÷ 6 = 8.",
+     "Check: 8 × 6 = 48, and 48 + 5 = 53. ✓"
+    ],
+    "g": "p5Missing"
+   },
+   {
+    "d": 3,
+    "q": "At 6 a.m. the temperature is −4°C. By midday it has risen by 9°C, and by evening it has fallen by 7°C. What is the evening temperature?",
+    "a": "−2°C",
+    "work": [
+     "Use a number line. Moving up (rising) goes to the right; moving down (falling) goes to the left. Zero is in the middle and negative numbers are to the left of zero.",
+     "Start at −4. Rise by 9: −4 + 9. First go up 4 to reach 0, then up the remaining 5, so we get to 5°C.",
+     "Then fall by 7: 5 − 7 = -2.",
+     "That passes below zero, so the answer is negative."
+    ],
+    "g": "p5Temp"
+   },
+   {
+    "d": 3,
+    "q": "How many prime numbers are there between 20 and 30?",
+    "a": "2",
+    "work": [
+     "A prime number has exactly two factors: 1 and itself (like 7). Numbers such as 9 = 3 × 3 are not prime.",
+     "Check each number between 20 and 30: 21 no, 22 no, 23 prime, 24 no, 25 no, 26 no, 27 no, 28 no, 29 prime.",
+     "Even numbers (except 2) can be halved, so are not prime. Numbers ending in 5 are in the 5 times table. Test the rest by trying 3, 7, ...",
+     "The primes are 23, 29: 2 numbers."
+    ],
+    "g": "p5Primes"
+   },
+   {
+    "d": 3,
+    "q": "What is the sum of the first 10 odd numbers? (1 + 3 + 5 + ...)",
+    "a": "100",
+    "work": [
+     "Try small cases and look for a pattern. 1 = 1. 1 + 3 = 4. 1 + 3 + 5 = 9. 1 + 3 + 5 + 7 = 16.",
+     "The answers 1, 4, 9, 16 are square numbers: 1 × 1, 2 × 2, 3 × 3, 4 × 4.",
+     "Why? Each new odd number adds an L-shaped layer of dots to a square, making the next bigger square.",
+     "So the first 10 odd numbers add up to 10 × 10 = 100."
+    ],
+    "g": "p5Odd"
+   },
+   {
     "d": 1,
     "q": "A tank holds 28 litres. 3/4 of the water is used. How many litres are left?",
     "a": "7 litres",
@@ -886,6 +959,71 @@
      "The train arrives at 12:25."
     ],
     "g": "p5Time"
+   },
+   {
+    "d": 2,
+    "q": "Ana and Leo share £30 in the ratio 2 : 3. (For every £2 Ana gets, Leo gets £3.) How much does Leo get?",
+    "a": "£18",
+    "work": [
+     "The ratio 2 : 3 means we cut the money into equal parts: Ana gets 2 parts and Leo gets 3 parts.",
+     "Altogether there are 2 + 3 = 5 parts.",
+     "5 parts are £30, so 1 part is 30 ÷ 5 = £6.",
+     "Leo gets 3 parts: 3 × £6 = £18.",
+     "Check: Ana gets 2 × 6 = £12, and 12 + 18 = 30. ✓"
+    ],
+    "g": "p5Share"
+   },
+   {
+    "d": 2,
+    "q": "A square has a perimeter of 28 cm. What is its area?",
+    "a": "49 cm²",
+    "work": [
+     "A square has 4 equal sides, so the perimeter is 4 × one side.",
+     "One side = 28 ÷ 4 = 7 cm.",
+     "The area of a square is side × side: how many 1 cm squares fit inside.",
+     "7 × 7 = 49.",
+     "The area is 49 cm²."
+    ],
+    "g": "p5SquareArea"
+   },
+   {
+    "d": 3,
+    "q": "How many different numbers divide exactly into 24? (These are called factors of 24.)",
+    "a": "8",
+    "work": [
+     "A factor of 24 is a whole number that goes into 24 with nothing left over. They come in pairs that multiply to 24.",
+     "Start at 1 and work up, finding pairs: 1 × 24, 2 × 12, 3 × 8, 4 × 6.",
+     "The factors are 1, 2, 3, 4, 6, 8, 12, 24.",
+     "Count them: 8."
+    ],
+    "g": "p5Factors"
+   },
+   {
+    "d": 3,
+    "q": "The mean of 5 numbers is 8. Four of them are 8, 12, 6, 9. What is the fifth number?",
+    "a": "5",
+    "work": [
+     "The mean is the total shared out equally, so total = mean × how many numbers.",
+     "5 numbers with mean 8 have a total of 5 × 8 = 40.",
+     "The four we know add up to 8 + 12 + 6 + 9 = 35.",
+     "The fifth is what is missing: 40 − 35 = 5.",
+     "Check: the five numbers add to 40, and 40 ÷ 5 = 8. ✓"
+    ],
+    "g": "p5Mean"
+   },
+   {
+    "d": 3,
+    "q": "How many squares of any size are there in a 4 by 4 grid of small squares?",
+    "a": "30",
+    "work": [
+     "Count the squares size by size so that we do not miss any.",
+     "Size 1 × 1: it can start in 4 places across and 4 places down, so 4 × 4 = 16.",
+     "Size 2 × 2: it can start in 3 places across and 3 places down, so 3 × 3 = 9.",
+     "Size 3 × 3: it can start in 2 places across and 2 places down, so 2 × 2 = 4.",
+     "Size 4 × 4: it can start in 1 places across and 1 places down, so 1 × 1 = 1.",
+     "Add them all: 16 + 9 + 4 + 1 = 30."
+    ],
+    "g": "p5Grid"
    },
    {
     "d": 1,
@@ -915,15 +1053,66 @@
    },
    {
     "d": 2,
-    "q": "A bike costs £60. In a sale it is 20% off. What is the sale price?",
-    "a": "£48",
+    "q": "A car travels at 60 km each hour (60 km/h) for 2.5 hours. How far does it go?",
+    "a": "150 km",
     "work": [
-     "'Per cent' means 'out of 100'. 20% means 20 out of every 100, or 20/100.",
-     "20% is a fifth. A fifth of 60 is 60 ÷ 5 = 12.",
-     "That is how much is taken off: £12.",
-     "Sale price = £60 − £12 = £48."
+     "Speed tells us how far we go in 1 hour. So distance = speed × time.",
+     "Do the whole hours first: 2 × 60 = 120 km.",
+     "Then the half hour: half of 60 is 30 km.",
+     "Add them: 120 + 30 = 150 km."
     ],
-    "g": "p5Pct"
+    "g": "p5Speed"
+   },
+   {
+    "d": 2,
+    "q": "170 children go on a trip. Each coach holds 40 children. How many coaches are needed?",
+    "a": "5",
+    "work": [
+     "Divide the children by the seats on each coach: 170 ÷ 40.",
+     "40 × 4 = 160, which is not quite 170. 170 ÷ 40 = 4 with 10 left over.",
+     "The 10 children left over still need a seat, so we need one more coach.",
+     "4 + 1 = 5 coaches.",
+     "(Always round UP for this kind of question: you can't leave children behind.)"
+    ],
+    "g": "p5Buses"
+   },
+   {
+    "d": 3,
+    "q": "What is 1/2 + 1/3? Give your answer as a fraction.",
+    "a": "5/6",
+    "work": [
+     "We can only add fractions when the bottom numbers (denominators) are the same, because then the pieces are the same size.",
+     "Find a number that both 2 and 3 go into: 6.",
+     "1/2 = 3/6 (multiply top and bottom by 3).",
+     "1/3 = 2/6 (multiply top and bottom by 2).",
+     "Add the tops and keep the bottom: 3/6 + 2/6 = 5/6.",
+     "It cannot be simplified: 5/6."
+    ],
+    "g": "p5FracAdd"
+   },
+   {
+    "d": 3,
+    "q": "Pablo is 7 years old and Pablo's mum is 35 years old. How old will Pablo's mum be when Pablo is 13?",
+    "a": "41",
+    "work": [
+     "Both ages go up by 1 every year, so the gap between them never changes. The gap is 35 − 7 = 28 years.",
+     "When Pablo is 13, mum will be 28 years older.",
+     "13 + 28 = 41.",
+     "(Or: 6 years pass, so mum is 35 + 6 = 41.)"
+    ],
+    "g": "p5Ages"
+   },
+   {
+    "d": 3,
+    "q": "What is 1 + 2 + 3 + ... + 20? (all the whole numbers from 1 to 20)",
+    "a": "210",
+    "work": [
+     "Adding one by one is slow. Pair up the numbers: the first with the last, the second with the second last, and so on.",
+     "1 + 20 = 21, 2 + 19 = 21, 3 + 18 = 21, ... every pair makes 21.",
+     "There are 20 numbers, so 10 pairs.",
+     "10 pairs of 21 is 10 × 21 = 210."
+    ],
+    "g": "p5SumRow"
    },
    {
     "d": 1,
@@ -951,92 +1140,15 @@
    },
    {
     "d": 2,
-    "q": "I think of a number. I multiply it by 6 and then add 5. The answer is 53. What was my number?",
-    "a": "8",
+    "q": "A box is 5 cm long, 4 cm wide and 3 cm tall. It is filled with 1 cm cubes. How many cubes fit in?",
+    "a": "60",
     "work": [
-     "Work backwards. Undo the last thing I did first.",
-     "Last I added 5, so subtract 5: 53 − 5 = 48.",
-     "Before that I multiplied by 6, so divide by 6: 48 ÷ 6 = 8.",
-     "Check: 8 × 6 = 48, and 48 + 5 = 53. ✓"
+     "Fill the bottom layer first. The bottom is 5 cm by 4 cm, so 4 rows of 5 cubes: 5 × 4 = 20 cubes.",
+     "The box is 3 cm tall, so there are 3 layers like that.",
+     "20 × 3 = 60.",
+     "(This is the volume: length × width × height.)"
     ],
-    "g": "p5Missing"
-   },
-   {
-    "d": 2,
-    "q": "How many different numbers divide exactly into 24? (These are called factors of 24.)",
-    "a": "8",
-    "work": [
-     "A factor of 24 is a whole number that goes into 24 with nothing left over. They come in pairs that multiply to 24.",
-     "Start at 1 and work up, finding pairs: 1 × 24, 2 × 12, 3 × 8, 4 × 6.",
-     "The factors are 1, 2, 3, 4, 6, 8, 12, 24.",
-     "Count them: 8."
-    ],
-    "g": "p5Factors"
-   },
-   {
-    "d": 2,
-    "q": "Ana and Leo share £30 in the ratio 2 : 3. (For every £2 Ana gets, Leo gets £3.) How much does Leo get?",
-    "a": "£18",
-    "work": [
-     "The ratio 2 : 3 means we cut the money into equal parts: Ana gets 2 parts and Leo gets 3 parts.",
-     "Altogether there are 2 + 3 = 5 parts.",
-     "5 parts are £30, so 1 part is 30 ÷ 5 = £6.",
-     "Leo gets 3 parts: 3 × £6 = £18.",
-     "Check: Ana gets 2 × 6 = £12, and 12 + 18 = 30. ✓"
-    ],
-    "g": "p5Share"
-   },
-   {
-    "d": 2,
-    "q": "A square has a perimeter of 28 cm. What is its area?",
-    "a": "49 cm²",
-    "work": [
-     "A square has 4 equal sides, so the perimeter is 4 × one side.",
-     "One side = 28 ÷ 4 = 7 cm.",
-     "The area of a square is side × side: how many 1 cm squares fit inside.",
-     "7 × 7 = 49.",
-     "The area is 49 cm²."
-    ],
-    "g": "p5SquareArea"
-   },
-   {
-    "d": 2,
-    "q": "A car travels at 60 km each hour (60 km/h) for 2.5 hours. How far does it go?",
-    "a": "150 km",
-    "work": [
-     "Speed tells us how far we go in 1 hour. So distance = speed × time.",
-     "Do the whole hours first: 2 × 60 = 120 km.",
-     "Then the half hour: half of 60 is 30 km.",
-     "Add them: 120 + 30 = 150 km."
-    ],
-    "g": "p5Speed"
-   },
-   {
-    "d": 2,
-    "q": "170 children go on a trip. Each coach holds 40 children. How many coaches are needed?",
-    "a": "5",
-    "work": [
-     "Divide the children by the seats on each coach: 170 ÷ 40.",
-     "40 × 4 = 160, which is not quite 170. 170 ÷ 40 = 4 with 10 left over.",
-     "The 10 children left over still need a seat, so we need one more coach.",
-     "4 + 1 = 5 coaches.",
-     "(Always round UP for this kind of question: you can't leave children behind.)"
-    ],
-    "g": "p5Buses"
-   },
-   {
-    "d": 2,
-    "q": "Bus A comes every 4 minutes and bus B every 6 minutes. They both arrive together at 9:00. After how many minutes will they next arrive together?",
-    "a": "12 minutes",
-    "work": [
-     "Bus A arrives at 4, 8, 12, ... minutes after 9:00, the 4 times table (these are multiples of 4).",
-     "Bus B arrives at 6, 12, 18, ... (the multiples of 6).",
-     "We need the first number that is in BOTH lists.",
-     "Multiples of 4: 4, 8, 12.",
-     "Multiples of 6: 6, 12.",
-     "The first number in both is 12. They meet again after 12 minutes."
-    ],
-    "g": "p5Multiple"
+    "g": "p5Volume"
    },
    {
     "d": 2,
@@ -1051,82 +1163,7 @@
     "g": "p5Seq"
    },
    {
-    "d": 2,
-    "q": "What is 1/2 + 1/3? Give your answer as a fraction.",
-    "a": "5/6",
-    "work": [
-     "We can only add fractions when the bottom numbers (denominators) are the same, because then the pieces are the same size.",
-     "Find a number that both 2 and 3 go into: 6.",
-     "1/2 = 3/6 (multiply top and bottom by 3).",
-     "1/3 = 2/6 (multiply top and bottom by 2).",
-     "Add the tops and keep the bottom: 3/6 + 2/6 = 5/6.",
-     "It cannot be simplified: 5/6."
-    ],
-    "g": "p5FracAdd"
-   },
-   {
-    "d": 2,
-    "q": "At 6 a.m. the temperature is −4°C. By midday it has risen by 9°C, and by evening it has fallen by 7°C. What is the evening temperature?",
-    "a": "−2°C",
-    "work": [
-     "Use a number line. Moving up (rising) goes to the right; moving down (falling) goes to the left. Zero is in the middle and negative numbers are to the left of zero.",
-     "Start at −4. Rise by 9: −4 + 9. First go up 4 to reach 0, then up the remaining 5, so we get to 5°C.",
-     "Then fall by 7: 5 − 7 = -2.",
-     "That passes below zero, so the answer is negative."
-    ],
-    "g": "p5Temp"
-   },
-   {
-    "d": 2,
-    "q": "The mean of 5 numbers is 8. Four of them are 8, 12, 6, 9. What is the fifth number?",
-    "a": "5",
-    "work": [
-     "The mean is the total shared out equally, so total = mean × how many numbers.",
-     "5 numbers with mean 8 have a total of 5 × 8 = 40.",
-     "The four we know add up to 8 + 12 + 6 + 9 = 35.",
-     "The fifth is what is missing: 40 − 35 = 5.",
-     "Check: the five numbers add to 40, and 40 ÷ 5 = 8. ✓"
-    ],
-    "g": "p5Mean"
-   },
-   {
-    "d": 2,
-    "q": "A box is 5 cm long, 4 cm wide and 3 cm tall. It is filled with 1 cm cubes. How many cubes fit in?",
-    "a": "60",
-    "work": [
-     "Fill the bottom layer first. The bottom is 5 cm by 4 cm, so 4 rows of 5 cubes: 5 × 4 = 20 cubes.",
-     "The box is 3 cm tall, so there are 3 layers like that.",
-     "20 × 3 = 60.",
-     "(This is the volume: length × width × height.)"
-    ],
-    "g": "p5Volume"
-   },
-   {
-    "d": 2,
-    "q": "How many prime numbers are there between 20 and 30?",
-    "a": "2",
-    "work": [
-     "A prime number has exactly two factors: 1 and itself (like 7). Numbers such as 9 = 3 × 3 are not prime.",
-     "Check each number between 20 and 30: 21 no, 22 no, 23 prime, 24 no, 25 no, 26 no, 27 no, 28 no, 29 prime.",
-     "Even numbers (except 2) can be halved, so are not prime. Numbers ending in 5 are in the 5 times table. Test the rest by trying 3, 7, ...",
-     "The primes are 23, 29: 2 numbers."
-    ],
-    "g": "p5Primes"
-   },
-   {
-    "d": 2,
-    "q": "Pablo is 7 years old and Pablo's mum is 35 years old. How old will Pablo's mum be when Pablo is 13?",
-    "a": "41",
-    "work": [
-     "Both ages go up by 1 every year, so the gap between them never changes. The gap is 35 − 7 = 28 years.",
-     "When Pablo is 13, mum will be 28 years older.",
-     "13 + 28 = 41.",
-     "(Or: 6 years pass, so mum is 35 + 6 = 41.)"
-    ],
-    "g": "p5Ages"
-   },
-   {
-    "d": 2,
+    "d": 3,
     "q": "What is the biggest 4-digit number whose digits add up to 16?",
     "a": "9700",
     "work": [
@@ -1139,52 +1176,18 @@
     "g": "p5Digits"
    },
    {
-    "d": 2,
-    "q": "Round 4786 to the nearest 100, then multiply by 7. What do you get?",
-    "a": "33600",
-    "work": [
-     "To round to the nearest 100 look at the tens digit: if it is 5 or more we round up, otherwise we round down.",
-     "4786 is between 4700 and 4800. The tens digit is 8, so we round up to 4800.",
-     "Now 4800 × 7: 48 × 7 = 336, then add the two zeros: 33600."
-    ],
-    "g": "p5Round"
-   },
-   {
     "d": 3,
-    "q": "What is 1 + 2 + 3 + ... + 20? (all the whole numbers from 1 to 20)",
-    "a": "210",
+    "q": "Bus A comes every 4 minutes and bus B every 6 minutes. They both arrive together at 9:00. After how many minutes will they next arrive together?",
+    "a": "12 minutes",
     "work": [
-     "Adding one by one is slow. Pair up the numbers: the first with the last, the second with the second last, and so on.",
-     "1 + 20 = 21, 2 + 19 = 21, 3 + 18 = 21, ... every pair makes 21.",
-     "There are 20 numbers, so 10 pairs.",
-     "10 pairs of 21 is 10 × 21 = 210."
+     "Bus A arrives at 4, 8, 12, ... minutes after 9:00, the 4 times table (these are multiples of 4).",
+     "Bus B arrives at 6, 12, 18, ... (the multiples of 6).",
+     "We need the first number that is in BOTH lists.",
+     "Multiples of 4: 4, 8, 12.",
+     "Multiples of 6: 6, 12.",
+     "The first number in both is 12. They meet again after 12 minutes."
     ],
-    "g": "p5SumRow"
-   },
-   {
-    "d": 3,
-    "q": "6 friends each shake hands once with every other friend. How many handshakes are there in total?",
-    "a": "15",
-    "work": [
-     "Each friend shakes hands with the other 5 friends.",
-     "That makes 6 × 5 = 30 if we count 'from each person'.",
-     "But a handshake involves two people, so we counted every handshake twice (once from each person).",
-     "30 ÷ 2 = 15 handshakes.",
-     "(Check with 4 friends: A–B, A–C, A–D, B–C, B–D, C–D = 6, and 4 × 3 ÷ 2 = 6.)"
-    ],
-    "g": "p5Hand"
-   },
-   {
-    "d": 3,
-    "q": "What is the sum of the first 10 odd numbers? (1 + 3 + 5 + ...)",
-    "a": "100",
-    "work": [
-     "Try small cases and look for a pattern. 1 = 1. 1 + 3 = 4. 1 + 3 + 5 = 9. 1 + 3 + 5 + 7 = 16.",
-     "The answers 1, 4, 9, 16 are square numbers: 1 × 1, 2 × 2, 3 × 3, 4 × 4.",
-     "Why? Each new odd number adds an L-shaped layer of dots to a square, making the next bigger square.",
-     "So the first 10 odd numbers add up to 10 × 10 = 100."
-    ],
-    "g": "p5Odd"
+    "g": "p5Multiple"
    },
    {
     "d": 3,
@@ -1200,18 +1203,15 @@
     "g": "p5Coins"
    },
    {
-    "d": 3,
-    "q": "How many squares of any size are there in a 4 by 4 grid of small squares?",
-    "a": "30",
+    "d": 1,
+    "q": "Round 4786 to the nearest 100, then multiply by 7. What do you get?",
+    "a": "33600",
     "work": [
-     "Count the squares size by size so that we do not miss any.",
-     "Size 1 × 1: it can start in 4 places across and 4 places down, so 4 × 4 = 16.",
-     "Size 2 × 2: it can start in 3 places across and 3 places down, so 3 × 3 = 9.",
-     "Size 3 × 3: it can start in 2 places across and 2 places down, so 2 × 2 = 4.",
-     "Size 4 × 4: it can start in 1 places across and 1 places down, so 1 × 1 = 1.",
-     "Add them all: 16 + 9 + 4 + 1 = 30."
+     "To round to the nearest 100 look at the tens digit: if it is 5 or more we round up, otherwise we round down.",
+     "4786 is between 4700 and 4800. The tens digit is 8, so we round up to 4800.",
+     "Now 4800 × 7: 48 × 7 = 336, then add the two zeros: 33600."
     ],
-    "g": "p5Grid"
+    "g": "p5Round"
    }
   ]
  }
