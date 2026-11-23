@@ -848,15 +848,16 @@
    },
    {
     "d": 3,
-    "q": "At 6 a.m. the temperature is −4°C. By midday it has risen by 9°C, and by evening it has fallen by 7°C. What is the evening temperature?",
-    "a": "−2°C",
+    "q": "I am a 2-digit number. My two digits add up to 12. If you swap my digits around, the new number is 18 bigger than me. What number am I?",
+    "a": "57",
     "work": [
-     "Use a number line. Moving up (rising) goes to the right; moving down (falling) goes to the left. Zero is in the middle and negative numbers are to the left of zero.",
-     "Start at −4. Rise by 9: −4 + 9. First go up 4 to reach 0, then up the remaining 5, so we get to 5°C.",
-     "Then fall by 7: 5 − 7 = -2.",
-     "That passes below zero, so the answer is negative."
-    ],
-    "g": "p5Temp"
+     "Write the number as tens and units. For example 47 is 4 tens and 7 units, and swapping the digits gives 74 (7 tens and 4 units).",
+     "When we swap the digits, the number goes up by 18. Look at what happens to the tens and units: the tens digit and the units digit change places, so the swapped number is bigger than the original by 9 × (the difference between the digits). (Try it: 47 → 74 is 27 bigger, and 9 × (7 − 4) = 27.)",
+     "We need the swapped number to be 18 bigger, so 9 × (difference) = 18. That means the difference between the digits is 18 ÷ 9 = 2. The units digit is 2 more than the tens digit.",
+     "The digits also add up to 12. Two digits that add up to 12 and differ by 2: the middle is 6 (half of 12), so they are 6 − 1 = 5 and 6 + 1 = 7.",
+     "The units digit is the bigger one, so the number is 57.",
+     "Check: 5 + 7 = 12 ✓. Swapping gives 75, and 75 − 57 = 18 ✓."
+    ]
    },
    {
     "d": 3,
@@ -947,16 +948,15 @@
    },
    {
     "d": 3,
-    "q": "The mean of 5 numbers is 8. Four of them are 8, 12, 6, 9. What is the fifth number?",
-    "a": "5",
+    "q": "Three different whole numbers, each bigger than 2, have a mean of 7. What is the biggest the largest of the three numbers could be?",
+    "a": "14",
     "work": [
-     "The mean is the total shared out equally, so total = mean × how many numbers.",
-     "5 numbers with mean 8 have a total of 5 × 8 = 40.",
-     "The four we know add up to 8 + 12 + 6 + 9 = 35.",
-     "The fifth is what is missing: 40 − 35 = 5.",
-     "Check: the five numbers add to 40, and 40 ÷ 5 = 8. ✓"
-    ],
-    "g": "p5Mean"
+     "The mean is the total shared out equally, so total = mean × how many numbers. Three numbers with a mean of 7 add up to 3 × 7 = 21.",
+     "We want the biggest number to be as large as possible. To do that, the other two must be as SMALL as possible, so that as much of the total as possible is left for the big one.",
+     "The numbers must be whole, different from each other, and bigger than 2. The smallest allowed is 3, then the next smallest different one is 4.",
+     "So the other two are 3 and 4, which add up to 7. That leaves 21 − 7 = 14 for the largest number.",
+     "Check: 3 + 4 + 14 = 21 and 21 ÷ 3 = 7 ✓. Could 15 work? Then the other two would add up to 6, and the only way with different numbers bigger than 2 is... the smallest possible pair adds up to 7, so no."
+    ]
    },
    {
     "d": 3,
@@ -1041,15 +1041,16 @@
    },
    {
     "d": 3,
-    "q": "Oscar is 7 years old and Oscar's mum is 35 years old. How old will Oscar's mum be when Oscar is 13?",
-    "a": "41",
+    "q": "Oscar's dad is 5 times as old as Oscar. In 6 years' time, dad will be 3 times as old as Oscar. How old is Oscar now?",
+    "a": "6",
     "work": [
-     "Both ages go up by 1 every year, so the gap between them never changes. The gap is 35 − 7 = 28 years.",
-     "When Oscar is 13, mum will be 28 years older.",
-     "13 + 28 = 41.",
-     "(Or: 6 years pass, so mum is 35 + 6 = 41.)"
-    ],
-    "g": "p5Ages"
+     "Both of them get older by the same amount each year, so the gap between their ages never changes. The trick is to write the gap in two different ways and say they are equal.",
+     "Now: draw Oscar's age as 1 box. Dad is 5 boxes. The gap between them is 5 − 1 = 4 boxes.",
+     "In 6 years: Oscar's age is 1 box + 6. Dad is 3 times as old as Oscar, so the gap is 3 − 1 = 2 times Oscar's age then. That is 2 boxes + 12 (twice 6).",
+     "The gap is the same, so 4 boxes = 2 boxes + 12. Take 2 boxes away from both sides: 2 boxes = 12.",
+     "So 1 box = 12 ÷ 2 = 6. Oscar is 6 now.",
+     "Check: Oscar 6, dad 30 (5 times 6 ✓). In 6 years Oscar is 12 and dad is 36, and 36 = 3 × 12 ✓."
+    ]
    },
    {
     "d": 3,
