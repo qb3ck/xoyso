@@ -163,4 +163,12 @@ G.eReverse = () => { for (;;) { const a = rnd(1, 7), b = a + rnd(1, 9 - a), k = 
   return { q: `The digits of a 2-digit number add up to ${s}. When the digits are swapped, the new number is ${9 * k} more than the original. What is the original number?`, a: `${o}`, work: [`Say the original number has tens digit a and units digit b. It is 10a + b, and the swapped number is 10b + a.`, `The swapped number minus the original is 9b − 9a = 9 × (b − a), and this is ${9 * k}, so b − a = ${k}.`, `a + b = ${s} and b − a = ${k} give b = ${b} and a = ${a}.`, `The original number is ${o}. Check: ${b}${a} − ${o} = ${9 * k} and ${a} + ${b} = ${s}.`] }; } };
 G.eRooks = () => { const n = pick([4, 5, 6, 7]), r = n * n * (n - 1) * (n - 1) / 2, n2 = n * n;
   return { q: `In how many ways can 2 identical rooks be placed on a ${n} × ${n} chessboard so that they are not in the same row or the same column?`, a: `${r}`, work: [`Put the first rook anywhere: ${n2} squares.`, `The second rook cannot be in the first rook's row or column. That takes out ${2 * n - 1} squares (including its own), leaving ${n2 - 2 * n + 1}.`, `${n2} × ${n2 - 2 * n + 1} = ${n2 * (n2 - 2 * n + 1)}, but this counts each pair of positions twice, because the rooks are identical.`, `${n2 * (n2 - 2 * n + 1)} ÷ 2 = ${r}.`] }; };
+
+/* diagrams for practice questions */
+const gridFig = (n) => { const cs = n <= 3 ? 34 : n === 4 ? 28 : 24, gap = 18, W = n * (n * cs + gap) + 10, H = n * cs + 36; let b = '';
+  for (let k = 1; k <= n; k++) { const ox = 8 + (k - 1) * (n * cs + gap);
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) b += `<rect x="${ox + c * cs}" y="${8 + r * cs}" width="${cs}" height="${cs}" fill="none" stroke="currentColor" stroke-width="1" opacity=".45"/>`;
+    b += `<rect x="${ox}" y="${8 + (n - k) * cs}" width="${k * cs}" height="${k * cs}" fill="rgba(240,170,60,.4)" stroke="currentColor" stroke-width="2.2"/><text x="${ox + n * cs / 2}" y="${8 + n * cs + 18}" text-anchor="middle" fill="currentColor">a ${k} × ${k} square</text>`; }
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="A ${n} by ${n} grid with a square of each size highlighted" style="max-width:${Math.round(W * 1.6)}px;width:100%;height:auto;font:13px sans-serif">${b}</svg>`; };
+['pSquares'].forEach((k) => { if (!G[k]) return; const f = G[k]; G[k] = (...a) => { const r = f(...a); const m = r.q.match(/(\d) (?:×|by) (\d)/); if (m) r.work[0] = { t: r.work[0], svg: gridFig(+m[1]) }; return r; }; });
 if (typeof module !== 'undefined') module.exports = G;

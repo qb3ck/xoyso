@@ -87,7 +87,7 @@ function render() {
      <p class="qtext">${esc(q.q)}</p>
      ${shown ? `<div><p class="eyebrow">Answer</p><p class="answer">${esc(q.a)}</p></div><div><p class="eyebrow">Working</p><ol class="work">${q.work.map(wi).join('')}</ol></div>
        <div><p class="eyebrow">${m ? 'Marked: ' + (m === 'r' ? 'right' : 'wrong') + '. Tap to change.' : 'How did you do? Be honest.'}</p><div class="mark"><button class="btn ${m === 'r' ? 'on r' : ''}" data-m="r">✓ I got it right</button><button class="btn ${m === 'w' ? 'on w' : ''}" data-m="w">✗ I got it wrong</button></div></div>
-       <div><p class="eyebrow">Want more?</p><button class="btn" id="prac">Practise more questions like this</button></div>`
+       ${q.g && G[q.g] ? `<div><p class="eyebrow">Want more?</p><button class="btn" id="prac">Practise more questions like this</button></div>` : ''}`
      : `<div class="how"><b>Do this</b><span>Work it out on paper first. Only then tap the button to see the answer and the working.</span></div><button class="btn primary" id="show">Show the answer and working</button>`}
     </div>` : `<div class="panel"><p class="clue">The first question appears on ${longDate(DATA.start)}.</p></div>`}
    <h2 class="sec">Calendar</h2>
