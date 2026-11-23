@@ -20,7 +20,7 @@ const save = () => { try { localStorage.setItem(KEY, JSON.stringify(DB)); } catc
 let DATA = null, group = null, sel = null, shown = false, viewMonth = null, prac = null;
 function newPractice(g, prev) { let r = null; for (let i = 0; i < 12; i++) { r = G[g](); if (!prev || r.q !== prev.q) break; } return { ...r, g, shown: false, n: (prev ? prev.n : 0) + 1 }; }
 const today = () => ymd(new Date());
-const qFor = (g, date) => { const i = dayDiff(date, DATA.start); const list = DATA.groups[g]; if (i < 0 || i >= DAYS) return null; return i < list.length ? list[i] : yearSchedule(g, list, parse(DATA.start))[i - list.length] || null; };
+const qFor = (g, date) => { const i = dayDiff(date, DATA.start); const list = DATA.groups[g]; return i >= 0 && i < list.length ? list[i] : null; };
 const mark = (g, date) => DB.d[`${g}:${date}`] || null;
 
 /* ---- account sync (progress rows qotd:<year>:<date>; the latest answer decides right/wrong) ---- */
@@ -59,7 +59,7 @@ function setMark(g, date, v) {
 function stars(n) { return `<span class="stars" aria-label="Difficulty ${n} of 3">${'★'.repeat(n)}<i>${'★'.repeat(3 - n)}</i></span>`; }
 function longDate(s) { const d = parse(s); return `${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`; }
 function render() {
-  const t = today(), n = DAYS;
+  const t = today(), n = DATA.groups[group].length;
   const dates = Array.from({ length: n }, (_, i) => ymd(new Date(parse(DATA.start).getTime() + i * 864e5)));
   const open = dates.filter((d) => d <= t);
   const done = open.filter((d) => mark(group, d)).length, right = open.filter((d) => mark(group, d) === 'r').length, missed = open.length - done;
