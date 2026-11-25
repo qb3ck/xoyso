@@ -424,10 +424,8 @@ READ.push(
 );
 READ.find((r) => r.id === 'ciclo').pg = '41';
 const MQ = (q, c, w, why, t, s) => MCQ.push([q, c, w, why, t, s]);
-MQ('¿Qué porcentaje del planeta es agua?', '70,8%', ['29,2%', '96,5%', '50%'], 'Diapositiva 44.', 'agu', '44');
 MQ('Del agua del planeta, ¿qué porcentaje es agua salada?', '96,5%', ['2,5%', '70,8%', '30,1%'], 'El 96,5% es salada y el 2,5% dulce (diapositiva 44).', 'agu', '44');
 MQ('¿Dónde está la mayor parte del agua dulce?', 'en las capas de hielo y los glaciares', ['en los ríos y lagos', 'en el agua subterránea', 'en la atmósfera'], '68,7% hielo y glaciares; 30,1% agua subterránea; 1,2% superficial y otros.', 'agu', '44');
-MQ('¿Qué porcentaje del agua dulce es agua subterránea?', '30,1%', ['68,7%', '1,2%', '96,5%'], 'Diapositiva 44.', 'agu', '44');
 MQ('¿Qué es el mar, según las diapositivas?', 'una prolongación de los océanos cerca del continente', ['una masa de agua dulce', 'un río muy grande', 'un lago salado'], 'Diapositiva 45.', 'agu', '45');
 MQ('¿Por qué el agua del mar es salada?', 'por la disolución de rocas que traen los ríos', ['porque el Sol le echa sal', 'porque llueve poco', 'por las mareas'], 'Diapositiva 45.', 'agu', '45');
 MQ('¿Qué pasa con la salinidad cuando el mar es más cerrado y hace más calor?', 'aumenta, porque hay más evaporación', ['disminuye', 'no cambia', 'se convierte en agua dulce'], 'Más evaporación = más sal en el agua que queda (diapositiva 45).', 'agu', '45');
@@ -463,8 +461,6 @@ MQ('¿Cómo se forma un acuífero?', 'el agua de lluvia se filtra hasta una roca
 MQ('¿Qué amenaza más a las aguas subterráneas?', 'la extracción excesiva y la contaminación', ['las mareas', 'las olas', 'el delta'], 'Diapositiva 60.', 'sub', '60');
 MQ('¿Qué hacen las aguas subterráneas por el suelo y los ríos?', 'protegen la humedad del suelo y alimentan ríos y lagos', ['destruyen el suelo', 'evaporan los ríos', 'forman los volcanes'], 'Diapositiva 60.', 'sub', '60');
 MQ('¿Qué acuífero se ve en la diapositiva 61?', 'el Acuífero Guaraní', ['el Acuífero Ibérico', 'el Acuífero del Nilo', 'el Acuífero Mediterráneo'], 'Está bajo Brasil, Paraguay, Argentina y Uruguay.', 'sub', '61');
-MQ('¿Qué ahorra más agua de los gestos de la diapositiva 62?', 'usar los electrodomésticos con la carga completa (200 litros)', ['cerrar el grifo al enjabonarse (12 litros)', 'usar un vaso al cepillarse los dientes (19 litros)', 'lavar frutas en un bol (10 litros)'], 'Electrodomésticos llenos: 200 litros.', 'sub', '62');
-MQ('¿Cuántos litros se ahorran al ducharse en vez de bañarse?', '60', ['6', '19', '200'], 'Diapositiva 62.', 'sub', '62');
 for (const [r, v] of VERT) { const w = ['Atlántica', 'Mediterránea', 'Cantábrica'].filter((x) => x !== v); MQ(`¿En qué vertiente está el río ${r}?`, v, w, `El ${r} es de la vertiente ${v} (mapa de la diapositiva 57).`, 'rio', '57'); }
 for (const [r, c] of RIV) { const w = rsample(['Europa', 'Asia', 'África', 'América del Sur', 'América del Norte', 'Oceanía'].filter((x) => x !== c), 3); MQ(`¿En qué continente está el río ${r}?`, c, w, `El ${r} está en ${c}. (Dato añadido: la diapositiva 64 solo da la lista de ríos.)`, 'rio', '64'); }
 const TQ = (s, v, why, t, sl) => TF.push([s, v, why, t, sl]);
@@ -526,32 +522,19 @@ ST('ciclo', 'El agua del ciclo solo está en los océanos.', false, 'Circula ent
 SM('subt', '¿Cómo se forma un acuífero?', 'el agua de lluvia se filtra hasta encontrar una roca impermeable', ['el agua del mar sube por la costa', 'el agua de un río se congela', 'el agua se evapora bajo tierra'], 'Se acumula sobre la roca impermeable.', 'sub', '60');
 SM('subt', '¿Cuáles son los dos peligros principales para las aguas subterráneas?', 'la extracción excesiva y la contaminación', ['el frío y la nieve', 'las mareas y las olas', 'el viento y el sol'], 'Son muy vulnerables a ambas.', 'sub', '61');
 SM('subt', '¿Qué es el Acuífero Guaraní?', 'un gran acuífero bajo Brasil, Paraguay, Argentina y Uruguay', ['un río de Europa', 'un lago de montaña', 'un mar cerrado'], 'Diapositiva 61.', 'sub', '61');
-SM('subt', '¿Qué ahorra más agua de estos gestos?', 'poner los electrodomésticos con la carga completa (200 litros)', ['cerrar el grifo al enjabonarse (12 litros)', 'usar un vaso al lavarse los dientes (19 litros)', 'lavar la fruta en un bol (10 litros)'], '200 litros, frente a 60 de ducharse en vez de bañarse.', 'sub', '62');
-SM('subt', '¿Cuántos litros se ahorran duchándose en vez de bañarse?', '60', ['12', '6', '19'], 'Diapositiva 62.', 'sub', '62');
 ST('subt', 'Las aguas subterráneas alimentan ríos y lagos.', true, 'Y protegen la humedad del suelo.', 'sub', '61');
 ST('subt', 'Todas las aguas subterráneas son imposibles de agotar.', false, 'Son vulnerables a la extracción excesiva.', 'sub', '61');
 
 /* ---------- written-answer questions (no choices). [question, accepted answers, shown answer, why, topic, slide, section] ---------- */
 const INP = [];
 const IQ = (q, acc, shown, why, t, s, sec) => INP.push([q, acc, shown, why, t, s, sec]);
-IQ('¿Qué porcentaje del planeta es agua?', ['70,8'], '70,8%', 'Diapositiva 44.', 'agu', '44', 'ciclo2');
 IQ('Del agua del planeta, ¿qué porcentaje es agua salada (mares y océanos)?', ['96,5'], '96,5%', 'Diapositiva 44.', 'agu', '44', 'ciclo2');
 IQ('Del agua del planeta, ¿qué porcentaje es agua dulce?', ['2,5'], '2,5%', 'Diapositiva 44.', 'agu', '44', 'ciclo2');
-IQ('Del agua dulce, ¿qué porcentaje está en capas de hielo y glaciares?', ['68,7'], '68,7%', 'Es la mayor parte del agua dulce.', 'agu', '44', 'ciclo2');
-IQ('Del agua dulce, ¿qué porcentaje es agua subterránea?', ['30,1'], '30,1%', 'Diapositiva 44.', 'agu', '44', 'ciclo2');
-IQ('Del agua dulce, ¿qué porcentaje es agua superficial y otros (ríos, lagos...)?', ['1,2'], '1,2%', 'Muy poca: la mayor parte está en hielo y bajo tierra.', 'agu', '44', 'ciclo2');
-IQ('El agua de mar tiene un 96,5% de agua. ¿Qué porcentaje es sal marina?', ['3,5'], '3,5%', '96,5% + 3,5% = 100%.', 'agu', '45', 'ciclo2');
-IQ('¿Qué porcentaje de las sales del mar es cloro? (la sal más abundante)', ['55'], '55%', 'Después viene el sodio (30,6%).', 'agu', '45', 'ciclo2');
-IQ('¿Qué porcentaje de las sales del mar es sodio?', ['30,6'], '30,6%', 'Cloro 55% y sodio 30,6%.', 'agu', '45', 'ciclo2');
 IQ('¿Cuántos millones de km³ de agua dulce hay en la Tierra?', ['10,6'], '10,6 millones de km³', 'Frente a 1385 millones de km³ en mares y océanos.', 'agu', '44', 'ciclo2');
 IQ('¿Cuántos millones de km³ de agua hay en mares y océanos?', ['1385'], '1385 millones de km³', 'Diapositiva 44.', 'agu', '44', 'ciclo2');
 IQ('¿Qué porcentaje de la población vive en la costa?', ['80'], '80%', 'Diapositiva 36.', 'hum', '36', 'humano');
 IQ('¿A menos de cuántos metros de altitud vive la mayoría de la gente?', ['500'], '500 m', 'Diapositiva 36.', 'hum', '36', 'humano');
 IQ('¿Hasta unos cuántos metros de profundidad llega la plataforma continental?', ['400'], 'unos 400 m', 'Definición del libro (p. 16-17).', 'rel', '5', 'relieve');
-IQ('¿Cuántos litros se ahorran ducharse en vez de bañarse?', ['60'], '60 litros', 'Diapositiva 62.', 'sub', '62', 'subt');
-IQ('¿Cuántos litros se ahorran al poner los electrodomésticos con la carga completa?', ['200'], '200 litros', 'Es el gesto que más ahorra.', 'sub', '62', 'subt');
-IQ('¿Cuántos litros se ahorran al usar un vaso de agua para enjuagarse los dientes?', ['19'], '19 litros', 'Diapositiva 62.', 'sub', '62', 'subt');
-IQ('¿Cuántos litros se ahorran al cerrar el grifo mientras te enjabonas las manos?', ['12'], '12 litros', 'Diapositiva 62.', 'sub', '62', 'subt');
 IQ('Escribe cómo se llama el paso de líquido a gas.', ['evaporacion'], 'evaporación', 'El calor del Sol evapora el agua.', 'cic', '41', 'ciclo');
 IQ('Escribe cómo se llama el paso de gas a líquido que forma las nubes.', ['condensacion'], 'condensación', 'El vapor se enfría y se condensa.', 'cic', '41', 'ciclo');
 IQ('Escribe cómo se llama el paso de sólido a gas sin pasar por líquido.', ['sublimacion'], 'sublimación', 'Ejemplo: los copos de nieve.', 'cic', '41', 'ciclo');
@@ -563,9 +546,6 @@ IQ('Escribe los tres pasos del proceso de los agentes externos: erosión, ... y 
 
 /* ---------- match-the-numbers sets: [title, topic, slide, section, [[what, figure], ...]] ---------- */
 const MATCH = [
-  ['El agua de la Tierra', 'agu', '44', 'ciclo2', [['Parte del planeta que es agua', '70,8%'], ['Parte del agua del planeta que es salada', '96,5%'], ['Parte del agua del planeta que es dulce', '2,5%'], ['Agua dulce en capas de hielo y glaciares', '68,7%'], ['Agua dulce que es subterránea', '30,1%'], ['Agua dulce superficial y otros', '1,2%']]],
-  ['Las sales del mar', 'agu', '45', 'ciclo2', [['Sal marina en el agua de mar', '3,5%'], ['Cloro (de las sales)', '55%'], ['Sodio (de las sales)', '30,6%'], ['Sulfato (de las sales)', '7,7%'], ['Magnesio (de las sales)', '3,7%'], ['Potasio (de las sales)', '1,1%']]],
-  ['Cuánta agua hay', 'agu', '44', 'ciclo2', [['Agua en mares y océanos', '1385 millones de km³'], ['Agua dulce de toda la Tierra', '10,6 millones de km³'], ['Agua dulce en ríos y lagos', '93 113 km³']]],
-  ['Ahorrar agua: litros que se ahorran', 'sub', '62', 'subt', [['Vaso de agua para enjuagarse los dientes', '19 litros'], ['Ducharse en vez de bañarse', '60 litros'], ['Cerrar el grifo al enjabonarse las manos', '12 litros'], ['Cisterna inteligente (por uso)', '6 litros'], ['Electrodomésticos con la carga completa', '200 litros'], ['Lavar frutas y verduras en un bol', '10 litros']]],
+  ['Cuánta agua hay', 'agu', '44', 'ciclo2', [['Parte del agua del planeta que es salada', '96,5%'], ['Parte del agua del planeta que es dulce', '2,5%'], ['Agua en mares y océanos', '1385 millones de km³'], ['Agua dulce de toda la Tierra', '10,6 millones de km³'], ['Agua dulce en ríos y lagos', '93 113 km³']]],
   ['Personas y mar', 'hum', '36', 'humano', [['Población que vive en la costa', '80%'], ['Altitud a la que vive la mayoría', 'menos de 500 m'], ['Profundidad de la plataforma continental', 'unos 400 m']]],
 ];
