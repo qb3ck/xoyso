@@ -83,7 +83,7 @@ const READ = [
     <h3>Tres tipos de límite entre placas (10)</h3>
     <p class="note">No hace falta saber los dibujos complicados de las placas moviéndose unas bajo otras (diapositivas 8 y 10): solo qué hacen las placas en cada tipo de límite.</p>
     <table class="t"><tr><th>Límite</th><th>Qué pasa</th><th>Qué se forma</th></tr>
-    <tr><td><b>Convergente</b></td><td>las placas se <b>acercan</b> y chocan</td><td>cordilleras (el choque de la India con Asia formó el Himalaya), fosas y volcanes</td></tr>
+    <tr><td><b>Convergente</b></td><td>las placas se <b>acercan</b> y chocan</td><td>cordilleras (por ejemplo, el Himalaya), fosas y volcanes</td></tr>
     <tr><td><b>Divergente</b></td><td>las placas se <b>separan</b> y sube magma</td><td>dorsales oceánicas y valles de rift</td></tr>
     <tr><td><b>Transformante</b></td><td>las placas se <b>deslizan</b> una junto a otra, en sentidos contrarios</td><td>fallas transformantes y terremotos</td></tr></table>
     <h3>Deformaciones (11)</h3>
@@ -129,7 +129,7 @@ const READ = [
     ${fig('valle.jpg', 'Diapositiva 26. Un río en sus tres cursos: <b>curso alto</b> (valle estrecho), <b>curso medio</b> (valle ancho, meandros), <b>curso bajo</b> (vega y desembocadura).')}
     <p class="note">En el dibujo de tu libro «Los cursos de un río» aparecen también: <b>nacimiento, divisoria de aguas, lago, torrente, afluente, llanura aluvial, meandro, desembocadura y delta</b>.</p>
     <h3>Valles, delta y estuario (28-30)</h3>
-    <p class="note">Estas diapositivas solo tienen fotos (el «Estuario del Miño» es el ejemplo que da). ${ADD} Ideas básicas:</p>
+    <p class="note">Estas diapositivas solo tienen fotos (en una de ellas se ve un estuario). ${ADD} Ideas básicas:</p>
     <ul><li><b>Valle fluvial:</b> lo excava un río; suele tener forma de V. <b>Valle glaciar:</b> lo excava un glaciar; tiene forma de U.</li>
     <li><b>Delta:</b> el río deposita sedimentos en la desembocadura y forma terreno en abanico con varios brazos.</li>
     <li><b>Estuario:</b> la desembocadura se ensancha en forma de embudo y el agua del río se mezcla con la del mar.</li></ul>
@@ -190,7 +190,7 @@ const MCQ = [
   ['En un límite convergente, las placas…', 'se acercan y chocan', ['se separan', 'se deslizan una junto a otra', 'no se mueven'], 'Convergente = se acercan.', 'pla', '10'],
   ['En un límite divergente, las placas…', 'se separan y sube magma', ['chocan', 'se deslizan lateralmente', 'se funden'], 'Divergente = se separan.', 'pla', '10'],
   ['En un límite transformante, las placas…', 'se deslizan lateralmente', ['se acercan', 'se separan', 'se hunden'], 'Transformante = se deslizan una junto a otra.', 'pla', '10'],
-  ['¿Qué se formó cuando la placa de la India chocó con Asia?', 'el Himalaya', ['una fosa oceánica', 'una dorsal', 'un delta'], 'El choque de dos placas levanta cordilleras.', 'pla', '9'],
+  ['El Himalaya es un ejemplo de lo que se forma cuando chocan dos placas. ¿Qué es?', 'una cordillera', ['una fosa oceánica', 'una dorsal', 'un delta'], 'El choque de dos placas levanta cordilleras.', 'pla', '9'],
   ['¿Qué pasa si los materiales que se deforman son blandos?', 'se forma un pliegue', ['se forma una falla', 'se forma un volcán', 'no pasa nada'], 'Blandos ⇒ pliegue. Duros ⇒ falla.', 'def', '11'],
   ['¿Qué pasa si los materiales que se deforman son duros?', 'se forma una falla', ['se forma un pliegue', 'se forma un delta', 'se disuelven'], 'Duros ⇒ falla (se rompen).', 'def', '11'],
   ['En una falla, ¿cómo se llaman las dos partes de la roca rota?', 'labio levantado y labio hundido', ['plano y cumbre', 'cráter y cono', 'cauce y vega'], 'Hay un labio de falla levantado y otro hundido.', 'def', '11'],
@@ -220,7 +220,7 @@ const MCQ = [
   ['¿Qué aparece en el curso medio de un río?', 'meandros y un valle ancho', ['un valle muy estrecho', 'solo hielo', 'una fosa'], 'Diapositiva 26.', 'ext', '26'],
   ['¿Qué hay en el curso bajo de un río?', 'la vega y la desembocadura', ['el nacimiento', 'un torrente', 'una cordillera'], 'Cerca de la desembocadura el terreno es llano y fértil.', 'ext', '26'],
   ['¿Qué es un delta?', 'una desembocadura donde los sedimentos forman terreno con varios brazos', ['una desembocadura ancha en forma de embudo', 'un valle de montaña', 'una cueva'], 'Delta = depósito de sedimentos. (Añadido.)', 'ext', '29'],
-  ['¿Qué es un estuario?', 'una desembocadura ancha en forma de embudo', ['un lago de montaña', 'una duna', 'una isla'], 'Ejemplo de la diapositiva 30: el estuario del Miño. (Definición añadida.)', 'ext', '30'],
+  ['¿Qué es un estuario?', 'una desembocadura ancha en forma de embudo', ['un lago de montaña', 'una duna', 'una isla'], 'Diapositiva 30. (Definición añadida.)', 'ext', '30'],
   ['¿Qué forman las olas y las corrientes marinas en la costa?', 'acantilados y playas', ['volcanes', 'dunas', 'cordilleras'], 'Diapositiva 31.', 'ext', '31'],
   ['¿Qué ocurre justo antes de que caiga un trozo de acantilado?', 'el mar socava la base y las rocas quedan a punto de desplomarse', ['el río lo cubre de arena', 'sube el magma', 'se forma un pliegue'], 'Pasos: oleaje, socavamiento, desplome, plataforma de abrasión.', 'ext', '31'],
   ['¿Quién modifica más el relieve entre los seres vivos?', 'el ser humano', ['los árboles', 'los animales', 'las algas'], 'Diapositiva 32.', 'ext', '32'],
@@ -244,7 +244,7 @@ const TF = [
   ['La dorsal oceánica es una cadena de montañas submarinas.', true, 'Es una cadena submarina donde se forma nueva corteza.', 'rel', '5'],
   ['La fosa marina es la parte más profunda del océano.', true, 'Fosa = zona más profunda, estrecha y alargada.', 'rel', '5'],
   ['Una península está rodeada de agua por todas partes.', false, 'Está rodeada de agua por todas partes menos por una (eso sería una isla).', 'rel', '5'],
-  ['El Himalaya se formó por el choque de la placa de la India con la de Asia.', true, 'Choque de placas ⇒ cordillera.', 'pla', '9'],
+  ['El Himalaya se formó por el choque de dos placas.', true, 'Choque de placas ⇒ cordillera.', 'pla', '9'],
   ['En un límite divergente las placas se acercan.', false, 'Divergente = se separan. Las que se acercan son las convergentes.', 'pla', '10'],
   ['En un límite transformante las placas se deslizan lateralmente.', true, 'Se deslizan una junto a otra.', 'pla', '10'],
   ['Los materiales duros se doblan y forman pliegues.', false, 'Los duros se rompen (falla). Los blandos se pliegan.', 'def', '11'],
@@ -321,8 +321,6 @@ GLOSS.push(
   ['vertiente', 'conjunto de ríos que desembocan en un mismo mar u océano'],
 );
 const rsample = (a, n) => [...a].sort(() => Math.random() - 0.5).slice(0, n);
-const RIV = [['Támesis','Europa'],['Rin','Europa'],['Volga','Europa'],['Tíber','Europa'],['Danubio','Europa'],['Sena','Europa'],['Garona','Europa'],['Indo','Asia'],['Yangtsé','Asia'],['Ganges','Asia'],['Huang He','Asia'],['Mekong','Asia'],['Lena','Asia'],['Níger','África'],['Nilo','África'],['Congo','África'],['Amazonas','América del Sur'],['Río de la Plata','América del Sur'],['Misisipi','América del Norte'],['Murray','Oceanía']];
-const VERT = [['Miño','Atlántica'],['Duero','Atlántica'],['Tajo','Atlántica'],['Guadiana','Atlántica'],['Guadalquivir','Atlántica'],['Ebro','Mediterránea'],['Turia','Mediterránea'],['Júcar','Mediterránea'],['Segura','Mediterránea'],['Ter','Mediterránea'],['Llobregat','Mediterránea'],['Nalón','Cantábrica'],['Navia','Cantábrica'],['Bidasoa','Cantábrica']];
 
 READ.push(
 { id: 'ciclo2', title: 'El ciclo natural del agua y cuánta agua hay', pg: '42-45', body: `
@@ -369,7 +367,7 @@ READ.push(
   <dt>caudal</dt><dd>cantidad de agua que lleva el río</dd>
   <dt>afluente</dt><dd>río que desemboca en otro río más grande</dd>
   <dt>desembocadura</dt><dd>donde el río termina (en el mar, en un lago o en otro río)</dd>
-  <dt>cuenca hidrográfica</dt><dd>territorio cuyas aguas van todas a un mismo río. Ejemplo: la cuenca del Ebro</dd></dl>
+  <dt>cuenca hidrográfica</dt><dd>territorio cuyas aguas van todas a un mismo río.</dd></dl>
   <h3>Los cursos de un río (54-55)</h3>
   ${fig('cursos.jpg', 'Diapositiva 54. Curso alto: nacimiento, divisoria de aguas, lago, torrente, afluente. Curso medio: meandro, margen derecho, margen izquierdo. Curso bajo: desembocadura, delta.')}
   <p><b>El curso</b> es el recorrido que hace un río desde su nacimiento hasta su desembocadura.</p>
@@ -387,20 +385,19 @@ READ.push(
   <h3>Regímenes fluviales (56)</h3>
   ${fig('regimenes.jpg', 'Diapositiva 56. Coeficiente de caudal de cada mes, de enero a diciembre.')}
   <p>Muestra <b>cómo cambia el caudal de un río a lo largo del año</b> (su régimen).</p>
-  <ul><li><b>Segre</b> (afluente del Ebro): más caudal en <b>mayo y junio</b> (deshielo), menos al final del verano y en otoño.</li>
-  <li><b>Miño</b> (desemboca en el Atlántico): más caudal en <b>invierno</b> (diciembre a marzo), menos en <b>verano</b> (julio a septiembre).</li></ul>
+  <ul><li>Un río de montaña alimentado por el <b>deshielo</b>: más caudal en <b>mayo y junio</b>, menos al final del verano y en otoño.</li>
+  <li>Un río atlántico alimentado por la <b>lluvia</b>: más caudal en <b>invierno</b> (diciembre a marzo), menos en <b>verano</b> (julio a septiembre).</li></ul>
   <p class="note">Los meses los he leído a ojo en el gráfico. Compruébalos en tu libro.</p>
   <h3>Los ríos de España (57)</h3>
   ${fig('vertientes.jpg', 'Diapositiva 57. Cada color es una vertiente.')}
-  <table class="t"><tr><th>Vertiente</th><th>Ríos</th></tr>
-  <tr><td><b>Cantábrica</b> (verde)</td><td>ríos cortos del norte: Nalón, Navia, Nervión, Bidasoa</td></tr>
-  <tr><td><b>Atlántica</b> (amarillo)</td><td>Miño, Duero, Tajo, Guadiana, Guadalquivir (y Odiel, Tinto, Guadalete)</td></tr>
-  <tr><td><b>Mediterránea</b> (rosa)</td><td>Ebro, Ter, Llobregat, Turia, Júcar, Segura</td></tr></table>
+  <p>Una <b>vertiente</b> agrupa los ríos que desembocan en el mismo mar u océano. En España hay tres:</p>
+  <table class="t"><tr><th>Vertiente</th><th>Los ríos desembocan en</th></tr>
+  <tr><td><b>Cantábrica</b> (verde)</td><td>el mar Cantábrico (ríos cortos del norte)</td></tr>
+  <tr><td><b>Atlántica</b> (amarillo)</td><td>el océano Atlántico</td></tr>
+  <tr><td><b>Mediterránea</b> (rosa)</td><td>el mar Mediterráneo</td></tr></table>
   <h3>¿Para qué nos sirven los ríos? (58-59)</h3>
   <ol><li><b>Delimitan territorios</b> (fronteras naturales).</li><li><b>Energía:</b> el agua de los embalses produce electricidad.</li><li><b>Ocio y deporte:</b> turismo y actividades acuáticas.</li><li><b>Vías de comunicación y transporte</b> de personas y mercancías.</li><li><b>Agua para riego</b> (agrícola).</li><li><b>Agua de uso doméstico</b> (potabilizada).</li><li><b>Agua de uso industrial</b> (por ejemplo, refrigeración).</li></ol>
   <p class="note">Los ríos no son sitios para tirar residuos sólidos ni líquidos.</p>
-  <h3>Los 27 ríos (64)</h3>
-  <p>La diapositiva 64 da una lista de ríos, sin instrucciones. Son los siete de España <b>(Guadalquivir, Miño, Duero, Guadiana, Turia, Ebro, Tajo)</b> y veinte del resto del mundo. ${ADD} Continentes: <b>Europa</b>: Támesis, Rin, Volga, Tíber, Danubio, Sena, Garona · <b>Asia</b>: Indo, Yangtsé, Ganges, Huang He, Mekong, Lena · <b>África</b>: Níger, Nilo, Congo · <b>América del Sur</b>: Amazonas, Río de la Plata · <b>América del Norte</b>: Misisipi · <b>Oceanía</b>: Murray.</p>
   <p class="note">El texto de la diapositiva 53 (voluntaria) pide buscar los cinco ríos más caudalosos y los más largos del mundo, y el más largo y el más caudaloso de España. No lo incluyo porque es una búsqueda tuya.</p>` },
 
 { id: 'subt', title: 'Aguas subterráneas y ahorro de agua', pg: '60-62', body: `
@@ -449,9 +446,9 @@ MQ('¿Qué acción predomina en el curso alto?', 'la erosión', ['el transporte'
 MQ('¿Qué acción predomina en el curso bajo?', 'la sedimentación', ['la erosión', 'el transporte', 'la infiltración'], 'Alto = erosión; medio = transporte; bajo = sedimentación.', 'rio', '54');
 MQ('¿Cómo puede ser la desembocadura de un río?', 'en delta o en estuario', ['solo en delta', 'solo en lago', 'en meandro'], 'Diapositiva 54.', 'rio', '54');
 MQ('¿Qué muestra un régimen fluvial?', 'cómo cambia el caudal del río a lo largo del año', ['la longitud del río', 'la altura del nacimiento', 'los afluentes del río'], 'Diapositiva 56.', 'rio', '56');
-MQ('Según la diapositiva 56, ¿cuándo lleva más caudal el Segre?', 'en mayo y junio', ['en diciembre y enero', 'en agosto', 'en octubre'], 'El Segre alcanza su máximo en mayo-junio (lectura del gráfico).', 'rio', '56');
-MQ('Según la diapositiva 56, ¿cuándo lleva menos caudal el Miño?', 'en verano', ['en invierno', 'en marzo', 'en diciembre'], 'El Miño lleva más agua en invierno y menos en verano (lectura del gráfico).', 'rio', '56');
-MQ('¿Qué río de España es afluente del Ebro, según la diapositiva 56?', 'el Segre', ['el Miño', 'el Tajo', 'el Turia'], 'Diapositiva 56: el Segre es afluente del Ebro.', 'rio', '56');
+MQ('Según la diapositiva 56, ¿cuándo lleva más caudal un río de montaña alimentado por el deshielo?', 'en mayo y junio', ['en diciembre y enero', 'en agosto', 'en octubre'], 'El deshielo alcanza su máximo en mayo-junio (diapositiva 56).', 'rio', '56');
+MQ('Según la diapositiva 56, ¿cuándo lleva menos caudal un río atlántico alimentado por la lluvia?', 'en verano', ['en invierno', 'en marzo', 'en diciembre'], 'Lleva más agua en invierno y menos en verano (diapositiva 56).', 'rio', '56');
+MQ('¿Cuántas vertientes tienen los ríos de España, según la diapositiva 57?', 'tres', ['dos', 'cuatro', 'cinco'], 'Cantábrica, Atlántica y Mediterránea.', 'rio', '57');
 MQ('¿Cuál de estos NO es un uso de los ríos?', 'recoger vertidos sólidos y líquidos', ['producir electricidad', 'regar los campos', 'transportar mercancías'], 'La diapositiva 59 avisa: los ríos no son espacios para recoger vertidos.', 'rio', '59');
 MQ('¿Cómo producen electricidad los ríos?', 'con el agua de los embalses', ['con las mareas', 'con la lava', 'con el viento del río'], 'Diapositiva 59: recursos energéticos.', 'rio', '59');
 MQ('¿Qué puede ser un río para dos países?', 'una frontera natural', ['un volcán', 'una duna', 'un acuífero'], 'Los ríos delimitan territorios (diapositiva 59).', 'rio', '59');
@@ -459,9 +456,7 @@ MQ('¿Cuántos usos de los ríos hay en la diapositiva 59?', 'siete', ['tres', '
 MQ('¿Cómo se forma un acuífero?', 'el agua de lluvia se filtra hasta una roca impermeable', ['el agua del mar sube por la tierra', 'el río se seca', 'la nieve se evapora'], 'Diapositiva 60.', 'sub', '60');
 MQ('¿Qué amenaza más a las aguas subterráneas?', 'la extracción excesiva y la contaminación', ['las mareas', 'las olas', 'el delta'], 'Diapositiva 60.', 'sub', '60');
 MQ('¿Qué hacen las aguas subterráneas por el suelo y los ríos?', 'protegen la humedad del suelo y alimentan ríos y lagos', ['destruyen el suelo', 'evaporan los ríos', 'forman los volcanes'], 'Diapositiva 60.', 'sub', '60');
-MQ('¿Qué acuífero se ve en la diapositiva 61?', 'el Acuífero Guaraní', ['el Acuífero Ibérico', 'el Acuífero del Nilo', 'el Acuífero Mediterráneo'], 'Está bajo Brasil, Paraguay, Argentina y Uruguay.', 'sub', '61');
-for (const [r, v] of VERT) { const w = ['Atlántica', 'Mediterránea', 'Cantábrica'].filter((x) => x !== v); MQ(`¿En qué vertiente está el río ${r}?`, v, w, `El ${r} es de la vertiente ${v} (mapa de la diapositiva 57).`, 'rio', '57'); }
-for (const [r, c] of RIV) { const w = rsample(['Europa', 'Asia', 'África', 'América del Sur', 'América del Norte', 'Oceanía'].filter((x) => x !== c), 3); MQ(`¿En qué continente está el río ${r}?`, c, w, `El ${r} está en ${c}. (Dato añadido: la diapositiva 64 solo da la lista de ríos.)`, 'rio', '64'); }
+MQ('¿Qué acuífero se ve en la diapositiva 61?', 'el Acuífero Guaraní', ['el Acuífero Ibérico', 'el Acuífero Andino', 'el Acuífero Mediterráneo'], 'Está bajo Brasil, Paraguay, Argentina y Uruguay.', 'sub', '61');
 const TQ = (s, v, why, t, sl) => TF.push([s, v, why, t, sl]);
 TQ('El 96,5% del agua de la Tierra es agua salada.', true, 'Diapositiva 44.', 'agu', '44');
 TQ('La mayor parte del agua dulce está en los ríos y lagos.', false, 'Está en las capas de hielo y glaciares. En ríos y lagos hay muy poco.', 'agu', '44');
@@ -475,8 +470,8 @@ TQ('Las desalinizadoras convierten el agua del mar en agua potable.', true, 'Dia
 TQ('El hielo de los glaciares es agua continental sólida.', true, 'Diapositiva 51.', 'rio', '51');
 TQ('El curso alto de un río tiene poca pendiente.', false, 'Tiene mucha pendiente, porque va entre montañas.', 'rio', '54');
 TQ('En el curso bajo hay más sedimentación.', true, 'Diapositiva 54.', 'rio', '54');
-TQ('El Miño pertenece a la vertiente mediterránea.', false, 'Es de la vertiente atlántica.', 'rio', '57');
-TQ('El Ebro desemboca en el mar Mediterráneo.', true, 'Mapa de la diapositiva 57.', 'rio', '57');
+TQ('Las tres vertientes de España son la Cantábrica, la Atlántica y la Mediterránea.', true, 'Mapa de la diapositiva 57.', 'rio', '57');
+TQ('Los ríos de la vertiente atlántica desembocan en el océano Atlántico.', true, 'Diapositiva 57.', 'rio', '57');
 TQ('Los ríos sirven para delimitar territorios.', true, 'Pueden ser fronteras naturales (diapositiva 59).', 'rio', '59');
 TQ('Los ríos son un buen lugar para tirar residuos.', false, 'La diapositiva 59 lo advierte.', 'rio', '59');
 TQ('Los acuíferos se forman sobre una roca impermeable.', true, 'El agua filtrada se detiene en la roca impermeable (diapositiva 60).', 'sub', '60');
