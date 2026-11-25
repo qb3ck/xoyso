@@ -331,15 +331,14 @@ READ.push(
   <p>El agua circula siempre entre los océanos, la atmósfera, los ríos, los lagos, las aguas subterráneas y los seres vivos. Cambia de estado (sólido, líquido y gaseoso) por la <b>evaporación, condensación, precipitación, transpiración, escorrentía, infiltración y sublimación</b> (las definiciones están en «El ciclo del agua» de más arriba). Toda el agua continental, subterránea y superficial viene de las precipitaciones.</p>
   <h3>¿Cuánta agua hay en la Tierra? (44)</h3>
   ${fig('aguatierra.jpg', 'Diapositiva 44.')}
-  <ul><li>El <b>70,8%</b> del planeta es agua.</li>
-  <li>Del agua del planeta: <b>96,5% es salada</b> (mares y océanos) y <b>2,5% es dulce</b>. ${ADD} <span class="note">(La diapositiva da esas cifras; el resto lo pone en el gráfico. Compruébalas.)</span></li>
+  <ul><li>Del agua del planeta: <b>96,5% es salada</b> (mares y océanos) y <b>2,5% es dulce</b>. ${ADD} <span class="note">(La diapositiva da esas cifras; el resto lo pone en el gráfico. Compruébalas.)</span></li>
   <li>Volumen de agua en mares y océanos: 1385 millones de km³. Agua dulce: solo 10,6 millones de km³, y de ella solo 93 113 km³ están en ríos y lagos.</li>
-  <li><b>Reparto del agua dulce:</b> 68,7% capas de hielo y glaciares · 30,1% agua subterránea · 1,2% agua dulce superficial y otros.</li></ul>
+  <li>La mayor parte del agua dulce está en las <b>capas de hielo y glaciares</b>; el resto es sobre todo agua subterránea, y en ríos y lagos hay muy poca.</li></ul>
   <h3>Aguas oceánicas (45)</h3>
   <ul><li><b>Océano:</b> gran masa de agua. <b>Mar:</b> prolongación de los océanos cerca del continente.</li>
   <li>El agua es <b>salada</b> por la disolución de rocas que traen los ríos.</li>
   <li><b>Salinidad:</b> cuanto más cerrado es el mar y más calor hace, más evaporación y <b>más salinidad</b>.</li>
-  <li>Agua de mar: 96,5% agua + 3,5% sal marina. Las sales: cloro 55% · sodio 30,6% · sulfato 7,7% · magnesio 3,7% · calcio 1,2% · potasio 1,1% · otros 0,7%.</li></ul>
+  <li>El agua de mar contiene agua y <b>sal marina</b>; la sal más abundante es el <b>cloro</b>, seguida del sodio.</li></ul>
   <p class="note">La diapositiva 45 dice «97%» en el texto y 96,5% en el gráfico: para el examen usa el gráfico (96,5%).</p>` },
 
 { id: 'oceanos', title: 'Océanos y mares: corrientes, mareas, olas y usos', pg: '46-50', body: `
@@ -424,12 +423,12 @@ READ.push(
 );
 READ.find((r) => r.id === 'ciclo').pg = '41';
 const MQ = (q, c, w, why, t, s) => MCQ.push([q, c, w, why, t, s]);
-MQ('Del agua del planeta, ¿qué porcentaje es agua salada?', '96,5%', ['2,5%', '70,8%', '30,1%'], 'El 96,5% es salada y el 2,5% dulce (diapositiva 44).', 'agu', '44');
-MQ('¿Dónde está la mayor parte del agua dulce?', 'en las capas de hielo y los glaciares', ['en los ríos y lagos', 'en el agua subterránea', 'en la atmósfera'], '68,7% hielo y glaciares; 30,1% agua subterránea; 1,2% superficial y otros.', 'agu', '44');
+MQ('Del agua del planeta, ¿qué porcentaje es agua salada?', '96,5%', ['2,5%', '50%', '10%'], 'El 96,5% es salada y el 2,5% dulce (diapositiva 44).', 'agu', '44');
+MQ('¿Dónde está la mayor parte del agua dulce?', 'en las capas de hielo y los glaciares', ['en los ríos y lagos', 'en el agua subterránea', 'en la atmósfera'], 'Casi toda está en el hielo y los glaciares; en ríos y lagos hay muy poca (diapositiva 44).', 'agu', '44');
 MQ('¿Qué es el mar, según las diapositivas?', 'una prolongación de los océanos cerca del continente', ['una masa de agua dulce', 'un río muy grande', 'un lago salado'], 'Diapositiva 45.', 'agu', '45');
 MQ('¿Por qué el agua del mar es salada?', 'por la disolución de rocas que traen los ríos', ['porque el Sol le echa sal', 'porque llueve poco', 'por las mareas'], 'Diapositiva 45.', 'agu', '45');
 MQ('¿Qué pasa con la salinidad cuando el mar es más cerrado y hace más calor?', 'aumenta, porque hay más evaporación', ['disminuye', 'no cambia', 'se convierte en agua dulce'], 'Más evaporación = más sal en el agua que queda (diapositiva 45).', 'agu', '45');
-MQ('¿Cuál es la sal más abundante en el agua del mar?', 'cloro', ['sodio', 'calcio', 'magnesio'], 'Cloro 55% y sodio 30,6% (diapositiva 45).', 'agu', '45');
+MQ('¿Cuál es la sal más abundante en el agua del mar?', 'cloro', ['sodio', 'calcio', 'magnesio'], 'El cloro es la sal más abundante, después el sodio (diapositiva 45).', 'agu', '45');
 MQ('¿Qué son las corrientes marinas?', 'grandes ríos que discurren bajo el agua del mar', ['olas muy altas', 'subidas del nivel del mar', 'ríos que desembocan en un delta'], 'Diapositiva 46.', 'oce', '46');
 MQ('¿Por qué las corrientes marinas no se mezclan con el agua de alrededor?', 'por diferencias de temperatura, salinidad y densidad', ['por el viento', 'por la Luna', 'por las olas'], 'Diapositiva 46.', 'oce', '46');
 MQ('¿Qué provoca las mareas?', 'la atracción de la Luna', ['el viento', 'los ríos', 'los volcanes'], 'Diapositiva 47.', 'oce', '47');
@@ -465,7 +464,7 @@ for (const [r, v] of VERT) { const w = ['Atlántica', 'Mediterránea', 'Cantábr
 for (const [r, c] of RIV) { const w = rsample(['Europa', 'Asia', 'África', 'América del Sur', 'América del Norte', 'Oceanía'].filter((x) => x !== c), 3); MQ(`¿En qué continente está el río ${r}?`, c, w, `El ${r} está en ${c}. (Dato añadido: la diapositiva 64 solo da la lista de ríos.)`, 'rio', '64'); }
 const TQ = (s, v, why, t, sl) => TF.push([s, v, why, t, sl]);
 TQ('El 96,5% del agua de la Tierra es agua salada.', true, 'Diapositiva 44.', 'agu', '44');
-TQ('La mayor parte del agua dulce está en los ríos y lagos.', false, 'Está en las capas de hielo y glaciares (68,7%). En ríos y lagos hay muy poco.', 'agu', '44');
+TQ('La mayor parte del agua dulce está en los ríos y lagos.', false, 'Está en las capas de hielo y glaciares. En ríos y lagos hay muy poco.', 'agu', '44');
 TQ('Cuanto más cerrado es un mar y más calor hace, más salinidad tiene.', true, 'Hay más evaporación y queda más sal.', 'agu', '45');
 TQ('Las corrientes marinas son siempre frías.', false, 'Pueden ser cálidas o frías.', 'oce', '46');
 TQ('Las mareas las provoca el viento.', false, 'Las provoca la atracción de la Luna. El viento provoca las olas.', 'oce', '47');
